@@ -1,2 +1,2 @@
 # MultipleUnitTrainControl
-Factorio mod written in Lua.  Replaces bidirectional trains with ones twice as powerful, to simulate real locomotives driving backwards.
+Factorio mod written in Lua.  Lets locomotives provide backwards force in automatic if they are in a bidirectional pair.
