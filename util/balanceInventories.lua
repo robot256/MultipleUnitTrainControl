@@ -9,6 +9,7 @@
 
 function balanceInventories(inventoryOne, inventoryTwo)
 	if not inventoryOne.valid or not inventoryTwo.valid then
+		print("Balancer ignoring invalid engines")
 		return
 	end
 	

@@ -146,6 +146,19 @@ local function ProcessTrain(t)
 							if isLocoBackward(t,d) then
 								-- It is backwards!  It's okay to leave it as an MU.
 								needToDowngrade = false
+								-- Make sure it's properly in the update table
+								if d.name == c.name then
+									local need_to_add = true
+									for i,locos in pairs(global.mu_pairs) do
+										if (locos[1] == c and locos[2] == d) or (locos[1] == d and locos[2] == c) then
+											need_to_add = false
+										end
+									end
+									if need_to_add then
+										table.insert(global.mu_pairs, {c,d})
+										print("Added pair to refresh list during scrub, train "..c.train.id)
+									end
+								end
 							end
 						end
 					end
@@ -159,6 +172,19 @@ local function ProcessTrain(t)
 							if isLocoForward(t,d) then
 								-- It is backwards!  It's okay to leave it as an MU.
 								needToDowngrade = false
+								-- Make sure it's properly in the update table
+								if d.name == c.name then
+									local need_to_add = true
+									for i,locos in pairs(global.mu_pairs) do
+										if (locos[1] == c and locos[2] == d) or (locos[1] == d and locos[2] == c) then
+											need_to_add = false
+										end
+									end
+									if need_to_add then
+										table.insert(global.mu_pairs, {c,d})
+										print("Added pair to refresh list during scrub, train "..c.train.id)
+									end
+								end
 							end
 						end
 					end
@@ -313,6 +339,7 @@ local function OnNthTick(event)
 		
 		-- Only pop one invalid pair per refresh cycle
 		if next(pairs_to_purge) then
+			print("Balancer purging nil engines")
 			table.remove(global.mu_pairs,pairs_to_purge[1])
 		end
 		
@@ -355,7 +382,17 @@ local function StartBalanceUpdates()
 end
 
 
-
+local function QueueAllTrains()
+	for _, surface in pairs(game.surfaces) do
+		local trains = surface.get_trains()
+		for _,train in pairs(trains) do
+			table.insert(global.trains_in_queue,train)
+		end
+	end
+	if not script.get_event_handler(defines.events.on_tick) then
+		script.on_event(defines.events.on_tick, OnTick)
+	end
+end
 
 ---- Bootstrap ----
 do
@@ -381,15 +418,7 @@ script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
 			script.on_event(defines.events.on_train_created, OnTrainCreated)
 			
 			-- Scrub existing trains and add MU locomotives when necessary
-			for _, surface in pairs(game.surfaces) do
-				local trains = surface.get_trains()
-				for _,train in pairs(trains) do
-					table.insert(global.trains_in_queue,train)
-				end
-			end
-			if not script.get_event_handler(defines.events.on_tick) then
-				script.on_event(defines.events.on_tick, OnTick)
-			end
+			QueueAllTrains()
 			
 			-- if there were saved pairs, start the fuel balancer
 			if global.mu_pairs and next(global.mu_pairs) then
@@ -400,15 +429,8 @@ script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
 			-- Mod is disabled
 			script.on_nth_tick(nil)  -- stop fuel updates
 			-- Revert the MU locomotives using the on_train_created and on_tick handlers
-			for _, surface in pairs(game.surfaces) do
-				local trains = surface.get_trains()
-				for _,train in pairs(trains) do
-					table.insert(global.trains_in_queue,train)
-				end
-			end
-			if not script.get_event_handler(defines.events.on_tick) then
-				script.on_event(defines.events.on_tick, OnTick)
-			end
+			QueueAllTrains()
+			
 			-- Clean globals
 			global.mu_pairs = {}
 			global.inventories_to_balance = {}
@@ -444,6 +466,8 @@ script.on_configuration_changed(function(data)
 	global.trains_in_queue = global.trains_in_queue or {}
 	global.mu_pairs = global.mu_pairs or {}
 	global.inventories_to_balance = global.inventories_to_balance or {}
+	-- On config change, scrub the list of trains
+	QueueAllTrains()
 	init_events()
 end)
 end
