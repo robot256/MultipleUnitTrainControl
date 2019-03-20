@@ -8,9 +8,9 @@ Description: Lets locomotives provide backwards force in automatic if they are i
 License: MIT
 Source: GitHub
 Download: mods.factorio.com
-Version: 0.1.0
-Release: 2019-03-17
-Tested-With-Factorio-Version: 0.17.14
+Version: 0.1.1
+Release: 2019-03-19
+Tested-With-Factorio-Version: 0.17.16
 Category: Helper, Train
 Tags: Train
 
@@ -28,7 +28,7 @@ Since the game still thinks only one locomotive is driving, but with twice the p
 
 [size=150]Features[/size]
 [list]
-[*]Upgrading and downgrading locomotives preserves color, name, fuel inventory, burner heat, and train schedule.
+[*]Upgrading and downgrading locomotives preserves color, name, health, fuel inventory, burner heat, and train schedule.
 [*]Correctly detects when the player uncouples locomotives of an MU consist.
 [*]Pressing 'Q' over an MU version will correctly select its normal version from your inventory.
 [*]Mod setting to turn off MU Control (reverts all MU locomotives to normal).
@@ -41,12 +41,12 @@ Since the game still thinks only one locomotive is driving, but with twice the p
 [*]Preserve contents of locomotive equipment grids on replacement.
 [*]Support additional modded locomotives, especially [url=https://mods.factorio.com/mod/Realistic_Electric_Trains]Realistic Electric Trains[/url].
 [*]Add MU Control as a research technology.
-[*]Possibly add support for linking pairs locomotives that are not directly coupled to each other. This would be another level of technology (Radio-Controlled Multiple Units).
+[*]Add support for linking pairs locomotives that are not directly coupled to each other. This would be another level of technology (Radio-Controlled Multiple Units).
 [/list]
 
 [size=150]Known Issues[/size]
 [list]
-[*]When first installing the mod, and sometimes when upgrading it, existing locomotive pairs might not be upgraded, or they might not be added to the fuel balancing queue.  Disabling and reenabling the MU Control mod setting will fix all of this.
+[*]When installing, enabling, or disabling the mod on an existing map, trains that are moving across an intersection during the upgrade will be disconnected and may be damaged/destroyed by the rest of their train.
 [*]The MU version of each locomotive type is not craftable and should never end up in your inventory, but sometimes it does. It will revert as soon as you place it on a track.
 [*]Making a blueprint of an MU version will keep the MU version in the blueprint, and you'll never be able to build that part of the blueprint. You could disable MU Control temporarily (reverts all MU locomotives immediately), make the blueprint, then re-enable MU Control.
 [*]When a locomotive is replaced, the train is changed to manual mode.  Since you cannot automatically couple two locomotives without them running into each other, creation of an MU consist is expected to be a manual process, but after upgrading a save file you will have to set trains back to automatic.
