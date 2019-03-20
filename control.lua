@@ -31,16 +31,23 @@ local current_nth_tick = settings_nth_tick
 
 -----------------------------
 -- Set up the mapping between normal and MU locomotives
-local upgrade_pairs =  {["locomotive"]="locomotive-mu",
-						["heavy-locomotive"]="heavy-locomotive-mu", 
-						["express-locomotive"]="express-locomotive-mu",
-						["nuclear-locomotive"]="nuclear-locomotive-mu"}
-local downgrade_pairs = {["locomotive-mu"]="locomotive",
-						["heavy-locomotive-mu"]="heavy-locomotive", 
-						["express-locomotive-mu"]="express-locomotive",
-						["nuclear-locomotive-mu"]="nuclear-locomotive"}
-						
+-- Extract from the game prototypes list what MU locomotives are enabled
+local function InitEntityMaps()
 
+	global.upgrade_pairs = {}
+	global.downgrade_pairs = {}
+
+	for _,loco in pairs(game.entity_prototypes) do
+		if loco.type == "locomotive" then
+			local a = loco.name
+			if string.sub(a,-3,-1) == "-mu" then
+				local b = string.sub(a,1,-4)
+				global.upgrade_pairs[b] = a
+				global.downgrade_pairs[a] = b
+			end
+		end
+	end
+end
 ------------------------- FUEL BALANCING CODE --------------------------------------
 
 
@@ -84,7 +91,7 @@ local function ProcessTrain(t)
 	for i,c in ipairs(t.carriages) do
 		-- Make sure this isn't one we just placed during a replacement
 		if c.type == "locomotive" then
-			if upgrade_pairs[c.name] and enoughLocos then
+			if global.upgrade_pairs[c.name] and enoughLocos then
 				-- This is a locomotive that can be upgraded
 				
 				-- Check to see if the adjacent carriage are a complementary locomotive.
@@ -92,13 +99,13 @@ local function ProcessTrain(t)
 					-- c is forwards, search later in the train
 					if i < numCars then   -- 1 indexed arrays FTW
 						d = t.carriages[i+1]
-						if d.type == "locomotive" and (d.name == c.name or d.name == upgrade_pairs[c.name]) then
+						if d.type == "locomotive" and (d.name == c.name or d.name == global.upgrade_pairs[c.name]) then
 							-- It is either the base or the upgraded version of this loco
 							-- Check if it is in the complementary direction
 							if isLocoBackward(t,d) then
 								-- It is backwards!  We make an MU!
 								--game.print("Making MU with carriages ".. i .." and ".. i+1)
-								local nc = replaceLocomotive(c,upgrade_pairs[c.name])
+								local nc = replaceLocomotive(c,global.upgrade_pairs[c.name])
 								if d.name == nc.name then
 									-- Done upgrading this pair, add to fuel balance list
 									--game.print("Adding pair of ".. nc.name .." in train " .. nc.train.id)
@@ -113,13 +120,13 @@ local function ProcessTrain(t)
 					-- c is backwards, search earlier in the train
 					if i > 1 then
 						d = t.carriages[i-1]
-						if d.type == "locomotive" and (d.name == c.name or d.name == upgrade_pairs[c.name]) then
+						if d.type == "locomotive" and (d.name == c.name or d.name == global.upgrade_pairs[c.name]) then
 							-- It is either the base or the upgraded version of this loco
 							-- Check if it is in the complementary direction
 							if isLocoForward(t,d) then
 								-- It is backwards!  We make an MU!
 								--game.print("Making MU with carriages ".. i .." and ".. i+1)
-								local nc = replaceLocomotive(c,upgrade_pairs[c.name])
+								local nc = replaceLocomotive(c,global.upgrade_pairs[c.name])
 								if d.name == nc.name then
 									-- Done upgrading this pair, add to fuel balance list
 									--game.print("Adding pair of ".. nc.name .." in train " .. nc.train.id)
@@ -132,7 +139,7 @@ local function ProcessTrain(t)
 					end
 				end
 			
-			elseif downgrade_pairs[c.name] then
+			elseif global.downgrade_pairs[c.name] then
 				-- This is a locomotive that can be downgraded
 				-- Check to see if the next carriage is NOT a complementary locomotive.
 				local needToDowngrade = true
@@ -140,7 +147,7 @@ local function ProcessTrain(t)
 					-- c is forwards, search later in the train
 					if i < numCars then   -- 1 indexed arrays FTW
 						d = t.carriages[i+1]
-						if d.type == "locomotive" and (d.name == c.name or d.name == downgrade_pairs[c.name]) then
+						if d.type == "locomotive" and (d.name == c.name or d.name == global.downgrade_pairs[c.name]) then
 							-- It is either the base or the upgraded version of this loco
 							-- Check if it is in the complementary direction
 							if isLocoBackward(t,d) then
@@ -166,7 +173,7 @@ local function ProcessTrain(t)
 					-- c is backwards, search earlier in the train
 					if i > 1 then
 						d = t.carriages[i-1]
-						if d.type == "locomotive" and (d.name == c.name or d.name == downgrade_pairs[c.name]) then
+						if d.type == "locomotive" and (d.name == c.name or d.name == global.downgrade_pairs[c.name]) then
 							-- It is either the base or the upgraded version of this loco
 							-- Check if it is in the complementary direction
 							if isLocoForward(t,d) then
@@ -200,7 +207,7 @@ local function ProcessTrain(t)
 							break
 						end
 					end
-					replaceLocomotive(c,downgrade_pairs[c.name])
+					replaceLocomotive(c,global.downgrade_pairs[c.name])
 					break
 				end
 			end
@@ -224,10 +231,10 @@ local function RevertTrain(t)
 		-- Serialize the position of this locomotive
 		-- Make sure this isn't one we just placed during a replacement
 		if c.type == "locomotive" then
-			if downgrade_pairs[c.name] then
+			if global.downgrade_pairs[c.name] then
 				-- This is a locomotive that can be downgraded
 				game.print("Removing MU locomotive ".. i)
-				replaceLocomotive(c,downgrade_pairs[c.name])
+				replaceLocomotive(c,global.downgrade_pairs[c.name])
 				break
 			end
 		end
@@ -458,6 +465,7 @@ script.on_init(function()
 	global.trains_in_queue = global.trains_in_queue or {}
 	global.mu_pairs = global.mu_pairs or {}
 	global.inventories_to_balance = global.inventories_to_balance or {}
+	InitEntityMaps()
 	init_events()
 end)
 
@@ -466,6 +474,7 @@ script.on_configuration_changed(function(data)
 	global.trains_in_queue = global.trains_in_queue or {}
 	global.mu_pairs = global.mu_pairs or {}
 	global.inventories_to_balance = global.inventories_to_balance or {}
+	InitEntityMaps()
 	-- On config change, scrub the list of trains
 	QueueAllTrains()
 	init_events()
