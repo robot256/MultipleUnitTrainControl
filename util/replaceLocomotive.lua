@@ -19,6 +19,8 @@ function replaceLocomotive(loco, newName)
 		local orientation = loco.orientation
 		local backer_name = loco.backer_name
 		local color = loco.color
+		local health = loco.health
+		
 		
 		-- Save the burner progress
 		local burner_heat = loco.burner.heat
@@ -40,6 +42,10 @@ function replaceLocomotive(loco, newName)
 			newDirection = 2
 		end
 		
+		-- Save the train schedule.  If we are replacing a lone MU with a regular loco, the train schedule will be lost when we delete it.
+		local train_schedule = loco.train.schedule
+		--local train_manual_mode = loco.train.manual_mode
+		
 		-- Save its coupling state.  By default, created locos couple to everything nearby, which we have to undo
 		--   if we're replacing after intentional uncoupling.
 		local disconnected_back = loco.disconnect_rolling_stock(defines.rail_direction.back)
@@ -59,9 +65,11 @@ function replaceLocomotive(loco, newName)
 			newLoco.disconnect_rolling_stock(defines.rail_direction.front)
 		end
 		
+		
 		-- Restore parameters
 		newLoco.backer_name = backer_name
 		if color then newLoco.color = color end  -- color is nil if you never changed it!
+		newLoco.health = health
 		
 		-- Restore the partially-used burner fuel
 		newLoco.burner.currently_burning = burner_currently_burning
@@ -79,6 +87,12 @@ function replaceLocomotive(loco, newName)
 				newLoco.burner.burnt_result_inventory.insert({name=k, count=v})
 			end
 		end
+		
+		-- Restore the train schedule and mode
+		newLoco.train.schedule = train_schedule
+		--newLoco.train.manual_mode = train_manual_mode
+		
+		
 		
 		--game.print("Finished replacing. Used direction "..newDirection..", new orientation: " .. newLoco.orientation)
 		return newLoco
