@@ -28,6 +28,9 @@ local settings_enabled = settings.global["multiple-unit-train-control-enabled"].
 local settings_nth_tick = settings.global["multiple-unit-train-control-on_nth_tick"].value
 local current_nth_tick = settings_nth_tick
 
+local settings_wireless_enabled = true
+local settings_technology_enabled = false
+
 
 -----------------------------
 -- Set up the mapping between normal and MU locomotives
@@ -59,7 +62,8 @@ local function ProcessInventoryQueue()
 		--game.print("Taking from inventory queue, " .. #global.inventories_to_balance .. " remaining")
 		local inventories = table.remove(global.inventories_to_balance, 1)
 		balanceInventories(inventories[1], inventories[2])
-		idle = false
+		
+		idle = false  -- Tell OnTick that we did something useful
 	end
 
 	return idle
@@ -68,180 +72,37 @@ end
 
 ------------------------- LOCOMOTIVE REPLACEMENT CODE -------------------------------
 
-------------------------
--- Takes a train and looks for locomotives to replace.
--- Expected to be run in a blocking manner (only one train processed at a time).
-------------------------
-local function ProcessTrain(t)
+
+-- Process replacement orders from the queue
+--   Need to preserve mu_pairs across replacement
+local function ProcessReplacementQueue()
+	local idle = true
 	
-	local id = t.id
-	local f = t.locomotives["front_movers"]
-	local b = t.locomotives["back_movers"]
-	local enoughLocos = (#f>0) and (#b>=0)
-	
-	--game.print("Processing train ".. id .." with ".. #f .." front-movers, ".. #b .." back-movers")
-	
-	-- Check for locos to upgrade or downgrade
-	--   For each carriage, check if it is a locomotive.
-	--     Check if it is in the upgrade keys, or the downgrade keys
-	--     Then check if there is a locomotive in the next slot
-	local numCars = #t.carriages
-	local d
-	local pairCreated = false
-	for i,c in ipairs(t.carriages) do
-		-- Make sure this isn't one we just placed during a replacement
-		if c.type == "locomotive" then
-			if global.upgrade_pairs[c.name] and enoughLocos then
-				-- This is a locomotive that can be upgraded
+	if global.replacement_queue then
+		while next(global.replacement_queue) do
+			local r = table.remove(global.replacement_queue, 1)
+			if r[1] and r[1].valid then
+				-- Replace the locomotive
+				local newLoco = replaceLocomotive(r[1], r[2])
+				-- Find which mu_pair the old one was in and put the new one instead
+				for _,p in pairs(globals.mu_pairs) do
+					if p[1] == r[1] then
+						p[1] = newLoco
+						break
+					elseif p[2] == r[1] then
+						p[2] = newLoco
+						break
+					end
+				end
 				
-				-- Check to see if the adjacent carriage are a complementary locomotive.
-				if isLocoForward(t,c) then
-					-- c is forwards, search later in the train
-					if i < numCars then   -- 1 indexed arrays FTW
-						d = t.carriages[i+1]
-						if d.type == "locomotive" and (d.name == c.name or d.name == global.upgrade_pairs[c.name]) then
-							-- It is either the base or the upgraded version of this loco
-							-- Check if it is in the complementary direction
-							if isLocoBackward(t,d) then
-								-- It is backwards!  We make an MU!
-								--game.print("Making MU with carriages ".. i .." and ".. i+1)
-								local nc = replaceLocomotive(c,global.upgrade_pairs[c.name])
-								if d.name == nc.name then
-									-- Done upgrading this pair, add to fuel balance list
-									--game.print("Adding pair of ".. nc.name .." in train " .. nc.train.id)
-									table.insert(global.mu_pairs,{d,nc})
-									pairCreated = true
-								end
-								break
-							end
-						end
-					end
-				else
-					-- c is backwards, search earlier in the train
-					if i > 1 then
-						d = t.carriages[i-1]
-						if d.type == "locomotive" and (d.name == c.name or d.name == global.upgrade_pairs[c.name]) then
-							-- It is either the base or the upgraded version of this loco
-							-- Check if it is in the complementary direction
-							if isLocoForward(t,d) then
-								-- It is backwards!  We make an MU!
-								--game.print("Making MU with carriages ".. i .." and ".. i+1)
-								local nc = replaceLocomotive(c,global.upgrade_pairs[c.name])
-								if d.name == nc.name then
-									-- Done upgrading this pair, add to fuel balance list
-									--game.print("Adding pair of ".. nc.name .." in train " .. nc.train.id)
-									table.insert(global.mu_pairs,{d,nc})
-									pairCreated = true
-								end
-								break
-							end
-						end
-					end
-				end
-			
-			elseif global.downgrade_pairs[c.name] then
-				-- This is a locomotive that can be downgraded
-				-- Check to see if the next carriage is NOT a complementary locomotive.
-				local needToDowngrade = true
-				if isLocoForward(t,c) then
-					-- c is forwards, search later in the train
-					if i < numCars then   -- 1 indexed arrays FTW
-						d = t.carriages[i+1]
-						if d.type == "locomotive" and (d.name == c.name or d.name == global.downgrade_pairs[c.name]) then
-							-- It is either the base or the upgraded version of this loco
-							-- Check if it is in the complementary direction
-							if isLocoBackward(t,d) then
-								-- It is backwards!  It's okay to leave it as an MU.
-								needToDowngrade = false
-								-- Make sure it's properly in the update table
-								if d.name == c.name then
-									local need_to_add = true
-									for i,locos in pairs(global.mu_pairs) do
-										if (locos[1] == c and locos[2] == d) or (locos[1] == d and locos[2] == c) then
-											need_to_add = false
-										end
-									end
-									if need_to_add then
-										table.insert(global.mu_pairs, {c,d})
-										print("Added pair to refresh list during scrub, train "..c.train.id)
-									end
-								end
-							end
-						end
-					end
-				else
-					-- c is backwards, search earlier in the train
-					if i > 1 then
-						d = t.carriages[i-1]
-						if d.type == "locomotive" and (d.name == c.name or d.name == global.downgrade_pairs[c.name]) then
-							-- It is either the base or the upgraded version of this loco
-							-- Check if it is in the complementary direction
-							if isLocoForward(t,d) then
-								-- It is backwards!  It's okay to leave it as an MU.
-								needToDowngrade = false
-								-- Make sure it's properly in the update table
-								if d.name == c.name then
-									local need_to_add = true
-									for i,locos in pairs(global.mu_pairs) do
-										if (locos[1] == c and locos[2] == d) or (locos[1] == d and locos[2] == c) then
-											need_to_add = false
-										end
-									end
-									if need_to_add then
-										table.insert(global.mu_pairs, {c,d})
-										print("Added pair to refresh list during scrub, train "..c.train.id)
-									end
-								end
-							end
-						end
-					end
-				end
-				-- If we didn't find a matching MU pair, then we need to downgrade this locomotive
-				if needToDowngrade==true then
-					--game.print("Removing MU locomotive ".. i)
-					-- Remove this pair from fuel balancing list
-					for k,q in pairs(global.mu_pairs) do
-						if (q[1] and q[1] == c) or (q[2] and q[2] == c) then
-							--game.print("Removing pair of ".. c.name .." in train " .. c.train.id)
-							table.remove(global.mu_pairs,k)
-							break
-						end
-					end
-					replaceLocomotive(c,global.downgrade_pairs[c.name])
-					break
-				end
-			end
-		end
-	end
-	--game.print("Done processing train ".. id)
-	return pairCreated
-end
-
-
--- Takes a train and reverts all MU locomotives to normal ones
-local function RevertTrain(t)
-
-	local id = t.id
-	
-	-- Check for locos to upgrade or downgrade
-	--   For each carriage, check if it is a locomotive.
-	--     Check if it is in the upgrade keys, or the downgrade keys
-	--     Then check if there is a locomotive in the next slot
-	for i,c in ipairs(t.carriages) do
-		-- Serialize the position of this locomotive
-		-- Make sure this isn't one we just placed during a replacement
-		if c.type == "locomotive" then
-			if global.downgrade_pairs[c.name] then
-				-- This is a locomotive that can be downgraded
-				game.print("Removing MU locomotive ".. i)
-				replaceLocomotive(c,global.downgrade_pairs[c.name])
+				idle = false  -- Tell OnTick that we did something useful
 				break
 			end
 		end
 	end
-	game.print("Done reverting train ".. id)
+	
+	return idle
 end
-
 
 
 -- Process up to one valid train from the queue per tick
@@ -250,28 +111,25 @@ end
 local function ProcessTrainQueue()
 	local idle = true
 
-	if global.trains_in_queue and next(global.trains_in_queue) then
+	if global.trains_in_queue then
 		--game.print("ProcessTrainQueue has a train in the queue")
 		while next(global.trains_in_queue) do
 			local t = table.remove(global.trains_in_queue,1)
 			if t and t.valid then
 				if settings_enabled==true then
-					ProcessTrain(t)
-					idle = false
+					if settings_wireless_enabled==true then
+						processTrainWireless(t)
+					else
+						processTrainBasic(t)
+					end
 				else
 					-- Mod disabled, go through the process of reverting every engine
-					RevertTrain(t)
-					idle = false
-					break
+					processTrainPurge(t)
 				end
+				
+				idle = false  -- Make sure OnTick stays enabled to process our queued replacements
+				break
 			end
-		end
-	else
-		-- No trains in queue, stop checking
-		
-		-- Disabled and done reverting trains, don't new ones to queue anymore
-		if not settings_enabled then
-			script.on_event(defines.events.on_train_created, nil)
 		end
 	end
 	
@@ -282,46 +140,62 @@ end
 ----------------------------------------------
 ------ EVENT HANDLING ---
 
-
+--== ONTICK EVENT ==--
+-- Process items queued up by other actions
+-- Only one action allowed per tick
 local function OnTick(event)
-	-- process any new trains and inventory balancing
-	local idle = ProcessTrainQueue()
+	local idle = true
 	
-	-- if we didn't spend time on a train this tick, check for inventory updates
+	-- Replacing Locomotives has first priority
+	idle = ProcessReplacementQueue()
+	
+	-- Processing new Trains has second priority
+	if idle then
+		idle = ProcessTrainQueue()
+	end
+	
+	-- Balancing inventories has third priority
 	if idle then
 		idle = ProcessInventoryQueue()
 	end
 	
 	if idle then
-		-- Both queues are empty, turn off tick updates
+		-- All three queues are empty, unsubscribe from OnTick to save UPS
 		--game.print("Turning off OnTick")
 		script.on_event(defines.events.on_tick, nil)
 	end
 		
 end
 
+--== ON_TRAIN_CREATED EVENT ==--
+-- Record every new train in global queue, so we can process them one at a time.
+--   Many of these events will be triggered by our own replacements, and those
+--   "intermediate" trains will be invalid by the time we pull them from the queue.
+--   This is the desired behavior. 
 local function OnTrainCreated(event)
--- Event contains train, old_train_id_1, old_train_id_2
+	-- Event contains train, old_train_id_1, old_train_id_2
+	
+	-- These are a hack to make sure our global variables get created.
 	if not global.trains_in_queue then
-		--game.print("assigning empty table to trains_in_queue...")
 		global.trains_in_queue = {}
 	end
-	
 	if not global.mu_pairs then
-		--game.print("assigning empty table to mu_pairs...")
 		global.mu_pairs = {}
+	end
+	if not global.replacement_queue then
+		global.replacement_queue = {}
 	end
 	
 	-- Add this train to the train processing queue
-	-- on_train_created only executes once for every train object, no duplicate checking required.
 	table.insert(global.trains_in_queue,event.train)
 	
 	-- Set up the on_tick action to process trains
 	script.on_event(defines.events.on_tick, OnTick)
 	
 end
-		
--- Initiates balancing of every MU consist
+
+--== ON_NTH_TICK EVENT ==--
+-- Initiates balancing of fuel inventories in every MU consist
 local function OnNthTick(event)
 	if not global.inventories_to_balance then
 		global.inventories_to_balance = {}
@@ -388,7 +262,7 @@ local function StartBalanceUpdates()
 	end
 end
 
-
+-- Queues all existing trains for updating with new settings
 local function QueueAllTrains()
 	for _, surface in pairs(game.surfaces) do
 		local trains = surface.get_trains()
@@ -396,10 +270,9 @@ local function QueueAllTrains()
 			table.insert(global.trains_in_queue,train)
 		end
 	end
-	if not script.get_event_handler(defines.events.on_tick) then
-		script.on_event(defines.events.on_tick, OnTick)
-	end
+	script.on_event(defines.events.on_tick, OnTick)
 end
+
 
 ---- Bootstrap ----
 do
@@ -407,11 +280,12 @@ local function init_events()
 	if settings_enabled then
 		script.on_event(defines.events.on_train_created, OnTrainCreated)
 		current_nth_tick = settings_nth_tick
-		script.on_nth_tick(settings_nth_tick, OnNthTick)
+		if current_nth_tick > 0 then
+			script.on_nth_tick(settings_nth_tick, OnNthTick)
+		end
 	else
 		script.on_event(defines.events.on_train_created, nil)
 		script.on_nth_tick(nil)
-		
 	end
 	
 end
