@@ -47,18 +47,18 @@ function processTrainBasic(t)
 	
 	
 	
-	n = #loco_units
-	ps = "Basic Processing Train " .. t.id ..":"
-	if n > 0 then
-		for i=1,n do
-			ps = ps .. " Unit " .. i .. "=["
-			for _,loco in pairs(loco_units[i]) do
-				ps = ps .. loco.backer_name .. ", "
-			end
-			ps = ps .. "]"
-		end
-	end
-	game.print(ps)
+	-- n = #loco_units
+	-- ps = "Basic Processing Train " .. t.id ..":"
+	-- if n > 0 then
+		-- for i=1,n do
+			-- ps = ps .. " Unit " .. i .. "=["
+			-- for _,loco in pairs(loco_units[i]) do
+				-- ps = ps .. loco.backer_name .. ", "
+			-- end
+			-- ps = ps .. "]"
+		-- end
+	-- end
+	-- game.print(ps)
 	
 	
 	
@@ -108,7 +108,7 @@ function processTrainBasic(t)
 								end
 								if loco2_free then
 									-- Found an MU twin, they are already a pair
-									game.print("Adding pair [" .. loco1.backer_name .. ", " .. loco2.backer_name .. "]")
+									--game.print("Adding pair [" .. loco1.backer_name .. ", " .. loco2.backer_name .. "]")
 									table.insert(found_pairs,{loco1,loco2})
 									loco1_done = true
 									break
@@ -138,7 +138,7 @@ function processTrainBasic(t)
 									end
 									if loco2_free then
 										-- Found a normal twin, upgrade loco2
-										game.print("Adding pair [" .. loco1.backer_name .. ", " .. loco2.backer_name .. "]")
+										--game.print("Adding pair [" .. loco1.backer_name .. ", " .. loco2.backer_name .. "]")
 										table.insert(found_pairs,{loco1,loco2})
 										table.insert(upgrade_locos,{loco2,mu_name})
 										loco1_done = true
@@ -150,7 +150,7 @@ function processTrainBasic(t)
 						
 						if not loco1_done then
 							-- Didn't find a twin to upgrade, have to downgrade this one :(
-							game.print("Downgrading unpaired front mover " .. loco1.backer_name )
+							--game.print("Downgrading unpaired front mover " .. loco1.backer_name )
 							table.insert(upgrade_locos,{loco1,std_name})
 						end
 					end
@@ -180,7 +180,7 @@ function processTrainBasic(t)
 								end
 								if loco2_free then
 									-- Found an MU twin, upgrade loco1
-									game.print("Adding pair [" .. loco1.backer_name .. ", " .. loco2.backer_name .. "]")
+									--game.print("Adding pair [" .. loco1.backer_name .. ", " .. loco2.backer_name .. "]")
 									table.insert(found_pairs,{loco1,loco2})
 									table.insert(upgrade_locos,{loco1,mu_name})
 									loco1_done = true
@@ -212,7 +212,7 @@ function processTrainBasic(t)
 									end
 									if loco2_free then
 										-- Found a normal twin, upgrade loco1 and loco2
-										game.print("Adding pair [" .. loco1.backer_name .. ", " .. loco2.backer_name .. "]")
+										--game.print("Adding pair [" .. loco1.backer_name .. ", " .. loco2.backer_name .. "]")
 										table.insert(found_pairs,{loco1,loco2})
 										table.insert(upgrade_locos,{loco1,mu_name})
 										table.insert(upgrade_locos,{loco2,mu_name})
@@ -246,7 +246,7 @@ function processTrainBasic(t)
 			end
 			if loco2_free then
 				-- Found an unpaired MU, downgrade it
-				game.print("Found back straggler " .. loco2.backer_name)
+				--game.print("Found back straggler " .. loco2.backer_name)
 				table.insert(upgrade_locos,{loco2, global.downgrade_pairs[loco2.name]})
 				loco1_done = true
 				break

@@ -9,8 +9,7 @@
 
 function replaceLocomotive(loco, newName)
 
-	game.print("Replacing ".. loco.name .. " '"..loco.backer_name.."' with " .. newName)
-
+	
 	-- Save basic parameters
 	local position = loco.position
 	local force = loco.force

@@ -31,9 +31,6 @@ local settings_mode = settings.global["multiple-unit-train-control-mode"].value
 local settings_nth_tick = settings.global["multiple-unit-train-control-on_nth_tick"].value
 local current_nth_tick = settings_nth_tick
 
-local settings_wireless_enabled = true
-local settings_technology_enabled = false
-
 
 -----------------------------
 -- Set up the mapping between normal and MU locomotives
@@ -42,15 +39,16 @@ local function InitEntityMaps()
 
 	global.upgrade_pairs = {}
 	global.downgrade_pairs = {}
-
-	for _,loco in pairs(game.entity_prototypes) do
-		if loco.type == "locomotive" then
-			local a = loco.name
-			if string.sub(a,-3,-1) == "-mu" then
-				local b = string.sub(a,1,-4)
-				global.upgrade_pairs[b] = a
-				global.downgrade_pairs[a] = b
-			end
+	
+	-- Retrieve entity names from dummy technology, store in global variable
+	for _,effect in pairs(game.technology_prototypes["multiple-unit-train-control-locomotives"].effects) do
+		if effect.type == "unlock-recipe" then
+			local recipe = game.recipe_prototypes[effect.recipe]
+			local std = recipe.products[1].name
+			local mu = recipe.ingredients[1].name
+			game.print("MU Control registered upgrade mapping " .. std .. " to " .. mu)
+			global.upgrade_pairs[std] = mu
+			global.downgrade_pairs[mu] = std
 		end
 	end
 end
@@ -86,6 +84,7 @@ local function ProcessReplacementQueue()
 			local r = table.remove(global.replacement_queue, 1)
 			if r[1] and r[1].valid then
 				-- Replace the locomotive
+				game.print("Replacing ".. r[1].name .. " '"..r[1].backer_name.."' with " .. r[2])
 				local newLoco = replaceLocomotive(r[1], r[2])
 				-- Find which mu_pair the old one was in and put the new one instead
 				for _,p in pairs(global.mu_pairs) do
@@ -276,7 +275,7 @@ local function OnNthTick(event)
 				newVal = math.max(minTicks*2,settings_nth_tick)
 			end
 			if newVal ~= current_nth_tick then
-				game.print("Changing Nth Tick duration to " .. newVal)
+				game.print("Changing MU Control Nth Tick duration to " .. newVal)
 				current_nth_tick = newVal
 				script.on_nth_tick(nil)
 				script.on_nth_tick(current_nth_tick, OnNthTick)
@@ -290,13 +289,13 @@ end
 -- Enables the on_nth_tick event according to the mod setting value
 local function StartBalanceUpdates()
 	if settings_nth_tick > 0 then
-		game.print("Enabling Nth Tick with setting " .. settings_nth_tick)
+		--game.print("Enabling Nth Tick with setting " .. settings_nth_tick)
 		script.on_nth_tick(nil)
 		current_nth_tick = settings_nth_tick
 		script.on_nth_tick(settings_nth_tick, OnNthTick)
 	else
 		-- Value of zero disables fuel balancing
-		game.print("Disabling Nth Tick due to setting")
+		--game.print("Disabling Nth Tick due to setting")
 		script.on_nth_tick(nil)
 		global.inventories_to_balance = {}
 	end
@@ -335,7 +334,7 @@ local function init_events()
 end
 
 script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
-	game.print("in mod_settings_changed!")
+	--game.print("in mod_settings_changed!")
 	if event.setting == "multiple-unit-train-control-mode" then
 		settings_mode = settings.global["multiple-unit-train-control-mode"].value
 		if settings_mode ~= "disabled" then
@@ -382,7 +381,7 @@ script.on_load(function()
 end)
 
 script.on_init(function()
-	game.print("In on_init!")
+	--game.print("In on_init!")
 	global.trains_in_queue = global.trains_in_queue or {}
 	global.mu_pairs = global.mu_pairs or {}
 	global.inventories_to_balance = global.inventories_to_balance or {}
@@ -391,7 +390,7 @@ script.on_init(function()
 end)
 
 script.on_configuration_changed(function(data)
-	game.print("In on_configuration_changed!")
+	--game.print("In on_configuration_changed!")
 	global.trains_in_queue = global.trains_in_queue or {}
 	global.mu_pairs = global.mu_pairs or {}
 	global.inventories_to_balance = global.inventories_to_balance or {}

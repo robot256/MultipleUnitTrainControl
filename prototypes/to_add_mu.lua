@@ -9,34 +9,37 @@ if mods["TrainOverhaul"] then
 
 	-- Generate an MU version of the Heavy, Express, and Nuclear Locomotives
 	
-	local heavy_loco = copyPrototype("item-with-entity-data", "heavy-locomotive", "heavy-locomotive-mu")
-	heavy_loco.order = "a[train-system]-fc[locomotive]"
-	heavy_loco.localised_name = {'template.mu-name',{'entity-name.heavy-locomotive'}}
-	heavy_loco.localised_description = {'template.mu-item-description',{'entity-name.heavy-locomotive'}}
+	-- Create New Items
+	local heavyMuItem = createMuLocoItemPrototype("item-with-entity-data", "heavy-locomotive", "heavy-locomotive-mu")
+	local expressMuItem = createMuLocoItemPrototype("item-with-entity-data", "express-locomotive", "express-locomotive-mu")
+	local nuclearMuItem = createMuLocoItemPrototype("item-with-entity-data", "nuclear-locomotive", "nuclear-locomotive-mu")
 	
-	local express_loco = copyPrototype("item-with-entity-data", "express-locomotive", "express-locomotive-mu")
-	express_loco.order = "a[train-system]-fc[locomotive]"
-	express_loco.localised_name = {'template.mu-name',{'entity-name.express-locomotive'}}
-	express_loco.localised_description = {'template.mu-item-description',{'entity-name.express-locomotive'}}
+	data:extend({heavyMuItem,
+				 expressMuItem,
+				 nuclearMuItem})
+
+	-- Create New Entities
+	local heavyMuEntity = createMuLocoEntityPrototype("heavy-locomotive", "heavy-locomotive-mu")
+	local expressMuEntity = createMuLocoEntityPrototype("express-locomotive", "express-locomotive-mu")
+	local nuclearMuEntity = createMuLocoEntityPrototype("nuclear-locomotive", "nuclear-locomotive-mu")
 	
-	local nuclear_loco = copyPrototype("item-with-entity-data", "nuclear-locomotive", "nuclear-locomotive-mu")
-	nuclear_loco.order = "a[train-system]-fc[locomotive]"
-	nuclear_loco.localised_name = {'template.mu-name',{'entity-name.nuclear-locomotive'}}
-	nuclear_loco.localised_description = {'template.mu-item-description',{'entity-name.nuclear-locomotive'}}
+	data:extend({heavyMuEntity,
+				 expressMuEntity,
+				 nuclearMuEntity})
 	
+	-- Create Dummy Recipes
+	local heavyLocoRecipe = createMuLocoRecipePrototype("heavy-locomotive", "heavy-locomotive-mu")
+	local expressMuRecipe = createMuLocoRecipePrototype("express-locomotive", "express-locomotive-mu")
+	local nuclearMuRecipe = createMuLocoRecipePrototype("nuclear-locomotive", "nuclear-locomotive-mu")
+	data:extend({heavyLocoRecipe,
+				 expressMuRecipe,
+				 nuclearMuRecipe})
 
-
-	data:extend({heavy_loco,
-				express_loco,
-				nuclear_loco})
-
-	
-	local heavyMu = createMuLocoPrototype("heavy-locomotive")
-	local expressMu = createMuLocoPrototype("express-locomotive")
-	local nuclearMu = createMuLocoPrototype("nuclear-locomotive")
-
-	-- Add all the MU versions to the data table
-	data:extend({heavyMu,
-				expressMu,
-				nuclearMu})
+	-- Add the MU versions to the dummy technology list
+	local newTechnology = data.raw.technology["multiple-unit-train-control-locomotives"]
+	table.insert(newTechnology.effects, {type = "unlock-recipe", recipe = "heavy-locomotive-mu"})
+	table.insert(newTechnology.effects, {type = "unlock-recipe", recipe = "express-locomotive-mu"})
+	table.insert(newTechnology.effects, {type = "unlock-recipe", recipe = "nuclear-locomotive-mu"})
+	data.raw.technology["multiple-unit-train-control-locomotives"] = newTechnology
+    
 end

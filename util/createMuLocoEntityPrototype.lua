@@ -6,7 +6,7 @@
 --]]
 
 
-function createMuLocoPrototype(name)
+function createMuLocoEntityPrototype(name, newName)
 	-- Check that source exists
 	if not data.raw["locomotive"][name] then
 		error("locomotive " .. name .. " doesn't exist")
@@ -17,7 +17,7 @@ function createMuLocoPrototype(name)
 	local loco = table.deepcopy(oldLoco)
 	
 	-- Change name of prototype
-	loco.name = loco.name .. "-mu"
+	loco.name = newName
 	-- Make this entity non-placeable (you're not allowed to have -mu items in your inventory)
 	if(loco.flags["placeable-neutral"]) then
 		loco.flags["placeable-neutral"] = nil
@@ -52,4 +52,4 @@ function createMuLocoPrototype(name)
 	return loco
 end
 
-return createMuLocoPrototype
+return createMuLocoEntityPrototype

@@ -4,10 +4,12 @@
  * Description: Add the MU locomotives and technology
 --]]
 
-require ("util.createMuLocoPrototype")
 require ("util.copyPrototype")
+require ("util.createMuLocoEntityPrototype")
+require ("util.createMuLocoItemPrototype")
+require ("util.createMuLocoRecipePrototype")
 require ("prototypes.entity")
---require ("prototypes.ret_add_mu") -- Requires collaboration with RET author to make it work
 require ("prototypes.to_add_mu")
+--require ("prototypes.ret_add_mu") -- Requires collaboration with RET author to make it work
 
 require ("prototypes.technology")
