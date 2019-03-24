@@ -6,18 +6,19 @@
 
 data:extend({
   {
-    type = "bool-setting",
-	name = "multiple-unit-train-control-enabled",
+    type = "string-setting",
+	name = "multiple-unit-train-control-mode",
 	order = "aa",
 	setting_type = "runtime-global",
-	default_value = true
+	default_value = "disabled",
+	allowed_values = {"disabled","basic","advanced","tech-unlock"}
   },
   {
     type = "int-setting",
 	name = "multiple-unit-train-control-on_nth_tick",
-	order = "aa",
+	order = "ab",
 	setting_type = "runtime-global",
 	minimum_value = 0,
-	default_value = 300
+	default_value = 600
   },
 })

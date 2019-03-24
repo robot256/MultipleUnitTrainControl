@@ -24,7 +24,7 @@ function processTrainWireless(t)
 					-- Potential twin, make sure it's not in a pair already
 					local loco2_free = true
 					for _,this_pair in pairs(found_pairs) do
-						if this_pair[2] == loco2 then  -- (back_mover is always 2nd member of a pair)
+						if this_pair[1] == loco2 or this_pair[2] == loco2 then  -- (back_mover is always 2nd member of a pair)
 							loco2_free = false
 							break
 						end
@@ -44,7 +44,7 @@ function processTrainWireless(t)
 						-- Potential twin, make sure it's not in a pair already
 						local loco2_free = true
 						for _,this_pair in pairs(found_pairs) do
-							if this_pair[2] == loco2 then  -- (back_mover is always 2nd member of a pair)
+							if this_pair[1] == loco2 or this_pair[2] == loco2 then  -- (back_mover is always 2nd member of a pair)
 								loco2_free = false
 								break
 							end
@@ -65,7 +65,7 @@ function processTrainWireless(t)
 				end
 			end
 			
-		elseif global.upgrade_pairs[loco1.name]
+		elseif global.upgrade_pairs[loco1.name] then
 			local std_name = loco1.name
 			local mu_name = global.upgrade_pairs[std_name]
 			-- Found a normal, look for its twin as an MU first
@@ -74,7 +74,7 @@ function processTrainWireless(t)
 					-- Potential twin, make sure it's not in a pair already
 					local loco2_free = true
 					for _,this_pair in pairs(found_pairs) do
-						if this_pair[2] == loco2 then  -- (back_mover is always 2nd member of a pair)
+						if this_pair[1] == loco2 or this_pair[2] == loco2 then  -- (back_mover is always 2nd member of a pair)
 							loco2_free = false
 							break
 						end
@@ -95,7 +95,7 @@ function processTrainWireless(t)
 						-- Potential twin, make sure it's not in a pair already
 						local loco2_free = true
 						for _,this_pair in pairs(found_pairs) do
-							if this_pair[2] == loco2 then  -- (back_mover is always 2nd member of a pair)
+							if this_pair[1] == loco2 or this_pair[2] == loco2 then  -- (back_mover is always 2nd member of a pair)
 								loco2_free = false
 								break
 							end
@@ -114,8 +114,27 @@ function processTrainWireless(t)
 		end
 	end
 	
-	
-	
+	-- If there are any unpaired MU locos left over in back_movers, they must be downgraded!
+	-- Didn't find an MU twin, look for a normal twin to this MU so we can upgrade it
+	for _,loco2 in pairs(back_movers) do
+		if global.downgrade_pairs[loco2.name] then
+			-- Found a back MU
+			-- Potential straggler, make sure it's not in a pair already
+			local loco2_free = true
+			for _,this_pair in pairs(found_pairs) do
+				if this_pair[1] == loco2 or this_pair[2] == loco2 then  -- (back_mover is always 2nd member of a pair)
+					loco2_free = false
+					break
+				end
+			end
+			if loco2_free then
+				-- Found an unpaired MU, downgrade it
+				table.insert(upgrade_locos,{loco2, global.downgrade_pairs[loco2.name]})
+				loco1_done = true
+				break
+			end
+		end
+	end
 	
 	return found_pairs, upgrade_locos
 end

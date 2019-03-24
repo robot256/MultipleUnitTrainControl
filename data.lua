@@ -10,4 +10,4 @@ require ("prototypes.entity")
 --require ("prototypes.ret_add_mu") -- Requires collaboration with RET author to make it work
 require ("prototypes.to_add_mu")
 
---require ("prototypes.technology")
+require ("prototypes.technology")

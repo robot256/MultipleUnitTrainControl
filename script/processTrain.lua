@@ -13,10 +13,10 @@ require("addPairToGlobal")
 --   wireless_enable: boolean, whether MU locomotives can be separated by wagons
 --
 -- Accesses global variables:
---   globals.upgrade_pairs
---   globals.downgrade_pairs
---   globals.mu_pairs
---   globals.replacement_queue
+--   global.upgrade_pairs
+--   global.downgrade_pairs
+--   global.mu_pairs
+--   global.replacement_queue
 
 function processTrain(t,basic_enable,wireless_enable)
 

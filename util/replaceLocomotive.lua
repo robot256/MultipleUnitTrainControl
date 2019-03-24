@@ -9,7 +9,7 @@
 
 function replaceLocomotive(loco, newName)
 
-	--game.print("Upgrading '"..loco.name.."', orientation " .. loco.orientation)
+	game.print("Replacing ".. loco.name .. " '"..loco.backer_name.."' with " .. newName)
 
 	-- Save basic parameters
 	local position = loco.position

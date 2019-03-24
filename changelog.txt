@@ -1,3 +1,11 @@
+---------------------------------------------------------------------------------------------------
+Version 0.1.2
+  Changes:
+    - Rewrite of the locomotive pairing algorithm.  "Basic MU Control" now can pair locomotives which are separated only by other locomotives.
+	- Added support for "Wireless MU Control", which can pair locomotives anywhere in the train.  L-W-W-L works now!
+	- Added support for two-tiered tech unlocks.  Researching tech will not automatically upgrade existing trains because that would potentially destroy moving trains.
+
+---------------------------------------------------------------------------------------------------
 Version: 0.1.1
   Bugfixes:
     - Fixed that train schedules were not preserved during replacement of a single MU locomotive to a normal locomotive.
