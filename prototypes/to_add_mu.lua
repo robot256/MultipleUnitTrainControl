@@ -36,10 +36,8 @@ if mods["TrainOverhaul"] then
 				 nuclearMuRecipe})
 
 	-- Add the MU versions to the dummy technology list
-	local newTechnology = data.raw.technology["multiple-unit-train-control-locomotives"]
-	table.insert(newTechnology.effects, {type = "unlock-recipe", recipe = "heavy-locomotive-mu"})
-	table.insert(newTechnology.effects, {type = "unlock-recipe", recipe = "express-locomotive-mu"})
-	table.insert(newTechnology.effects, {type = "unlock-recipe", recipe = "nuclear-locomotive-mu"})
-	data.raw.technology["multiple-unit-train-control-locomotives"] = newTechnology
-    
+	table.insert(data.raw.technology["multiple-unit-train-control-locomotives"].effects, {type = "unlock-recipe", recipe = "heavy-locomotive-mu"})
+	table.insert(data.raw.technology["multiple-unit-train-control-locomotives"].effects, {type = "unlock-recipe", recipe = "express-locomotive-mu"})
+	table.insert(data.raw.technology["multiple-unit-train-control-locomotives"].effects, {type = "unlock-recipe", recipe = "nuclear-locomotive-mu"})
+	
 end

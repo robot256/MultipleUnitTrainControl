@@ -42,12 +42,18 @@ function replaceLocomotive(loco, newName)
 	
 	-- Save the train schedule.  If we are replacing a lone MU with a regular loco, the train schedule will be lost when we delete it.
 	local train_schedule = loco.train.schedule
-	--local train_manual_mode = loco.train.manual_mode
 	
 	-- Save its coupling state.  By default, created locos couple to everything nearby, which we have to undo
 	--   if we're replacing after intentional uncoupling.
 	local disconnected_back = loco.disconnect_rolling_stock(defines.rail_direction.back)
 	local disconnected_front = loco.disconnect_rolling_stock(defines.rail_direction.front)
+	
+	-----------
+	-- RET Compatibility
+	if global.ret_locos and global.ret_locos[newName] then
+		remote.call("realistic_electric_trains", "unregister_locomotive", loco)
+	end
+	-----------
 	
 	-- Destroy the old Locomotive so we have space to make the new one
 	loco.destroy()
@@ -74,6 +80,20 @@ function replaceLocomotive(loco, newName)
 	newLoco.burner.heat = burner_heat
 	newLoco.burner.remaining_burning_fuel = burner_remaining_burning_fuel
 	
+	-----------
+	-- RET Compatibility
+	if global.ret_locos and global.ret_locos[newName] then
+		local prototype = newLoco.prototype
+		local efficiency_modifier = 1.05
+		local ticks_per_update = remote.call("realistic_electric_trains","get_ticks_per_update")
+		if prototype.burner_prototype.effectivity < 1 then
+			efficiency_modifier = efficiency_modifier / prototype.burner_prototype.effectivity
+		end
+		local ret_transfer = prototype.max_energy_usage * efficiency_modifier * ticks_per_update
+		remote.call("realistic_electric_trains", "register_locomotive", newLoco, {item=global.ret_locos[newName], transfer=ret_transfer})
+	end
+	-----------
+	
 	-- Translate the inventory results so we can insert the stacks.
 	for k,v in pairs(burner_inventory) do
 		--game.print("Inserting fuel " .. k.." = "..v)
@@ -88,7 +108,6 @@ function replaceLocomotive(loco, newName)
 	
 	-- Restore the train schedule and mode
 	newLoco.train.schedule = train_schedule
-	--newLoco.train.manual_mode = train_manual_mode
 	
 	
 	

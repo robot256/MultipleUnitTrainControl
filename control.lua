@@ -39,6 +39,11 @@ local function InitEntityMaps()
 
 	global.upgrade_pairs = {}
 	global.downgrade_pairs = {}
+	if game.active_mods["Realistic_Electric_Trains"] then
+		global.ret_locos = {}
+	else
+		global.ret_locos = nil
+	end
 	
 	-- Retrieve entity names from dummy technology, store in global variable
 	for _,effect in pairs(game.technology_prototypes["multiple-unit-train-control-locomotives"].effects) do
@@ -46,9 +51,18 @@ local function InitEntityMaps()
 			local recipe = game.recipe_prototypes[effect.recipe]
 			local std = recipe.products[1].name
 			local mu = recipe.ingredients[1].name
-			game.print("MU Control registered upgrade mapping " .. std .. " to " .. mu)
 			global.upgrade_pairs[std] = mu
 			global.downgrade_pairs[mu] = std
+			------------
+			-- RET Compatibility
+			if game.active_mods["Realistic_Electric_Trains"] and recipe.ingredients[2] then
+				global.ret_locos[std] = recipe.ingredients[2].name
+				global.ret_locos[mu] = recipe.ingredients[2].name
+				game.print("MU Control registered Realistic Electric Trains upgrade mapping " 
+				            .. std .. " to " .. mu .. " with fuel " .. recipe.ingredients[2].name)
+			else
+				game.print("MU Control registered upgrade mapping " .. std .. " to " .. mu)
+			end
 		end
 	end
 end
@@ -243,9 +257,11 @@ local function OnNthTick(event)
 		for i=1,n do
 			entry = global.mu_pairs[i]
 			if (entry[1] and entry[2] and entry[1].valid and entry[2].valid) then
-				-- This pair is good
-				table.insert(global.inventories_to_balance, {entry[1].burner.inventory, entry[2].burner.inventory})
-				minTicks = minTicks + 1
+				-- This pair is good, balance if not electric
+				if not global.ret_locos or not global.ret_locos[entry[1].name] then
+					table.insert(global.inventories_to_balance, {entry[1].burner.inventory, entry[2].burner.inventory})
+					minTicks = minTicks + 1
+				end
 			else
 				-- This pair is not good
 				global.mu_pairs[i] = nil
