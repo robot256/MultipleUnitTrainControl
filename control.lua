@@ -12,7 +12,7 @@
  *  => On Mod Settings Changed (disabled flag changes to true)
  *  ===> Read through entire global list of MU pairs and replace them with normal locomotives
  
- *  => On Nth Tick (once per 5 seconds)
+ *  => On Nth Tick (once per ~10 seconds)
  *  ===> Read through entire global list of MU pairs.  
  *  ===> Move among each pair if one has more of any item than the other.
  *
@@ -55,14 +55,17 @@ local function InitEntityMaps()
 			global.downgrade_pairs[mu] = std
 			------------
 			-- RET Compatibility
+            local mod_name = ""
 			if game.active_mods["Realistic_Electric_Trains"] and recipe.ingredients[2] then
 				global.ret_locos[std] = recipe.ingredients[2].name
 				global.ret_locos[mu] = recipe.ingredients[2].name
-				game.print("MU Control registered Realistic Electric Trains upgrade mapping " 
-				            .. std .. " to " .. mu .. " with fuel " .. recipe.ingredients[2].name)
-			else
-				game.print("MU Control registered upgrade mapping " .. std .. " to " .. mu)
+                mod_name = "Realistic Electric Trains "
+				--game.print("MU Control registered Realistic Electric Trains upgrade mapping " 
+				--            .. std .. " to " .. mu .. " with fuel " .. recipe.ingredients[2].name)
+			--else
+				--game.print("MU Control registered upgrade mapping " .. std .. " to " .. mu)
 			end
+            game.print({"debug-message.mu-mapping-message",mod_name,std,mu})
 		end
 	end
 end
@@ -98,7 +101,8 @@ local function ProcessReplacementQueue()
 			local r = table.remove(global.replacement_queue, 1)
 			if r[1] and r[1].valid then
 				-- Replace the locomotive
-				game.print("Replacing ".. r[1].name .. " '"..r[1].backer_name.."' with " .. r[2])
+				--game.print("MU Control is replacing ".. r[1].name .. " '"..r[1].backer_name.."' with " .. r[2])
+                game.print({"debug-message.mu-replacement-message",r[1].name,r[1].backer_name,r[2]})
 				local newLoco = replaceLocomotive(r[1], r[2])
 				-- Find which mu_pair the old one was in and put the new one instead
 				for _,p in pairs(global.mu_pairs) do
@@ -204,7 +208,9 @@ local function OnTick(event)
 		idle = ProcessInventoryQueue()
 	end
 	
-	if idle then
+	if idle or ((not next(global.replacement_queue)) and 
+	            (not next(global.trains_in_queue)) and 
+				(not next(global.inventories_to_balance))) then
 		-- All three queues are empty, unsubscribe from OnTick to save UPS
 		--game.print("Turning off OnTick")
 		script.on_event(defines.events.on_tick, nil)
@@ -258,10 +264,12 @@ local function OnNthTick(event)
 			entry = global.mu_pairs[i]
 			if (entry[1] and entry[2] and entry[1].valid and entry[2].valid) then
 				-- This pair is good, balance if not electric
+				------ RET COMPATIBILITY
 				if not global.ret_locos or not global.ret_locos[entry[1].name] then
 					table.insert(global.inventories_to_balance, {entry[1].burner.inventory, entry[2].burner.inventory})
 					minTicks = minTicks + 1
 				end
+				-------
 			else
 				-- This pair is not good
 				global.mu_pairs[i] = nil
@@ -291,8 +299,10 @@ local function OnNthTick(event)
 				newVal = math.max(minTicks*2,settings_nth_tick)
 			end
 			if newVal ~= current_nth_tick then
-				game.print("Changing MU Control Nth Tick duration to " .. newVal)
+				--game.print("Changing MU Control Nth Tick duration to " .. newVal)
+                game.print({"debug-message.mu-changing-tick-message",newVal})
 				current_nth_tick = newVal
+				global.current_nth_tick = current_nth_tick
 				script.on_nth_tick(nil)
 				script.on_nth_tick(current_nth_tick, OnNthTick)
 			end
@@ -303,12 +313,14 @@ end
 
 ---------
 -- Enables the on_nth_tick event according to the mod setting value
+--  Stores current interval in global.current_nth_tick
 local function StartBalanceUpdates()
-	if settings_nth_tick > 0 then
+	global.current_nth_tick = settings_nth_tick
+	current_nth_tick = global.current_nth_tick
+	if current_nth_tick > 0 then
 		--game.print("Enabling Nth Tick with setting " .. settings_nth_tick)
 		script.on_nth_tick(nil)
-		current_nth_tick = settings_nth_tick
-		script.on_nth_tick(settings_nth_tick, OnNthTick)
+		script.on_nth_tick(current_nth_tick, OnNthTick)
 	else
 		-- Value of zero disables fuel balancing
 		--game.print("Disabling Nth Tick due to setting")
@@ -335,16 +347,26 @@ end
 ---- Bootstrap ----
 do
 local function init_events()
+	current_nth_tick = global.current_nth_tick
+	if not current_nth_tick then
+		current_nth_tick = 0
+	end
 	if settings_mode ~= "disabled" then
 		script.on_event(defines.events.on_train_created, OnTrainCreated)
-		current_nth_tick = settings_nth_tick
 		if current_nth_tick > 0 then
-			script.on_nth_tick(settings_nth_tick, OnNthTick)
+			script.on_nth_tick(current_nth_tick, OnNthTick)
 		end
 		
 	else
 		script.on_event(defines.events.on_train_created, nil)
 		script.on_nth_tick(nil)
+	end
+	
+	-- Set conditional OnTick event handler correctly on load, so we can sync with a multiplayer game.
+	if (global.trains_in_queue and next(global.trains_in_queue)) or
+	      (global.replacement_queue and next(global.replacement_queue)) or
+	      (global.inventories_to_balance and next(global.inventories_to_balance)) then
+		script.on_event(defines.events.on_tick, OnTick)
 	end
 	
 end
@@ -357,14 +379,13 @@ script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
 			-- Scrub existing trains and add MU locomotives when necessary
 			QueueAllTrains()
 			
-			-- Enable or disable events based on setting state
-			init_events()
-			
 			-- if there were saved pairs, start the fuel balancer
 			if global.mu_pairs and next(global.mu_pairs) then
 				StartBalanceUpdates()
 			end
 			
+            -- Enable or disable events based on setting state
+			init_events()
 		else
 			-- Mod is disabled
 			-- Revert the MU locomotives using the on_train_created and on_tick handlers

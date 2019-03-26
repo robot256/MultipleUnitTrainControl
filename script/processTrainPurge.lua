@@ -1,5 +1,9 @@
-
-
+--[[ Copyright (c) 2019 robot256 (MIT License)
+ * Project: Multiple Unit Train Control
+ * File: processTrainPurge.lua
+ * Description: Reads a train and locates locomotives to replace per the "purge" algorithm.
+ *    All upgraded locomotives that are found will be downgraded.
+--]]
 
 
 function processTrainPurge(t)

@@ -1,5 +1,10 @@
-
-
+--[[ Copyright (c) 2019 robot256 (MIT License)
+ * Project: Multiple Unit Train Control
+ * File: processTrainWireless.lua
+ * Description: Reads a train and locates locomotives to replace per the "advanced" algorithm.
+ *    Upgraded pairs can be anywhere in the train.
+ *    Upgraded locomotives that are found with a partner will be downgraded.
+--]]
 
 
 function processTrainWireless(t)

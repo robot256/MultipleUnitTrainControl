@@ -1,8 +1,10 @@
 --[[ Copyright (c) 2019 robot256 (MIT License)
  * Project: Multiple Unit Train Control
- * File: createMuLocoPrototype.lua
- * Description: Copies a locomotive prototype and creates the "-mu" version
- *   with twice as much power output.
+ * File: createMuLocoEntityPrototype.lua
+ * Description: Copies a locomotive entity prototype and creates the "-mu" version with:
+ *    - max_power is double the standard version.
+ *    - reversing_power_modifier is set to 0.1.
+ *    - MU localization text is added to name and description fields.
 --]]
 
 

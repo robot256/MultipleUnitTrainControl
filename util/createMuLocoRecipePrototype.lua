@@ -1,8 +1,12 @@
 --[[ Copyright (c) 2019 robot256 (MIT License)
  * Project: Multiple Unit Train Control
- * File: createMuLocoPrototype.lua
- * Description: Copies a locomotive prototype and creates the "-mu" version
- *   with twice as much power output.
+ * File: createMuLocoRecipePrototype.lua
+ * Description: Creates a new dummy recipe for the "-mu" version with:
+ *   - Recipe is hidden from player.
+ *   - name and ingredient[1].name are the MU version.
+ *   - result is the standard version.
+ *   - ingredient[2] is nil for burner locomotives. 
+ *       For RET locomotives, it contains the red-dummy fuel item to use for this normal and MU locomotive.
 --]]
 
 

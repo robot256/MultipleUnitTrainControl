@@ -1,5 +1,10 @@
-
-
+--[[ Copyright (c) 2019 robot256 (MIT License)
+ * Project: Multiple Unit Train Control
+ * File: processTrainBasic.lua
+ * Description: Reads a train and locates locomotives to replace per the "basic" algorithm.
+ *    Upgraded pairs must be part of a contiguous unit of locomotives (not separated by any wagons).
+ *    Upgraded locomotives that are found with a partner will be downgraded.
+--]]
 
 
 function processTrainBasic(t)
@@ -37,31 +42,6 @@ function processTrainBasic(t)
 			end
 		end
 	end
-	-- Close last unit if we ended on a single locomotive
-	--local n = #loco_units
-	--if n > 0 then
-	--	if #loco_units[n] < 2 then
-	--		loco_units[n] = nil
-	--	end
-	--end
-	
-	
-	
-	-- n = #loco_units
-	-- ps = "Basic Processing Train " .. t.id ..":"
-	-- if n > 0 then
-		-- for i=1,n do
-			-- ps = ps .. " Unit " .. i .. "=["
-			-- for _,loco in pairs(loco_units[i]) do
-				-- ps = ps .. loco.backer_name .. ", "
-			-- end
-			-- ps = ps .. "]"
-		-- end
-	-- end
-	-- game.print(ps)
-	
-	
-	
 	
 	-- Now search each loco_unit separately
 	

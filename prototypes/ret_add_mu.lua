@@ -1,7 +1,7 @@
 --[[ Copyright (c) 2019 robot256 (MIT License)
  * Project: Multiple Unit Train Control
  * File: ret_add_mu.lua
- * Description: Integration with Realistic Electric Trains
+ * Description: Integration with J_Aetherwing's Realistic Electric Trains
 --]]
 
 if mods["Realistic_Electric_Trains"] then

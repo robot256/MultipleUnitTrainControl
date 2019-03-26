@@ -8,8 +8,8 @@ Description: Lets locomotives provide backwards force in automatic if they are i
 License: MIT
 Source: GitHub
 Download: mods.factorio.com
-Version: 0.1.2
-Release: 2019-03-24
+Version: 0.1.3
+Release: 2019-03-25
 Tested-With-Factorio-Version: 0.17.17
 Category: Helper, Train
 Tags: Train
