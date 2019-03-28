@@ -2,17 +2,19 @@
 Version: 0.1.4
 Date: 2019-03-27
   Bugfixes:
-    - Fixed handling of MU versions inside blueprints (thanks GotLag!).
+    - Fixed that MU versions were created inside blueprints (thanks for the tip, GotLag!).
+    - Fixed that deconstruction orders were not preserved on replacement (only works if being deconstructed by the owning force).
 
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.3
 Date: 2019-03-25
   Features:
-    - Added French localization courtesy of @kryshnar.
+    - Added French locale courtesy of @kryshnar.
 
   Changes:
     - Code cleanup.
     - Moved important debug messages to localized strings.
+    - Chagned colors in icon for Wireless MU Control to make it more obviously wireless.
 
   Bugfixes:
     - Fixed some issues relating to multiplayer-safe save/load event handling.
@@ -44,7 +46,7 @@ Date: 2019-03-20
     - Fixed that locomotive health was not preserved on replacement.
 
 ---------------------------------------------------------------------------------------------------
-Version: 0.1.1
+Version: 0.1.0
 Date: 2019-03-17
   Features:
     - Initial release. Only supports locomotive pairs placed back-to-back.

@@ -2,17 +2,17 @@
 Factorio mod written in Lua.  Lets locomotives provide backwards force in automatic if they are in a bidirectional pair.
 
 
-Type: Mod
-Name: Multiple Unit Train Control
-Description: Lets locomotives provide backwards force in automatic if they are in a bidirectional pair.
-License: MIT
-Source: GitHub
-Download: mods.factorio.com
-Version: 0.1.3
-Release: 2019-03-25
-Tested-With-Factorio-Version: 0.17.17
-Category: Helper, Train
-Tags: Train
+- Type: Mod
+- Name: Multiple Unit Train Control
+- Description: Lets locomotives provide backwards force in automatic if they are in a bidirectional pair.
+- License: MIT
+- Source: GitHub
+- Download: mods.factorio.com
+- Version: 0.1.4
+- Release: 2019-03-27
+- Tested-With-Factorio-Version: 0.17.17
+- Category: Helper, Train
+- Tags: Train
 
 Have you ever wished that all your locomotives would provide acceleration when running automatically, not just the ones facing forwards?  You're not alone!  With the power of Multiple Unit Train Control (MU Control) technology, a coupled pair of locomotives (an MU consist) can drive in either direction using the power of both!
 
@@ -35,7 +35,7 @@ Four modes can be selected in the mod settings:
 ## Features
 - Upgrading and downgrading locomotives preserves color, name, health, fuel inventory, burner heat, and train schedule.
 - Detects when the player uncouples locomotives of an MU consist.
-- Pressing 'Q' over an MU version will select its normal version from your inventory.
+- Mining, blueprinting, or pressing 'Q' over an MU version will produce its standard version.
 - Mod setting to configure frequency for fuel balancing.
 - Currently supports: Vanilla, [Train & Fuel Overhaul](https://mods.factorio.com/mods/Optera/TrainOverhaul)
 
@@ -46,7 +46,6 @@ Four modes can be selected in the mod settings:
 ## Known Issues
 - When installing, enabling, or disabling the mod on an existing map, trains that are moving across an intersection during the upgrade may be disconnected, damaged or destroyed in the process.
 - The MU version of each locomotive type is not craftable and should never end up in your inventory, but sometimes it does. It will revert as soon as you place it on a track.
-- Making a blueprint of an MU version will keep the MU version in the blueprint, and you'll never be able to build that part of the blueprint. You could disable MU Control temporarily (reverts all MU locomotives immediately), make the blueprint, then re-enable MU Control.
 - When a locomotive is replaced, the train is changed to manual mode.  Since you cannot automatically couple two locomotives without them running into each other, creation of an MU consist is expected to be a manual process, but after upgrading a save file you will have to set trains back to automatic.
 - Train kill statistics may not be preserved when upgrading/downgrading locomotives.
 - Mode is currently a runtime setting, so MU Control technologies will be available to research even if you have set MU Control to ignore them.
@@ -55,3 +54,4 @@ Four modes can be selected in the mod settings:
 - Noxy - Multidirectional Trains, which gave me the idea and some examples of train manipulation.
 - Optera - Train & Fuel Overhaul, which taught me how to make altered entities, and for releasing their copyPrototype library function to public domain.
 - Train30 - Created the icon graphics for MU Control technologies.
+- kryshnar - Provided French locale.

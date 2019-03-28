@@ -18,7 +18,7 @@ function replaceLocomotive(loco, newName)
 	local backer_name = loco.backer_name
 	local color = loco.color
 	local health = loco.health
-	
+	local to_be_deconstructed = loco.to_be_deconstructed(force)
 	
 	-- Save the burner progress
 	local burner_heat = loco.burner.heat
@@ -72,8 +72,13 @@ function replaceLocomotive(loco, newName)
 	
 	-- Restore parameters
 	newLoco.backer_name = backer_name
-	if color then newLoco.color = color end  -- color is nil if you never changed it!
+	if color then   -- color is nil if you never changed it!
+		newLoco.color = color 
+	end
 	newLoco.health = health
+	if to_be_deconstructed == true then
+		newLoco.order_deconstruction(force)
+	end
 	
 	-- Restore the partially-used burner fuel
 	newLoco.burner.currently_burning = burner_currently_burning
