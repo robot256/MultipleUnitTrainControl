@@ -55,23 +55,53 @@ local function InitEntityMaps()
 			global.downgrade_pairs[mu] = std
 			------------
 			-- RET Compatibility
-            local mod_name = ""
+			local mod_name = ""
 			if game.active_mods["Realistic_Electric_Trains"] and recipe.ingredients[2] then
 				global.ret_locos[std] = recipe.ingredients[2].name
 				global.ret_locos[mu] = recipe.ingredients[2].name
-                mod_name = "Realistic Electric Trains "
+				mod_name = "Realistic Electric Trains "
 				--game.print("MU Control registered Realistic Electric Trains upgrade mapping " 
 				--            .. std .. " to " .. mu .. " with fuel " .. recipe.ingredients[2].name)
 			--else
 				--game.print("MU Control registered upgrade mapping " .. std .. " to " .. mu)
 			end
-            game.print({"debug-message.mu-mapping-message",mod_name,std,mu})
+			game.print({"debug-message.mu-mapping-message",mod_name,std,mu})
 		end
 	end
 end
+
+
+------------------------- BLUEPRINT HANDLING ---------------------------------------
+-- Finds the blueprint a player created and changes all MU locos to standard
+local function purgeBlueprint(bp)
+	-- Get Entity table from blueprint
+	local entities = bp.get_blueprint_entities()
+	-- Find any downgradable items and downgrade them
+	for _,e in pairs(entities) do
+		if global.downgrade_pairs[e.name] then
+			--game.print("MU Control fixing blueprint by changing ".. e.name .." to ".. global.downgrade_pairs[e.name])
+			e.name = global.downgrade_pairs[e.name]
+		end
+	end
+	-- Find icons too
+	local icons = bp.blueprint_icons
+	for _,i in pairs(icons) do
+		if i.signal.type == "item" then
+			if global.downgrade_pairs[i.signal.name] then
+				--game.print("MU Control fixing blueprint icons by changing ".. i.signal.name .." to ".. global.downgrade_pairs[i.signal.name])
+				i.signal.name = global.downgrade_pairs[i.signal.name]
+			end
+		end
+	end
+	-- Write tables back to the blueprint
+	bp.set_blueprint_entities(entities)
+	bp.blueprint_icons = icons
+end
+
+
+
+
 ------------------------- FUEL BALANCING CODE --------------------------------------
-
-
 -- Takes inventories from the queue and process them, one per tick
 local function ProcessInventoryQueue()
 	local idle = true
@@ -102,7 +132,7 @@ local function ProcessReplacementQueue()
 			if r[1] and r[1].valid then
 				-- Replace the locomotive
 				--game.print("MU Control is replacing ".. r[1].name .. " '"..r[1].backer_name.."' with " .. r[2])
-                game.print({"debug-message.mu-replacement-message",r[1].name,r[1].backer_name,r[2]})
+				game.print({"debug-message.mu-replacement-message",r[1].name,r[1].backer_name,r[2]})
 				local newLoco = replaceLocomotive(r[1], r[2])
 				-- Find which mu_pair the old one was in and put the new one instead
 				for _,p in pairs(global.mu_pairs) do
@@ -256,8 +286,8 @@ local function OnNthTick(event)
 	end
 	if next(global.mu_pairs) then
 		local minTicks = 0
-    
-    
+	
+	
 		local n = #global.mu_pairs
 		local done = false
 		for i=1,n do
@@ -300,13 +330,47 @@ local function OnNthTick(event)
 			end
 			if newVal ~= current_nth_tick then
 				--game.print("Changing MU Control Nth Tick duration to " .. newVal)
-                game.print({"debug-message.mu-changing-tick-message",newVal})
+				game.print({"debug-message.mu-changing-tick-message",newVal})
 				current_nth_tick = newVal
 				global.current_nth_tick = current_nth_tick
 				script.on_nth_tick(nil)
 				script.on_nth_tick(current_nth_tick, OnNthTick)
 			end
 		end
+	end
+end
+
+--== ON_PLAYER_CONFIGURED_BLUEPRINT EVENT ==--
+-- ID 70, fires when you select a blueprint to place
+local function OnPlayerConfiguredBlueprint(event)
+	--game.print("MU Control handling Blueprint from ".. event.name .." event.")
+	-- Get Blueprint (ItemStack object)
+	local bp = game.get_player(event.player_index).cursor_stack
+	if bp and bp.valid_for_read==true then
+		purgeBlueprint(bp)
+	else
+		game.print("MU Control: cursor_stack was invalid inside ConfiguredBlueprint, this shouldn't happen")
+		
+	end
+	
+end
+	
+--== ON_PLAYER_SETUP_BLUEPRINT EVENT ==--
+-- ID 68, fires when you select an area to make a blueprint or copy
+local function OnPlayerSetupBlueprint(event)
+	--game.print("MU Control handling Blueprint from ".. event.name .." event.")
+	
+	-- Get Blueprint from player (LuaItemStack object)
+	-- If this is a Copy operation, BP is in cursor_stack
+	-- If this is a Blueprint operation, BP is in blueprint_to_setup
+	-- Need to use "valid_for_read" because "valid" returns true for empty LuaItemStack
+	
+	local item1 = game.get_player(event.player_index).blueprint_to_setup
+	local item2 = game.get_player(event.player_index).cursor_stack
+	if item1 and item1.valid_for_read==true then
+		purgeBlueprint(item1)
+	elseif item2 and item2.valid_for_read==true then
+		purgeBlueprint(item2)
 	end
 end
 
@@ -347,10 +411,18 @@ end
 ---- Bootstrap ----
 do
 local function init_events()
+
+	-- Subscribe to Blueprint activity always
+	script.on_event(defines.events.on_player_configured_blueprint, OnPlayerConfiguredBlueprint)
+	script.on_event(defines.events.on_player_setup_blueprint, OnPlayerSetupBlueprint)
+
+	-- Subscribe to On_Nth_Tick according to saved global setting
 	current_nth_tick = global.current_nth_tick
 	if not current_nth_tick then
 		current_nth_tick = 0
 	end
+	
+	-- Subscribe to On_Train_Created according to mod enabled setting
 	if settings_mode ~= "disabled" then
 		script.on_event(defines.events.on_train_created, OnTrainCreated)
 		if current_nth_tick > 0 then
@@ -384,7 +456,7 @@ script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
 				StartBalanceUpdates()
 			end
 			
-            -- Enable or disable events based on setting state
+			-- Enable or disable events based on setting state
 			init_events()
 		else
 			-- Mod is disabled
