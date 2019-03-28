@@ -20,6 +20,12 @@ function replaceLocomotive(loco, newName)
 	local health = loco.health
 	local to_be_deconstructed = loco.to_be_deconstructed(force)
 	
+	-- Save equipment grid contents
+	local grid_equipment = nil
+	if loco.grid and loco.grid.valid then
+		grid_equipment = saveGrid(loco.grid)
+	end
+	
 	-- Save the burner progress
 	local burner_heat = loco.burner.heat
 	local burner_remaining_burning_fuel = loco.burner.remaining_burning_fuel
@@ -30,8 +36,6 @@ function replaceLocomotive(loco, newName)
 	if ( loco.burner.burnt_result_inventory.valid ) then
 		local burner_burnt_result_inventory = loco.burner.burnt_result_inventory.get_contents()
 	end
-	
-	-- Save equipment grid (future feature)
 	
 	-- Adjust the direction of the new locomotive
 	-- This mapping was determined by brute force because direction and orientation for trains are stupid.
@@ -109,6 +113,11 @@ function replaceLocomotive(loco, newName)
 			--game.print("Inserting burnt fuel " .. k.." = "..v)
 			newLoco.burner.burnt_result_inventory.insert({name=k, count=v})
 		end
+	end
+	
+	-- Restore the equipment grid
+	if newLoco.grid and newLoco.grid.valid then
+		restoreGrid(newLoco.grid, grid_equipment)
 	end
 	
 	-- Restore the train schedule and mode

@@ -18,7 +18,8 @@
  *
  --]]
 
-
+require("util.saveGrid")
+require("util.restoreGrid")
 require("util.replaceLocomotive")
 require("util.balanceInventories")
 require("script.processTrainPurge")

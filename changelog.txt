@@ -4,6 +4,7 @@ Date: 2019-03-27
   Bugfixes:
     - Fixed that MU versions were created inside blueprints (thanks for the tip, GotLag!).
     - Fixed that deconstruction orders were not preserved on replacement (only works if being deconstructed by the owning force).
+    - Fixed that equipment grids were not preserved on replacement (only tested with FARL module).
 
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.3
