@@ -26,6 +26,9 @@ function replaceLocomotive(loco, newName)
 		grid_equipment = saveGrid(loco.grid)
 	end
 	
+	-- Save item requests left over from a blueprint
+	local item_request = saveItemRequestProxy(loco)
+	
 	-- Save the burner progress
 	local burner_heat = loco.burner.heat
 	local burner_remaining_burning_fuel = loco.burner.remaining_burning_fuel
@@ -82,6 +85,12 @@ function replaceLocomotive(loco, newName)
 	newLoco.health = health
 	if to_be_deconstructed == true then
 		newLoco.order_deconstruction(force)
+	end
+	
+	-- Restore item_request_proxy by creating a new one
+	if item_request then
+		newProxy = surface.create_entity{name="item-request-proxy", position=position, force=force}
+		newProxy.item_requests = item_requests
 	end
 	
 	-- Restore the partially-used burner fuel
