@@ -18,6 +18,7 @@
  *
  --]]
 
+require("util.saveItemRequestProxy")
 require("util.saveGrid")
 require("util.restoreGrid")
 require("util.replaceLocomotive")
