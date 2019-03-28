@@ -1,6 +1,9 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.4
 Date: 2019-03-27
+  Features:
+    - Added support for Angel's Addons - Petrochem Train and Smelting Train. (Smelting Locomotive and Smelting Tender cannot pair with each other.)
+
   Bugfixes:
     - Fixed that MU versions were created inside blueprints (thanks for the tip, GotLag!).
     - Fixed that deconstruction orders were not preserved on replacement (only works if being deconstructed by the owning force).

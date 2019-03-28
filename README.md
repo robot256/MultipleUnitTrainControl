@@ -37,7 +37,7 @@ Four modes can be selected in the mod settings:
 - Detects when the player uncouples locomotives of an MU consist.
 - Mining, blueprinting, or pressing 'Q' over an MU version will produce its standard version.
 - Mod setting to configure frequency for fuel balancing.
-- Currently supports: Vanilla, [Train & Fuel Overhaul](https://mods.factorio.com/mods/Optera/TrainOverhaul)
+- Currently supports: Vanilla, [Train & Fuel Overhaul](https://mods.factorio.com/mods/Optera/TrainOverhaul), [Angel's Petrochem Train](https://mods.factorio.com/mod/angelsaddons-petrotrain), [Angle's Smelting Train](https://mods.factorio.com/mod/angelsaddons-smeltingtrain)
 
 ## Planned Features
 - Preserve contents of locomotive equipment grids on replacement.
@@ -46,6 +46,7 @@ Four modes can be selected in the mod settings:
 ## Known Issues
 - When installing, enabling, or disabling the mod on an existing map, trains that are moving across an intersection during the upgrade may be disconnected, damaged or destroyed in the process.
 - The MU version of each locomotive type is not craftable and should never end up in your inventory, but sometimes it does. It will revert as soon as you place it on a track.
+- The MU version has a separate item-type circuit signal, which I assume will be faithfully utilized by LTN stops when outputting train rolling stock descriptions. Not a bug, but don't click the wrong one by accident on your crafting machine inserter.
 - When a locomotive is replaced, the train is changed to manual mode.  Since you cannot automatically couple two locomotives without them running into each other, creation of an MU consist is expected to be a manual process, but after upgrading a save file you will have to set trains back to automatic.
 - Train kill statistics may not be preserved when upgrading/downgrading locomotives.
 - Mode is currently a runtime setting, so MU Control technologies will be available to research even if you have set MU Control to ignore them.

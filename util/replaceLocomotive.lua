@@ -116,7 +116,7 @@ function replaceLocomotive(loco, newName)
 	end
 	
 	-- Restore the equipment grid
-	if newLoco.grid and newLoco.grid.valid then
+	if grid_equipment and newLoco.grid and newLoco.grid.valid then
 		restoreGrid(newLoco.grid, grid_equipment)
 	end
 	

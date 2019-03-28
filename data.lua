@@ -11,5 +11,6 @@ require ("util.createMuLocoRecipePrototype")
 require ("prototypes.entity")
 require ("prototypes.to_add_mu")
 --require ("prototypes.ret_add_mu") -- Requires collaboration with RET author to make it work
-
+require ("prototypes.apc_add_mu")
+require ("prototypes.as_add_mu")
 require ("prototypes.technology")

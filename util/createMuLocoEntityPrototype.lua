@@ -49,8 +49,11 @@ function createMuLocoEntityPrototype(name, newName)
 	
 	-- Concatenate the localized name and description string of the source loco with our template.
 	loco.localised_name = {'template.mu-name',{'entity-name.'..name}}
-	loco.localised_description = {'template.mu-description',{'entity-description.'..name}}
-	
+	if oldLoco.localised_description and #oldLoco.localised_description > 0 then
+		loco.localised_description = {'template.mu-description',{'entity-description.'..name}}
+	else
+		loco.localised_description = {'template.plain-mu-description'}
+	end
 	return loco
 end
 
