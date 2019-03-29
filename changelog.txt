@@ -1,3 +1,15 @@
+Version: 0.1.5
+Date: 2019-03-xx
+  Bugfixes:
+    - Fixed that blueprint item requests were not preserved on replacement (thanks for the tip, DaveMcW!).
+    - Fixed that fuel balancing would be disabled after upgrading from an older version of the mod.
+  
+  Changes:
+    - Changed default mode setting to "tech-unlock".
+  
+  ToDo:
+    - Pipette tool doesn't work anymore, don't know why.
+
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.4
 Date: 2019-03-27

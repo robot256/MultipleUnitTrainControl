@@ -10,7 +10,7 @@ data:extend({
 	name = "multiple-unit-train-control-mode",
 	order = "aa",
 	setting_type = "runtime-global",
-	default_value = "disabled",
+	default_value = "tech-unlock",
 	allowed_values = {"disabled","basic","advanced","tech-unlock"}
   },
   {
