@@ -8,11 +8,15 @@ function saveItemRequestProxy(target)
 					  position = target.position
 					})
 	for _, proxy in pairs(proxies) do
-	  if proxy.proxy_target == target and proxy.valid and #proxy.item_requests>0 then
-		return table.deepcopy(proxy.item_requests)
-	  else
-		return nil
-	  end
+		if proxy.proxy_target == target and proxy.valid then
+			local items = {}
+			for k,v in pairs(proxy.item_requests) do
+				items[k] = v
+			end
+			return items
+		else
+			return nil
+		end
 	end
 
 
