@@ -286,7 +286,7 @@ local function OnNthTick(event)
 	if not global.inventories_to_balance then
 		global.inventories_to_balance = {}
 	end
-	if next(global.mu_pairs) then
+	if global.mu_pairs and next(global.mu_pairs) then
 		local minTicks = 0
 	
 	
@@ -493,21 +493,24 @@ end)
 
 script.on_init(function()
 	--game.print("In on_init!")
-	global.trains_in_queue = global.trains_in_queue or {}
-	global.mu_pairs = global.mu_pairs or {}
-	global.inventories_to_balance = global.inventories_to_balance or {}
+	global.replacement_queue = {}
+	global.trains_in_queue = {}
+	global.mu_pairs = {}
+	global.inventories_to_balance = {}
 	InitEntityMaps()
 	init_events()
 end)
 
 script.on_configuration_changed(function(data)
 	--game.print("In on_configuration_changed!")
+	global.replacement_queue = global.replacement_queue or {}
 	global.trains_in_queue = global.trains_in_queue or {}
 	global.mu_pairs = global.mu_pairs or {}
 	global.inventories_to_balance = global.inventories_to_balance or {}
 	InitEntityMaps()
 	-- On config change, scrub the list of trains
 	QueueAllTrains()
+	StartBalanceUpdates()
 	init_events()
 end)
 end
