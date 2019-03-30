@@ -369,6 +369,49 @@ local function OnPlayerSetupBlueprint(event)
 end
 
 
+--== ON_PLAYER_PIPETTE ==--
+-- Fires when player presses 'Q'.  We need to sneakily grab the correct item from inventory if it exists,
+--  or sneakily give the correct item in cheat mode.
+local function OnPlayerPipette(event)
+	--game.print("MUTC: OnPlayerPipette, cheat mode="..tostring(event.used_cheat_mode))
+	local item = event.item
+	if item and item.valid then
+		--game.print("item: " .. item.name)
+		if global.downgrade_pairs[item.name] then
+			local player = game.players[event.player_index]
+			local newName = global.downgrade_pairs[item.name]
+			local cursor = player.cursor_stack
+			local inventory = player.get_main_inventory()
+			-- Check if the player got MU versions from inventory, and convert them
+			if cursor.valid_for_read == true and event.used_cheat_mode == false then
+				-- Huh, he actually had MU items.
+				--game.print("Converting cursor to "..newName)
+				cursor.set_stack({name=newName,count=cursor.count})
+			else
+				-- Check if the player could have gotten the right thing from inventory/cheat, otherwise clear the cursor
+				--game.print("Looking for " .. newName .. " in inventory")
+				local newItemStack = inventory.find_item_stack(newName)
+				cursor.set_stack(newItemStack)
+				if not cursor.valid_for_read then
+					--game.print("Not found!")
+					if player.cheat_mode==true then
+						--game.print("Giving free " .. newName)
+						cursor.set_stack({name=newName, count=game.item_prototypes[newName].stack_size})
+					end
+				else
+					--game.print("Found!")
+					inventory.remove(newItemStack)
+				end
+			end
+		end
+	end
+
+
+end
+
+
+
+
 ---------
 -- Enables the on_nth_tick event according to the mod setting value
 --  Stores current interval in global.current_nth_tick
@@ -407,6 +450,7 @@ local function init_events()
 
 	-- Subscribe to Blueprint activity always
 	script.on_event({defines.events.on_player_setup_blueprint,defines.events.on_player_configured_blueprint}, OnPlayerSetupBlueprint)
+	script.on_event(defines.events.on_player_pipette, OnPlayerPipette)
 
 	-- Subscribe to On_Nth_Tick according to saved global setting
 	current_nth_tick = global.current_nth_tick
