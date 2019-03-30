@@ -1,5 +1,8 @@
 Version: 0.1.5
 Date: 2019-03-xx
+  Features:
+    - Added support for magu5026's Electric Train mod.
+
   Bugfixes:
     - Fixed that blueprint item requests were not preserved on replacement (thanks for the tip, DaveMcW!).
     - Fixed that fuel balancing would be disabled after upgrading from an older version of the mod until you change the NthTick setting.
@@ -9,6 +12,7 @@ Date: 2019-03-xx
   Changes:
     - Changed default mode setting to "tech-unlock".
     - Added "script_raised_built" and "script_raised_destroy" flags when replacing locomotives, for inter-mod compatibility.
+    - Removed nerf to reversing_power_modifier because it only applies to single-directional trains, which can never have MU version in them.
   
   To-Do:
     - Pipette tool doesn't work anymore, don't know why. Need to subscribe to more events!

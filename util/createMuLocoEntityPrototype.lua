@@ -42,11 +42,6 @@ function createMuLocoEntityPrototype(name, newName, has_description)
 	local power_suffix = string.sub(loco.max_power,-2,-1)
 	loco.max_power = max_power .. power_suffix
 	
-	-- Change the reverse power modifier, because the other loco
-	--   provides all the reverse power for this pair in both auto and manual.
-	--   (But don't make it zero, because then you get stranded even in manual mode.)
-	loco.reversing_power_modifier = 0.1
-	
 	-- Concatenate the localized name and description string of the source loco with our template.
 	loco.localised_name = {'template.mu-name',{'entity-name.'..name}}
 	if has_description==true then
