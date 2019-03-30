@@ -5,9 +5,9 @@
 --]]
 
 
-------------
--- Add New Technologies for MU Control
-data:extend({
+data:extend{
+  ------------
+  -- Add New Technologies for MU Control
   {
     type = "technology",
 	name = "multiple-unit-train-control",
@@ -43,7 +43,27 @@ data:extend({
       },
 	  time = 30
 	},
-	order = "c-g-d"
+	order = "c-g-c"
   },
-})
-  
+
+  -----------------
+  -- Add dummy technology to catalog the MU conversions
+  {
+    type = "technology",
+	name = "multiple-unit-train-control-locomotives",
+	icon = "__MultipleUnitTrainControl__/graphics/icons/mu-control.png",
+	icon_size = 128,
+	enabled = false,
+	effects = 
+	{
+      
+    },
+    unit =
+    {
+      count = 8,
+      ingredients = {{"automation-science-pack", 1}},
+      time = 1
+    },
+    order = "c-a"
+  },
+}

@@ -8,22 +8,6 @@
 if mods["angelsaddons-petrotrain"] then
 
 	-- Generate an MU version of the Petrochem Locomotives
-	
-	-- Create New Items
-	local petroMuItem = createMuLocoItemPrototype("item-with-entity-data", "petro-locomotive-1", "petro-locomotive-1-mu")
-	
-	data:extend({petroMuItem})
-
-	-- Create New Entities
-	local petroMuEntity = createMuLocoEntityPrototype("petro-locomotive-1", "petro-locomotive-1-mu", false)
-	
-	data:extend({petroMuEntity})
-	
-	-- Create Dummy Recipes
-	local petroLocoRecipe = createMuLocoRecipePrototype("petro-locomotive-1", "petro-locomotive-1-mu")
-	data:extend({petroLocoRecipe})
-
-	-- Add the MU versions to the dummy technology list
-	table.insert(data.raw.technology["multiple-unit-train-control-locomotives"].effects, {type = "unlock-recipe", recipe = "petro-locomotive-1-mu"})
+	createMuLoco("petro-locomotive-1","petro-locomotive-1-mu","item-with-entity-data",false)
 	
 end
