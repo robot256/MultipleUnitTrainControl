@@ -17,8 +17,8 @@ if mods["angelsaddons-smeltingtrain"] then
 				 smelting2MuItem})
 
 	-- Create New Entities
-	local smelting1MuEntity = createMuLocoEntityPrototype("smelting-locomotive-1", "smelting-locomotive-1-mu")
-	local smelting2MuEntity = createMuLocoEntityPrototype("smelting-locomotive-tender", "smelting-locomotive-tender-mu")
+	local smelting1MuEntity = createMuLocoEntityPrototype("smelting-locomotive-1", "smelting-locomotive-1-mu", false)
+	local smelting2MuEntity = createMuLocoEntityPrototype("smelting-locomotive-tender", "smelting-locomotive-tender-mu", false)
 	
 	data:extend({smelting1MuEntity,
 				 smelting2MuEntity})

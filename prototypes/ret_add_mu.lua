@@ -15,8 +15,8 @@ if mods["Realistic_Electric_Trains"] then
 				 advElectricMuItem})
 	
 	-- Create Entity prototypes
-	local electricMuEntity = createMuLocoEntityPrototype("ret-electric-locomotive", "ret-electric-locomotive-mu")
-	local advElectricMuEntity = createMuLocoEntityPrototype("ret-electric-locomotive-mk2", "ret-electric-locomotive-mk2-mu")
+	local electricMuEntity = createMuLocoEntityPrototype("ret-electric-locomotive", "ret-electric-locomotive-mu", true)
+	local advElectricMuEntity = createMuLocoEntityPrototype("ret-electric-locomotive-mk2", "ret-electric-locomotive-mk2-mu", true)
 	data:extend({electricMuEntity,
 				 advElectricMuEntity})
 	

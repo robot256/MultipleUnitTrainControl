@@ -12,7 +12,7 @@ local baseLocoItem = createMuLocoItemPrototype("item-with-entity-data", "locomot
 data:extend({baseLocoItem})
 
 -- Entity
-local baseLocoEntity = createMuLocoEntityPrototype("locomotive", "locomotive-mu")
+local baseLocoEntity = createMuLocoEntityPrototype("locomotive", "locomotive-mu", true)
 data:extend({baseLocoEntity})
 
 -- Fake recipe

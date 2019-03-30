@@ -19,9 +19,9 @@ if mods["TrainOverhaul"] then
 				 nuclearMuItem})
 
 	-- Create New Entities
-	local heavyMuEntity = createMuLocoEntityPrototype("heavy-locomotive", "heavy-locomotive-mu")
-	local expressMuEntity = createMuLocoEntityPrototype("express-locomotive", "express-locomotive-mu")
-	local nuclearMuEntity = createMuLocoEntityPrototype("nuclear-locomotive", "nuclear-locomotive-mu")
+	local heavyMuEntity = createMuLocoEntityPrototype("heavy-locomotive", "heavy-locomotive-mu", true)
+	local expressMuEntity = createMuLocoEntityPrototype("express-locomotive", "express-locomotive-mu", true)
+	local nuclearMuEntity = createMuLocoEntityPrototype("nuclear-locomotive", "nuclear-locomotive-mu", true)
 	
 	data:extend({heavyMuEntity,
 				 expressMuEntity,

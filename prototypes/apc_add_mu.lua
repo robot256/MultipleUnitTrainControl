@@ -15,7 +15,7 @@ if mods["angelsaddons-petrotrain"] then
 	data:extend({petroMuItem})
 
 	-- Create New Entities
-	local petroMuEntity = createMuLocoEntityPrototype("petro-locomotive-1", "petro-locomotive-1-mu")
+	local petroMuEntity = createMuLocoEntityPrototype("petro-locomotive-1", "petro-locomotive-1-mu", false)
 	
 	data:extend({petroMuEntity})
 	

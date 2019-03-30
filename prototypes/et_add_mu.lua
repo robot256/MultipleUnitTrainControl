@@ -19,9 +19,9 @@ if mods["ElectricTrain"] then
 				 electric3MuItem})
 
 	-- Create New Entities
-	local electric1MuEntity = createMuLocoEntityPrototype("et-electric-locomotive-1", "et-electric-locomotive-1-mu")
-	local electric2MuEntity = createMuLocoEntityPrototype("et-electric-locomotive-2", "et-electric-locomotive-2-mu")
-	local electric3MuEntity = createMuLocoEntityPrototype("et-electric-locomotive-3", "et-electric-locomotive-3-mu")
+	local electric1MuEntity = createMuLocoEntityPrototype("et-electric-locomotive-1", "et-electric-locomotive-1-mu", false)
+	local electric2MuEntity = createMuLocoEntityPrototype("et-electric-locomotive-2", "et-electric-locomotive-2-mu", false)
+	local electric3MuEntity = createMuLocoEntityPrototype("et-electric-locomotive-3", "et-electric-locomotive-3-mu", false)
 	
 	data:extend({electric1MuEntity,
 				 electric2MuEntity,
