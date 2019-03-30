@@ -1,7 +1,7 @@
 Version: 0.1.5
 Date: 2019-03-xx
   Features:
-    - Added support for magu5026's Electric Train mod (won't work properly until they release 0.17.12 though).
+    - Added support for magu5026's Electric Train mod.
 
   Bugfixes:
     - Fixed that blueprint item requests were not preserved on replacement (thanks for the tip, DaveMcW!).
