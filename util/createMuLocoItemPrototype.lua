@@ -15,7 +15,7 @@ function createMuLocoItemPrototype(item_type,name,newName)
 	-- Copy source locomotive prototype
 	local newItem = copyPrototype(item_type, name, newName)
 	
-	newItem.order = "a[train-system]-fc[locomotive]" -- this doesn't get copied??
+	newItem.order = "a[train-system]-fz[locomotive-mu]" -- this doesn't get copied??
 	
 	-- Fix the localization
 	newItem.localised_name = {'template.mu-name',{'entity-name.'..name}}
