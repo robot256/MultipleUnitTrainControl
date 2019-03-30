@@ -63,10 +63,10 @@ function replaceLocomotive(loco, newName)
 	-----------
 	
 	-- Destroy the old Locomotive so we have space to make the new one
-	loco.destroy()
+	loco.destroy({raise_destroy=true})
 	
 	-- Create the new locomotive in the same spot and orientation
-	local newLoco = surface.create_entity{name=newName, position=position, direction=newDirection, force=force}
+	local newLoco = surface.create_entity{name=newName, position=position, direction=newDirection, force=force, raise_built=true}
 	
 	-- Restore coupling state
 	if not disconnected_back then

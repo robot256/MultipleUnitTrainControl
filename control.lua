@@ -79,25 +79,30 @@ local function purgeBlueprint(bp)
 	-- Get Entity table from blueprint
 	local entities = bp.get_blueprint_entities()
 	-- Find any downgradable items and downgrade them
-	for _,e in pairs(entities) do
-		if global.downgrade_pairs[e.name] then
-			--game.print("MU Control fixing blueprint by changing ".. e.name .." to ".. global.downgrade_pairs[e.name])
-			e.name = global.downgrade_pairs[e.name]
+	if entities and next(entities) then
+		for _,e in pairs(entities) do
+			if global.downgrade_pairs[e.name] then
+				--game.print("MU Control fixing blueprint by changing ".. e.name .." to ".. global.downgrade_pairs[e.name])
+				e.name = global.downgrade_pairs[e.name]
+			end
 		end
+		-- Write tables back to the blueprint
+		bp.set_blueprint_entities(entities)
 	end
 	-- Find icons too
 	local icons = bp.blueprint_icons
-	for _,i in pairs(icons) do
-		if i.signal.type == "item" then
-			if global.downgrade_pairs[i.signal.name] then
-				--game.print("MU Control fixing blueprint icons by changing ".. i.signal.name .." to ".. global.downgrade_pairs[i.signal.name])
-				i.signal.name = global.downgrade_pairs[i.signal.name]
+	if icons and next(icons) then
+		for _,i in pairs(icons) do
+			if i.signal.type == "item" then
+				if global.downgrade_pairs[i.signal.name] then
+					--game.print("MU Control fixing blueprint icons by changing ".. i.signal.name .." to ".. global.downgrade_pairs[i.signal.name])
+					i.signal.name = global.downgrade_pairs[i.signal.name]
+				end
 			end
 		end
+		-- Write tables back to the blueprint
+		bp.blueprint_icons = icons
 	end
-	-- Write tables back to the blueprint
-	bp.set_blueprint_entities(entities)
-	bp.blueprint_icons = icons
 end
 
 
@@ -344,19 +349,6 @@ end
 
 --== ON_PLAYER_CONFIGURED_BLUEPRINT EVENT ==--
 -- ID 70, fires when you select a blueprint to place
-local function OnPlayerConfiguredBlueprint(event)
-	--game.print("MU Control handling Blueprint from ".. event.name .." event.")
-	-- Get Blueprint (ItemStack object)
-	local bp = game.get_player(event.player_index).cursor_stack
-	if bp and bp.valid_for_read==true then
-		purgeBlueprint(bp)
-	else
-		game.print("MU Control: cursor_stack was invalid inside ConfiguredBlueprint, this shouldn't happen")
-		
-	end
-	
-end
-	
 --== ON_PLAYER_SETUP_BLUEPRINT EVENT ==--
 -- ID 68, fires when you select an area to make a blueprint or copy
 local function OnPlayerSetupBlueprint(event)
@@ -409,14 +401,12 @@ local function QueueAllTrains()
 	script.on_event(defines.events.on_tick, OnTick)
 end
 
-
 ---- Bootstrap ----
 do
 local function init_events()
 
 	-- Subscribe to Blueprint activity always
-	script.on_event(defines.events.on_player_configured_blueprint, OnPlayerConfiguredBlueprint)
-	script.on_event(defines.events.on_player_setup_blueprint, OnPlayerSetupBlueprint)
+	script.on_event({defines.events.on_player_setup_blueprint,defines.events.on_player_configured_blueprint}, OnPlayerSetupBlueprint)
 
 	-- Subscribe to On_Nth_Tick according to saved global setting
 	current_nth_tick = global.current_nth_tick

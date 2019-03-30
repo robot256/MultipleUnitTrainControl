@@ -8,7 +8,7 @@
 --]]
 
 
-function createMuLocoEntityPrototype(name, newName)
+function createMuLocoEntityPrototype(name, newName, has_description)
 	-- Check that source exists
 	if not data.raw["locomotive"][name] then
 		error("locomotive " .. name .. " doesn't exist")
@@ -49,7 +49,7 @@ function createMuLocoEntityPrototype(name, newName)
 	
 	-- Concatenate the localized name and description string of the source loco with our template.
 	loco.localised_name = {'template.mu-name',{'entity-name.'..name}}
-	if oldLoco.localised_description and string.len(oldLoco.localised_description) > 0 then
+	if has_description==true then
 		loco.localised_description = {'template.mu-description',{'entity-description.'..name}}
 	else
 		loco.localised_description = {'template.plain-mu-description'}

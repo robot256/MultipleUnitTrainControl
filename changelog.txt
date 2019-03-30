@@ -3,13 +3,15 @@ Date: 2019-03-xx
   Bugfixes:
     - Fixed that blueprint item requests were not preserved on replacement (thanks for the tip, DaveMcW!).
     - Fixed that fuel balancing would be disabled after upgrading from an older version of the mod until you change the NthTick setting.
+    - Fixed crash when selecting just rolling stock with the copy tool.
+    - Fixed concatenation of localised_description that broke in 0.1.4 by explicitly listing which mods have descriptions and which don't.
   
   Changes:
     - Changed default mode setting to "tech-unlock".
+    - Added "script_raised_built" and "script_raised_destroy" flags when replacing locomotives, for inter-mod compatibility.
   
   To-Do:
     - Pipette tool doesn't work anymore, don't know why. Need to subscribe to more events!
-    - Fix concatenation of localised_description that broke in 0.1.4.
 
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.4
