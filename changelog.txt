@@ -10,6 +10,7 @@ Date: 2019-03-xx
 	
   Bugfixes:
     - Changed MU Item sort order to work a little better in the signal selection dialog. Still kind of mess with many mods installed.
+	- Added MU versions of Electric Train locomotives to the exclude list of the Fuel Train Stop mod.
 
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.5

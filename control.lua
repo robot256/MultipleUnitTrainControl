@@ -34,7 +34,23 @@ local settings_nth_tick = settings.global["multiple-unit-train-control-on_nth_ti
 local current_nth_tick = settings_nth_tick
 
 
------------------------------
+
+------------------------- GLOBAL TABLE INITIALIZATION ---------------------------------------
+
+-- Interacts with other mods based on what MU locomotives were created
+local function CallRemoteInterface()
+    -- Make sure FuelTrainStop plays nice with ElectricTrain in the MU versions
+	if game.active_mods["ElectricTrain"] then
+		if remote.interfaces["FuelTrainStop"] then
+			for std,mu in global.upgrade_pairs do
+				if std:match("^et%-electric%-locomotive%-%d$") then
+					remote.call("FuelTrainStop", "exclude_from_fuel_schedule", mu)
+				end
+			end
+		end
+	end
+end
+
 -- Set up the mapping between normal and MU locomotives
 -- Extract from the game prototypes list what MU locomotives are enabled
 local function InitEntityMaps()
@@ -70,7 +86,12 @@ local function InitEntityMaps()
 			game.print({"debug-message.mu-mapping-message",mod_name,std,mu})
 		end
 	end
+	
+	-- Mod compatibility setup
+	CallRemoteInterface()
+	
 end
+
 
 
 ------------------------- BLUEPRINT HANDLING ---------------------------------------
@@ -477,6 +498,7 @@ local function init_events()
 		script.on_event(defines.events.on_tick, OnTick)
 	end
 	
+	
 end
 
 script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
@@ -517,6 +539,7 @@ script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
 			StartBalanceUpdates()
 		end
 	end
+	
 end)
 
 
