@@ -8,9 +8,9 @@ Factorio mod written in Lua.  Lets locomotives provide backwards force in automa
 - License: MIT
 - Source: GitHub
 - Download: mods.factorio.com
-- Version: 0.1.4
-- Release: 2019-03-27
-- Tested-With-Factorio-Version: 0.17.17
+- Version: 0.1.7
+- Release: 2019-03-31
+- Tested-With-Factorio-Version: 0.17.23
 - Category: Helper, Train
 - Tags: Train
 
@@ -29,18 +29,25 @@ Since the game still thinks only one locomotive is driving, but with twice the p
 Four modes can be selected in the mod settings:
 - Basic mode: Locomotives that are adjacent or separated by other locomotives can form MU consists.  Examples:  <L-L>, <L-<L-L>-L>
 - Advanced (Wireless) mode: Locomotives can form MU consists anywhere in the train.  Examples:  <L-W-W-W-W-L>, <L-<L-W-W-L>-W-W-L>
-- Tech Unlock mode: MU upgrades remain disabled until you complete research MU Control technology.  Unlock Wireless mode with a second research technology.  Note: After researching a new level, you must manually trigger an MU Control update on each existing train by coupling and uncoupling a wagon. This is to prevent instant upgrades from destroying trains if they are currently moving over a junction.
-- Disabled mode: Reverts all MU locomotives to normal.  Note: Mod defaults to Disabled so that you have time to stop all your trains before enabling it.
+- Tech Unlock mode (default): MU upgrades remain disabled until you complete research MU Control technology.  Unlock Wireless mode with a second research technology.  Note: After researching a new level, you must manually trigger an MU Control update on each existing train by coupling and uncoupling a wagon. This is to prevent instant upgrades from destroying trains if they are currently moving over a junction.
+- Disabled mode: Reverts all MU locomotives to normal.
 
 ## Features
 - Upgrading and downgrading locomotives preserves color, name, health, fuel inventory, equipment grid, burner heat, and train schedule.
 - Detects when the player uncouples locomotives of an MU consist.
 - Mining, blueprinting, or pressing 'Q' over an MU version will produce its standard version.
 - Mod setting to configure frequency for fuel balancing.
-- Currently supports: Vanilla, [Train & Fuel Overhaul](https://mods.factorio.com/mods/Optera/TrainOverhaul), [Angel's Petrochem Train](https://mods.factorio.com/mod/angelsaddons-petrotrain), [Angle's Smelting Train](https://mods.factorio.com/mod/angelsaddons-smeltingtrain)
+- Currently supports: 
+  - Vanilla
+  - [Train & Fuel Overhaul](https://mods.factorio.com/mods/Optera/TrainOverhaul)
+  - [Electric Train](https://mods.factorio.com/mod/ElectricTrain)
+  - [Fully Automated Rail Layer](https://mods.factorio.com/mod/FARL)
+  - [Angel's Petrochem Train](https://mods.factorio.com/mod/angelsaddons-petrotrain)
+  - [Angel's Smelting Train](https://mods.factorio.com/mod/angelsaddons-smeltingtrain)
+  - [Bob's Logistics](https://mods.factorio.com/mod/boblogistics)
 
 ## Planned Features
-- Support additional modded locomotives, especially [Realistic Electric Trains](https://mods.factorio.com/mod/Realistic_Electric_Trains).  If you want more, please send me suggestions!
+- Support additional modded locomotives.  If you want more, please send me suggestions!
 
 ## Known Issues
 - When installing, enabling, or disabling the mod on an existing map, trains that are moving across an intersection during the upgrade may be disconnected, damaged or destroyed in the process.
@@ -48,8 +55,7 @@ Four modes can be selected in the mod settings:
 - When a locomotive is replaced, the train is changed to manual mode.  Since you cannot automatically couple two locomotives without them running into each other, creation of an MU consist is expected to be a manual process, but after upgrading a save file you will have to set trains back to automatic.
 - Train kill statistics may not be preserved when upgrading/downgrading locomotives.
 - Mode is currently a runtime setting, so MU Control technologies will be available to research even if you have set MU Control to ignore them.
-- The MU version has a separate item-type circuit signal, which I assume will be faithfully utilized by LTN stops when outputting train rolling stock descriptions. Not a bug, but don't click the wrong one by accident on your crafting machine inserter.
-- When placing *fueled* locomotives via blueprint, fuel item requests will be cancelled when the locomotives are upgraded.
+- The MU version has a separate item-type circuit signal, which is a separate signal from LTN stops when outputting train rolling stock descriptions. Not a bug, but don't click the wrong one by accident.
 
 ## Credits:
 - Noxy - Multidirectional Trains, which gave me the idea and some examples of train manipulation.
