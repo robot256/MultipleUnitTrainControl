@@ -67,7 +67,7 @@ function replaceLocomotive(loco, newName)
 	loco.destroy({raise_destroy=true})
 	
 	-- Create the new locomotive in the same spot and orientation
-	local newLoco = surface.create_entity{name=newName, position=position, direction=newDirection, force=force, raise_built=true}
+	local newLoco = surface.create_entity{name=newName, position=position, direction=newDirection, force=force}
 	
 	-- Restore coupling state
 	if not disconnected_back then
@@ -137,7 +137,9 @@ function replaceLocomotive(loco, newName)
 	-- Restore the train schedule and mode
 	newLoco.train.schedule = train_schedule
 	
-	
+	-- After all that, fire an event so other scripts can reconnect to it
+	script.raise_event(defines.events.script_raised_built, {entity = newLoco})
+				
 	
 	--game.print("Finished replacing. Used direction "..newDirection..", new orientation: " .. newLoco.orientation)
 	return newLoco
