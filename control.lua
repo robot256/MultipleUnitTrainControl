@@ -498,7 +498,6 @@ local function init_events()
 		script.on_event(defines.events.on_tick, OnTick)
 	end
 	
-	
 end
 
 script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)

@@ -1,16 +1,16 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.6
-Date: 2019-03-xx
+Date: 2019-03-30
   Features:
     - Added support for Bob's Logistics trains.
 	
   Changes:
     - Reworked cloning code for easier mod support.
-	- Moved cloning to data-updates for compatibility with Bob's and other mods, so that updated properties are included in the clone correctly.
+    - Moved cloning to data-updates for compatibility with Bob's and other mods, so that updated properties are included in the clone correctly.
 	
   Bugfixes:
     - Changed MU Item sort order to work a little better in the signal selection dialog. Still kind of mess with many mods installed.
-	- Added MU versions of Electric Train locomotives to the exclude list of the Fuel Train Stop mod.
+    - Added MU versions of Electric Train locomotives to the exclude list of the Fuel Train Stop mod.
 
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.5
