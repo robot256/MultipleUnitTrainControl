@@ -19,6 +19,6 @@ data:extend({
 	order = "ab",
 	setting_type = "runtime-global",
 	minimum_value = 0,
-	default_value = 600
+	default_value = 300
   },
 })

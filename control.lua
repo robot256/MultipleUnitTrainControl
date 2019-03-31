@@ -27,6 +27,7 @@ require("script.processTrainPurge")
 require("script.processTrainBasic")
 require("script.processTrainWireless")
 require("script.addPairToGlobal")
+require("script.purgeLocoFromPairs")
 
 
 local settings_mode = settings.global["multiple-unit-train-control-mode"].value
@@ -161,6 +162,7 @@ local function ProcessReplacementQueue()
 				-- Replace the locomotive
 				--game.print("MU Control is replacing ".. r[1].name .. " '"..r[1].backer_name.."' with " .. r[2])
 				game.print({"debug-message.mu-replacement-message",r[1].name,r[1].backer_name,r[2]})
+				
 				local newLoco = replaceLocomotive(r[1], r[2])
 				-- Find which mu_pair the old one was in and put the new one instead
 				for _,p in pairs(global.mu_pairs) do
@@ -205,6 +207,7 @@ local function ProcessTrainQueue()
 	local idle = true
 	local found_pairs = {}
 	local upgrade_locos = {}
+	local unpaired_locos = {}
 	
 	if global.trains_in_queue then
 		--game.print("ProcessTrainQueue has a train in the queue")
@@ -213,17 +216,22 @@ local function ProcessTrainQueue()
 			if t and t.valid then
 				local mode = getAllowedMode(t.carriages[1].force)
 				if mode=="advanced" then
-					found_pairs,upgrade_locos = processTrainWireless(t)
+					found_pairs,upgrade_locos,unpaired_locos = processTrainWireless(t)
 				elseif mode=="basic" then
-					found_pairs,upgrade_locos = processTrainBasic(t)
+					found_pairs,upgrade_locos,unpaired_locos = processTrainBasic(t)
 				else
 					-- Mod disabled, go through the process of reverting every engine
-					found_pairs,upgrade_locos = processTrainPurge(t)
+					found_pairs,upgrade_locos,unpaired_locos = processTrainPurge(t)
 				end
 				
 				-- Add replacements to the replacement queue
 				for _,entry in pairs(upgrade_locos) do
 					table.insert(global.replacement_queue,entry)
+				end
+				
+				-- Remove pairs involving the now-unpaired locos.
+				for _,entry in pairs(unpaired_locos) do
+					purgeLocoFromPairs(entry)
 				end
 				
 				-- Add pairs to the pair lists.  (pairs will need to be updated when the replacements are made)
@@ -236,8 +244,6 @@ local function ProcessTrainQueue()
 			end
 		end
 		
-		
-	
 	end
 	
 	return idle
@@ -309,27 +315,30 @@ end
 --== ON_NTH_TICK EVENT ==--
 -- Initiates balancing of fuel inventories in every MU consist
 local function OnNthTick(event)
-	if not global.inventories_to_balance then
-		global.inventories_to_balance = {}
-	end
 	if global.mu_pairs and next(global.mu_pairs) then
-		local minTicks = 0
-	
+		local numInventories = 0
 	
 		local n = #global.mu_pairs
 		local done = false
 		for i=1,n do
 			entry = global.mu_pairs[i]
 			if (entry[1] and entry[2] and entry[1].valid and entry[2].valid) then
-				-- This pair is good, balance if not electric
-				------ RET COMPATIBILITY
-				if not global.ret_locos or not global.ret_locos[entry[1].name] then
-					table.insert(global.inventories_to_balance, {entry[1].burner.inventory, entry[2].burner.inventory})
-					minTicks = minTicks + 1
+				-- This pair is good, balance if there is burner fuel inventories (only check one, since they are identical prototypes)
+				local inventoryOne = entry[1].burner.inventory
+				local inventoryTwo = entry[2].burner.inventory
+				if inventoryOne.valid and inventoryOne.valid and #inventoryOne > 0 then
+					table.insert(global.inventories_to_balance, {inventoryOne, inventoryTwo})
+					numInventories = numInventories + 1
+					-- if it burns stuff, it might have a result
+					inventoryOne = entry[1].burner.burnt_result_inventory
+					inventoryTwo = entry[2].burner.burnt_result_inventory
+					if inventoryOne.valid and inventoryOne.valid and #inventoryOne > 0 then
+						table.insert(global.inventories_to_balance, {inventoryOne, inventoryTwo})
+						numInventories = numInventories + 1
+					end
 				end
-				-------
 			else
-				-- This pair is not good
+				-- This pair has one or more invalid locomotives, remove it from the list
 				global.mu_pairs[i] = nil
 			end
 		end
@@ -351,10 +360,12 @@ local function OnNthTick(event)
 			
 			-- Update the Nth tick interval to make sure we have enough time to update all the trains
 			local newVal = current_nth_tick
-			if minTicks+10 > current_nth_tick then
-				newVal = minTicks*2
-			elseif minTicks < current_nth_tick / 2 then
-				newVal = math.max(minTicks*2,settings_nth_tick)
+			if numInventories+10 > current_nth_tick then
+				-- If we have fewer than 10 spare ticks per update cycle, give ourselves 50% margin
+				newVal = (numInventories*3)/2
+			elseif numInventories < current_nth_tick / 2 then
+				-- If we have more than 100% margin, reduce either to the min setting or to just 50% margin
+				newVal = math.max((numInventories*3)/2, settings_nth_tick)
 			end
 			if newVal ~= current_nth_tick then
 				--game.print("Changing MU Control Nth Tick duration to " .. newVal)
@@ -433,24 +444,30 @@ end
 
 
 
----------
+-------------
 -- Enables the on_nth_tick event according to the mod setting value
---  Stores current interval in global.current_nth_tick
+--   Safe to run inside on_load().
 local function StartBalanceUpdates()
-	global.current_nth_tick = settings_nth_tick
-	current_nth_tick = global.current_nth_tick
-	if current_nth_tick > 0 then
-		--game.print("Enabling Nth Tick with setting " .. settings_nth_tick)
-		script.on_nth_tick(nil)
-		script.on_nth_tick(current_nth_tick, OnNthTick)
-	else
+
+	if settings_nth_tick == 0 or settings_mode == "disabled" then
 		-- Value of zero disables fuel balancing
 		--game.print("Disabling Nth Tick due to setting")
 		script.on_nth_tick(nil)
-		global.inventories_to_balance = {}
+	else
+		-- See if we stored a longer update rate in global
+		if global.current_nth_tick and global.current_nth_tick > settings_nth_tick then
+			current_nth_tick = global.current_nth_tick
+		else
+			current_nth_tick = settings_nth_tick
+		end
+		-- Start the event
+		--game.print("Enabling Nth Tick with setting " .. settings_nth_tick)
+		script.on_nth_tick(nil)
+		script.on_nth_tick(current_nth_tick, OnNthTick)
 	end
 end
 
+-----------
 -- Queues all existing trains for updating with new settings
 local function QueueAllTrains()
 	if not global.replacement_queue then
@@ -473,25 +490,15 @@ local function init_events()
 	script.on_event({defines.events.on_player_setup_blueprint,defines.events.on_player_configured_blueprint}, OnPlayerSetupBlueprint)
 	script.on_event(defines.events.on_player_pipette, OnPlayerPipette)
 
-	-- Subscribe to On_Nth_Tick according to saved global setting
-	current_nth_tick = global.current_nth_tick
-	if not current_nth_tick then
-		current_nth_tick = 0
-	end
+	-- Subscribe to On_Nth_Tick according to saved global and settings
+	StartBalanceUpdates()
 	
 	-- Subscribe to On_Train_Created according to mod enabled setting
 	if settings_mode ~= "disabled" then
 		script.on_event(defines.events.on_train_created, OnTrainCreated)
-		if current_nth_tick > 0 then
-			script.on_nth_tick(current_nth_tick, OnNthTick)
-		end
-		
-	else
-		script.on_event(defines.events.on_train_created, nil)
-		script.on_nth_tick(nil)
 	end
 	
-	-- Set conditional OnTick event handler correctly on load, so we can sync with a multiplayer game.
+	-- Set conditional OnTick event handler correctly on load based on global queues, so we can sync with a multiplayer game.
 	if (global.trains_in_queue and next(global.trains_in_queue)) or
 	      (global.replacement_queue and next(global.replacement_queue)) or
 	      (global.inventories_to_balance and next(global.inventories_to_balance)) then
@@ -507,11 +514,6 @@ script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
 		if settings_mode ~= "disabled" then
 			-- Scrub existing trains and add MU locomotives when necessary
 			QueueAllTrains()
-			
-			-- if there were saved pairs, start the fuel balancer
-			if global.mu_pairs and next(global.mu_pairs) then
-				StartBalanceUpdates()
-			end
 			
 			-- Enable or disable events based on setting state
 			init_events()
@@ -531,12 +533,10 @@ script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
 	end
 	
 	if event.setting == "multiple-unit-train-control-on_nth_tick" then
-		-- When interval changes, clear all on_nth_tick handlers and add it back to the new one
+		-- When interval changes, clear the saved update rate and start over
 		settings_nth_tick = settings.global["multiple-unit-train-control-on_nth_tick"].value
-		script.on_nth_tick(nil)
-		if global.mu_pairs and next(global.mu_pairs) then
-			StartBalanceUpdates()
-		end
+		global.current_nth_tick = nil
+		StartBalanceUpdates()
 	end
 	
 end)
@@ -555,6 +555,7 @@ script.on_init(function()
 	global.inventories_to_balance = {}
 	InitEntityMaps()
 	init_events()
+	
 end)
 
 script.on_configuration_changed(function(data)
@@ -566,7 +567,7 @@ script.on_configuration_changed(function(data)
 	InitEntityMaps()
 	-- On config change, scrub the list of trains
 	QueueAllTrains()
-	StartBalanceUpdates()
 	init_events()
+
 end)
 end

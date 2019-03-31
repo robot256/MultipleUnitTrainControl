@@ -47,6 +47,7 @@ function processTrainBasic(t)
 	
 	local found_pairs = {}
 	local upgrade_locos = {}
+	local unpaired_locos = {}
 	
 	for _,unit in pairs(loco_units) do
 		
@@ -132,6 +133,7 @@ function processTrainBasic(t)
 							-- Didn't find a twin to upgrade, have to downgrade this one :(
 							--game.print("Downgrading unpaired front mover " .. loco1.backer_name )
 							table.insert(upgrade_locos,{loco1,std_name})
+							table.insert(unpaired_locos,loco1)
 						end
 					end
 					
@@ -201,8 +203,12 @@ function processTrainBasic(t)
 									end
 								end
 							end
+							if not loco1_done then
+								-- if no twin for std loco1, do nothing
+								table.insert(unpaired_locos,loco1)
+							end
 						end
-						-- if no twin for std loco1, do nothing
+						
 					end
 				end
 			end
@@ -214,27 +220,28 @@ function processTrainBasic(t)
 	-- If there are any unpaired MU locos left over in back_movers, they must be downgraded!
 	-- Didn't find an MU twin, look for a normal twin to this MU so we can upgrade it
 	for _,loco2 in pairs(back_movers) do
-		if global.downgrade_pairs[loco2.name] then
-			-- Found a back MU
-			-- Potential straggler, make sure it's not in a pair already
-			local loco2_free = true
-			for _,this_pair in pairs(found_pairs) do
-				if this_pair[1] == loco2 or this_pair[2] == loco2 then  -- (back_mover is always 2nd member of a pair)
-					loco2_free = false
-					break
-				end
+		-- Potential straggler, make sure it's not in a pair already
+		local loco2_free = true
+		for _,this_pair in pairs(found_pairs) do
+			if this_pair[1] == loco2 or this_pair[2] == loco2 then  -- (back_mover is always 2nd member of a pair)
+				loco2_free = false
+				break
 			end
-			if loco2_free then
+		end
+		if loco2_free then
+			if global.downgrade_pairs[loco2.name] then
 				-- Found an unpaired MU, downgrade it
 				--game.print("Found back straggler " .. loco2.backer_name)
 				table.insert(upgrade_locos,{loco2, global.downgrade_pairs[loco2.name]})
 				loco1_done = true
 				break
 			end
+			-- record straggler
+			table.insert(unpaired_locos,loco2)
 		end
 	end
 	
-	return found_pairs, upgrade_locos
+	return found_pairs, upgrade_locos, unpaired_locos
 end
 
 return processTrainBasic	

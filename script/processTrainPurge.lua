@@ -11,13 +11,19 @@ function processTrainPurge(t)
 	-- Mod is Disabled, we must revert all MU locomotives!
 	local found_pairs = {}
 	local upgrade_locos = {}
+	local unpaired_locos = {}
 	for i,c in ipairs(t.carriages) do
-		if c.type == "locomotive" and global.downgrade_pairs[c.name] then
-			table.insert(upgrade_locos,{c,global.downgrade_pairs[c.name]})
+		if c.type == "locomotive" then
+			if global.downgrade_pairs[c.name] then
+				table.insert(upgrade_locos,{c,global.downgrade_pairs[c.name]})
+				table.insert(unpaired_locos, c)
+			elseif global.upgrade_pairs[c.name] then
+				table.insert(unpaired_locos, c)
+			end
 		end
 	end
 
-	return found_pairs, upgrade_locos 
+	return found_pairs, upgrade_locos, unpaired_locos
 
 end
 

@@ -17,6 +17,8 @@ function processTrainWireless(t)
 	-- Start with trying to map existing MUs to each other. If that doesn't work, we have to upgrade
 	local found_pairs = {}
 	local upgrade_locos = {}
+	local unpaired_locos = {}
+	
 	-- For every front_mover, look for its twin in back_movers
 	for _,loco1 in pairs(front_movers) do
 		local loco1_done = false
@@ -67,6 +69,7 @@ function processTrainWireless(t)
 				if not loco1_done then
 					-- Didn't find a twin to upgrade, have to downgrade this one :(
 					table.insert(upgrade_locos,{loco1,std_name})
+					table.insert(unpaired_locos,loco1)
 				end
 			end
 			
@@ -115,6 +118,10 @@ function processTrainWireless(t)
 						end
 					end
 				end
+				if not loco1_done then
+					-- Unpaired std loco, just record it
+					table.insert(unpaired_locos,loco1)
+				end
 			end
 		end
 	end
@@ -122,26 +129,27 @@ function processTrainWireless(t)
 	-- If there are any unpaired MU locos left over in back_movers, they must be downgraded!
 	-- Didn't find an MU twin, look for a normal twin to this MU so we can upgrade it
 	for _,loco2 in pairs(back_movers) do
-		if global.downgrade_pairs[loco2.name] then
-			-- Found a back MU
-			-- Potential straggler, make sure it's not in a pair already
-			local loco2_free = true
-			for _,this_pair in pairs(found_pairs) do
-				if this_pair[1] == loco2 or this_pair[2] == loco2 then  -- (back_mover is always 2nd member of a pair)
-					loco2_free = false
-					break
-				end
+		-- Potential straggler, make sure it's not in a pair already
+		local loco2_free = true
+		for _,this_pair in pairs(found_pairs) do
+			if this_pair[1] == loco2 or this_pair[2] == loco2 then  -- (back_mover is always 2nd member of a pair)
+				loco2_free = false
+				break
 			end
-			if loco2_free then
+		end
+		if loco2_free then
+			if global.downgrade_pairs[loco2.name] then
 				-- Found an unpaired MU, downgrade it
 				table.insert(upgrade_locos,{loco2, global.downgrade_pairs[loco2.name]})
 				loco1_done = true
 				break
 			end
+			-- record straggler regardless
+			table.insert(unpaired_locos,loco1)
 		end
 	end
 	
-	return found_pairs, upgrade_locos
+	return found_pairs, upgrade_locos, unpaired_locos
 end
 
 return processTrainWireless

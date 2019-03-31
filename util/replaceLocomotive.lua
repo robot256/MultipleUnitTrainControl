@@ -19,6 +19,7 @@ function replaceLocomotive(loco, newName)
 	local color = loco.color
 	local health = loco.health
 	local to_be_deconstructed = loco.to_be_deconstructed(force)
+	local player_driving = loco.get_driver()
 	
 	-- Save equipment grid contents
 	local grid_equipment = nil
@@ -126,6 +127,11 @@ function replaceLocomotive(loco, newName)
 	-- Restore the equipment grid
 	if grid_equipment and newLoco.grid and newLoco.grid.valid then
 		restoreGrid(newLoco.grid, grid_equipment)
+	end
+	
+	-- Restore the player driving
+	if player_driving then
+		newLoco.set_driver(player_driving)
 	end
 	
 	-- Restore the train schedule and mode
