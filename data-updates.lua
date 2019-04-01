@@ -17,4 +17,5 @@ require ("prototypes.as_add_mu")
 require ("prototypes.bob_add_mu")
 require ("prototypes.et_add_mu")
 require ("prototypes.farl_add_mu")
+require ("prototypes.bni_add_mu")
 --require ("prototypes.ret_add_mu") -- Requires collaboration with RET author to make it work
