@@ -395,7 +395,7 @@ local function OnPlayerSetupBlueprint(event)
 	local item2 = game.get_player(event.player_index).cursor_stack
 	if item1 and item1.valid_for_read==true then
 		purgeBlueprint(item1)
-	elseif item2 and item2.valid_for_read==true then
+	elseif item2 and item2.valid_for_read==true and item2.is_blueprint==true then
 		purgeBlueprint(item2)
 	end
 end
