@@ -8,7 +8,10 @@
 
 function restoreGrid(grid,savedItems)
 	for _,v in pairs(savedItems) do
-		grid.put(v)
+		local e = grid.put(v.item)
+		if v.energy then
+			e.energy = v.energy
+		end
 	end
 end
 
