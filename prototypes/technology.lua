@@ -15,7 +15,7 @@ data:extend{
 	icon_size = 128,
 	prerequisites = {"automated-rail-transportation","electronics"},
 	effects = {},  -- Handled by mod scripting
-	unit =  -- Intended to be early-game upgrade to base locomotive, then later upgraded locomotives.
+	unit =  -- Intended to be early-game upgrade for simple railroads
 	{
 	  count = 150,
 	  ingredients = {
@@ -33,7 +33,7 @@ data:extend{
 	icon_size = 128,
 	prerequisites = {"multiple-unit-train-control","advanced-electronics"},
 	effects = {},  -- Handled by mod scripting
-	unit =  -- Intended to be early-game upgrade to base locomotive, then later upgraded locomotives.
+	unit =  -- Wireless mode after you get advanced circuits.
 	{
 	  count = 250,
 	  ingredients = {
