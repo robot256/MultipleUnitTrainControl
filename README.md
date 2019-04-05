@@ -8,8 +8,8 @@ Factorio mod written in Lua.  Lets locomotives provide backwards force in automa
 - License: MIT
 - Source: GitHub
 - Download: mods.factorio.com
-- Version: 0.1.7
-- Release: 2019-03-31
+- Version: 0.1.9
+- Release: 2019-04-04
 - Tested-With-Factorio-Version: 0.17.23
 - Category: Helper, Train
 - Tags: Train
@@ -41,10 +41,12 @@ Four modes can be selected in the mod settings:
   - Vanilla
   - [Train & Fuel Overhaul](https://mods.factorio.com/mods/Optera/TrainOverhaul)
   - [Electric Train](https://mods.factorio.com/mod/ElectricTrain)
+  - [Batteries Not Included](https://mods.factorio.com/mod/BatteriesNotIncluded)
   - [Fully Automated Rail Layer](https://mods.factorio.com/mod/FARL)
   - [Angel's Petrochem Train](https://mods.factorio.com/mod/angelsaddons-petrotrain)
   - [Angel's Smelting Train](https://mods.factorio.com/mod/angelsaddons-smeltingtrain)
   - [Bob's Logistics](https://mods.factorio.com/mod/boblogistics)
+  - [Schall's Armoured Train](https://mods.factorio.com/mod/SchallArmouredTrain)
 
 ## Planned Features
 - Support additional modded locomotives.  If you want more, please send me suggestions!
