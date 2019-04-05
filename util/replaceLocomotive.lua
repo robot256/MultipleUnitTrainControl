@@ -22,24 +22,13 @@ function replaceLocomotive(loco, newName)
 	local player_driving = loco.get_driver()
 	
 	-- Save equipment grid contents
-	local grid_equipment = nil
-	if loco.grid and loco.grid.valid then
-		grid_equipment = saveGrid(loco.grid)
-	end
+	local grid_equipment = saveGrid(loco.grid)
 	
 	-- Save item requests left over from a blueprint
 	local item_requests = saveItemRequestProxy(loco)
 	
 	-- Save the burner progress
-	local burner_heat = loco.burner.heat
-	local burner_remaining_burning_fuel = loco.burner.remaining_burning_fuel
-	local burner_currently_burning = loco.burner.currently_burning
-	
-	-- Save the fuel inventory
-	local burner_inventory = loco.burner.inventory.get_contents()
-	if ( loco.burner.burnt_result_inventory.valid ) then
-		local burner_burnt_result_inventory = loco.burner.burnt_result_inventory.get_contents()
-	end
+	local saved_burner = saveBurner(loco.burner)
 	
 	-- Adjust the direction of the new locomotive
 	-- This mapping was determined by brute force because direction and orientation for trains are stupid.
@@ -56,13 +45,6 @@ function replaceLocomotive(loco, newName)
 	local disconnected_back = loco.disconnect_rolling_stock(defines.rail_direction.back)
 	local disconnected_front = loco.disconnect_rolling_stock(defines.rail_direction.front)
 	
-	-----------
-	-- RET Compatibility
-	if global.ret_locos and global.ret_locos[newName] then
-		remote.call("realistic_electric_trains", "unregister_locomotive", loco)
-	end
-	-----------
-	
 	-- Destroy the old Locomotive so we have space to make the new one
 	loco.destroy({raise_destroy=true})
 	
@@ -77,11 +59,10 @@ function replaceLocomotive(loco, newName)
 		newLoco.disconnect_rolling_stock(defines.rail_direction.front)
 	end
 	
-	
 	-- Restore parameters
 	newLoco.backer_name = backer_name
 	if color then   -- color is nil if you never changed it!
-		newLoco.color = color 
+		newLoco.color = color
 	end
 	newLoco.health = health
 	if to_be_deconstructed == true then
@@ -94,35 +75,7 @@ function replaceLocomotive(loco, newName)
 	end
 	
 	-- Restore the partially-used burner fuel
-	newLoco.burner.currently_burning = burner_currently_burning
-	newLoco.burner.heat = burner_heat
-	newLoco.burner.remaining_burning_fuel = burner_remaining_burning_fuel
-	
-	-----------
-	-- RET Compatibility
-	if global.ret_locos and global.ret_locos[newName] then
-		local prototype = newLoco.prototype
-		local efficiency_modifier = 1.05
-		local ticks_per_update = remote.call("realistic_electric_trains","get_ticks_per_update")
-		if prototype.burner_prototype.effectivity < 1 then
-			efficiency_modifier = efficiency_modifier / prototype.burner_prototype.effectivity
-		end
-		local ret_transfer = prototype.max_energy_usage * efficiency_modifier * ticks_per_update
-		remote.call("realistic_electric_trains", "register_locomotive", newLoco, {item=global.ret_locos[newName], transfer=ret_transfer})
-	end
-	-----------
-	
-	-- Translate the inventory results so we can insert the stacks.
-	for k,v in pairs(burner_inventory) do
-		--game.print("Inserting fuel " .. k.." = "..v)
-		newLoco.burner.inventory.insert({name=k, count=v})
-	end
-	if ( burner_burnt_result_inventory ) then
-		for k,v in pairs(burner_burnt_result_inventory) do
-			--game.print("Inserting burnt fuel " .. k.." = "..v)
-			newLoco.burner.burnt_result_inventory.insert({name=k, count=v})
-		end
-	end
+	restoreBurner(newLoco.burner, saved_burner)
 	
 	-- Restore the equipment grid
 	if grid_equipment and newLoco.grid and newLoco.grid.valid then

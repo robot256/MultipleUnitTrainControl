@@ -5,11 +5,16 @@
 --]]
 
 
-function createMuLoco(oldName, newName, itemType, hasDescription)
-
+function createMuLoco(oldName, newName, itemType, hasDescription, power_multiplier)
+	power_multiplier = power_multiplier or 2
+	-- Check that source exists
+	if not data.raw["locomotive"][oldName] then
+		error("MUTC Prototype Maker: locomotive " .. oldName .. " doesn't exist")
+	end
+	
 	data:extend{
 		createMuLocoItemPrototype(itemType, oldName, newName),
-		createMuLocoEntityPrototype(oldName, newName, hasDescription),
+		createMuLocoEntityPrototype(oldName, newName, hasDescription, power_multiplier),
 		createMuLocoRecipePrototype(oldName, newName)
 	}
 	table.insert(data.raw.technology["multiple-unit-train-control-locomotives"].effects, {type = "unlock-recipe", recipe = newName})

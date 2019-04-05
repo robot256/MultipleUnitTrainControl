@@ -8,12 +8,7 @@
 --]]
 
 
-function createMuLocoEntityPrototype(name, newName, has_description)
-	-- Check that source exists
-	if not data.raw["locomotive"][name] then
-		error("locomotive " .. name .. " doesn't exist")
-	end
-	
+function createMuLocoEntityPrototype(name, newName, has_description, power_multiplier)
 	-- Copy source locomotive prototype
 	local oldLoco = data.raw["locomotive"][name]
 	local loco = table.deepcopy(oldLoco)
@@ -38,7 +33,7 @@ function createMuLocoEntityPrototype(name, newName, has_description)
 	--loco.allow_copy_paste = false  --This also prevents pressing 'Q' from retrieving the normal item from your inventory. Not sure how to fix that.
 	
 	-- Change the power level (string contains suffix "kW"). This also increases fuel consumption.
-	local max_power = string.sub(loco.max_power,1,-3) * 2
+	local max_power = string.sub(loco.max_power,1,-3) * power_multiplier
 	local power_suffix = string.sub(loco.max_power,-2,-1)
 	loco.max_power = max_power .. power_suffix
 	
