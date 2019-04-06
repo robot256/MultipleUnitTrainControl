@@ -6,9 +6,15 @@
 
 
 if mods["electric-vehicles-lib-reborn"] then
-
-	-- Generate an MU version of the EVR Electric Locomotive
-	createMuLoco("electric-vehicles-electric-locomotive","electric-vehicles-electric-locomotive-mu",
-						"item-with-entity-data",true)
-	
+-- Check version number
+	local r = {0,1,2} -- required version
+	local ver = mods["electric-vehicles-lib-reborn"]
+	local f = {tonumber(string.match(ver,"^(%d+)%.")),  -- found version
+	           tonumber(string.match(ver,"%.(%d+)%.")),
+			   tonumber(string.match(ver,"%.(%d+)$"))}
+	if (f[1] > r[1]) or (f[1] == r[1] and f[2] > r[2]) or (f[1] == r[1] and f[2] == r[2] and f[3] >= r[3]) then
+		-- Generate an MU version of the EVR Electric Locomotive
+		createMuLoco("electric-vehicles-electric-locomotive","electric-vehicles-electric-locomotive-mu",
+							"item-with-entity-data",true)
+	end
 end

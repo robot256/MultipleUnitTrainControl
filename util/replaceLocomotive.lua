@@ -3,7 +3,6 @@
  * File: replaceLocomotive.lua
  * Description: Replaces one Locomotive Entity with a new one of a different entity-name.
  *    Preserves as many properties of the original as possible.
- *    Currently does not support preserving equipment grids.
 --]]
 
 

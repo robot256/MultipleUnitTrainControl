@@ -3,7 +3,6 @@
  * File: createMuLocoEntityPrototype.lua
  * Description: Copies a locomotive entity prototype and creates the "-mu" version with:
  *    - max_power is double the standard version.
- *    - reversing_power_modifier is set to 0.1.
  *    - MU localization text is added to name and description fields.
 --]]
 
@@ -28,9 +27,6 @@ function createMuLocoEntityPrototype(name, newName, has_description, power_multi
 	
 	-- Make it so a normal locomotive can be pasted on this blueprint, doesn't really work?
 	loco.additional_pastable_entities = {name}
-	
-	-- Disable blueprints (don't know how to make it put a normal locomotive in the blueprint instead
-	--loco.allow_copy_paste = false  --This also prevents pressing 'Q' from retrieving the normal item from your inventory. Not sure how to fix that.
 	
 	-- Change the power level (string contains suffix "kW"). This also increases fuel consumption.
 	local max_power = string.sub(loco.max_power,1,-3) * power_multiplier
