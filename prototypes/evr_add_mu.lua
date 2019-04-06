@@ -5,10 +5,10 @@
 --]]
 
 
-if mods["electric-vehicles-lib-reborn"] then
+if mods["electric-vehicles-reborn"] then
 -- Check version number
 	local r = {0,1,2} -- required version
-	local ver = mods["electric-vehicles-lib-reborn"]
+	local ver = mods["electric-vehicles-reborn"]
 	local f = {tonumber(string.match(ver,"^(%d+)%.")),  -- found version
 	           tonumber(string.match(ver,"%.(%d+)%.")),
 			   tonumber(string.match(ver,"%.(%d+)$"))}
