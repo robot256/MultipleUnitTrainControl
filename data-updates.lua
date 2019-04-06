@@ -19,5 +19,6 @@ require ("prototypes.et_add_mu")
 require ("prototypes.farl_add_mu")
 require ("prototypes.bni_add_mu")
 require ("prototypes.sat_add_mu")
---require ("prototypes.evr_add_mu") -- Still buggy, need collaboration
+require ("prototypes.evr_add_mu")
+require ("prototypes.5dt_add_mu")
 --require ("prototypes.ret_add_mu") -- Requires collaboration with RET author to make the remote caller interface work
