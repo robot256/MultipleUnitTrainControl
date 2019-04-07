@@ -9,8 +9,8 @@ Factorio mod written in Lua.  Lets locomotives provide backwards force in automa
 - Source: GitHub
 - Download: mods.factorio.com
 - Version: 0.1.12
-- Release: 2019-04-05
-- Tested-With-Factorio-Version: 0.17.23
+- Release: 2019-04-06
+- Tested-With-Factorio-Version: 0.17.25
 - Category: Helper, Train
 - Tags: Train
 
@@ -32,6 +32,7 @@ This mod is meant to be an alternative to [Noxy's Multidirectional Trains](url=h
   - [Electric Train](https://mods.factorio.com/mod/ElectricTrain)
   - [Batteries Not Included](https://mods.factorio.com/mod/BatteriesNotIncluded)
   - [Fully Automated Rail Layer](https://mods.factorio.com/mod/FARL)
+  - [Angel's Industries](https://mods.factorio.com/mod/angelsindustries) Crawler Train
   - [Angel's Petrochem Train](https://mods.factorio.com/mod/angelsaddons-petrotrain)
   - [Angel's Smelting Train](https://mods.factorio.com/mod/angelsaddons-smeltingtrain)
   - [Bob's Logistics](https://mods.factorio.com/mod/boblogistics)

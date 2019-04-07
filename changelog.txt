@@ -1,11 +1,16 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.1.13
+Date: 2019-04-06
+  Features:
+    - Added support for Angel's Industries (Crawler Train).
+
+---------------------------------------------------------------------------------------------------
 Version: 0.1.12
 Date: 2019-04-06
   Features:
     - Added support for Electric Vehicles: Reborn (requires version 0.1.2).
     - Added support for 5dim's mod - Trains.
   Bugfixes:
-    - Added Noxy's Multidirectional Trains as a conflict dependency.
     - Fixed changelog formatting.
 
 ---------------------------------------------------------------------------------------------------
