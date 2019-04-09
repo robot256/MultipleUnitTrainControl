@@ -18,13 +18,10 @@
  *
  --]]
 
-require("util.mapPipette")
 require("util.mapBlueprint")
 require("util.saveItemRequestProxy")
-require("util.saveGrid")
-require("util.restoreGrid")
 require("util.saveBurner")
-require("util.restoreBurner")
+require("util.saveGrid")
 require("util.replaceLocomotive")
 require("util.balanceInventories")
 require("script.processTrainPurge")

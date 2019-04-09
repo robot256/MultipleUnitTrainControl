@@ -3,6 +3,7 @@
  * File: replaceLocomotive.lua
  * Description: Replaces one Locomotive Entity with a new one of a different entity-name.
  *    Preserves as many properties of the original as possible.
+ * Dependencies:  saveGrid.lua, saveBurner.lua, saveItemRequestProxy.lua
 --]]
 
 

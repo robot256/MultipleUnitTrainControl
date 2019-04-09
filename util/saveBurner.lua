@@ -1,7 +1,7 @@
 --[[ Copyright (c) 2019 robot256 (MIT License)
  * Project: Multiple Unit Train Control
  * File: saveBurner.lua
- * Description: Saves the state and contents of a burner.
+ * Description: Saves and restores the state and contents of a burner.
  *    Includes currently burning data, fuel inventory, and burnt inventory.
 --]]
 
@@ -20,4 +20,19 @@ function saveBurner(burner)
 	end
 end
 
-return saveBurner
+function restoreBurner(target,saved)
+	target.heat = saved.heat
+	target.currently_burning = saved.currently_burning
+	target.remaining_burning_fuel = saved.remaining_burning_fuel
+	for k,v in pairs(saved.inventory) do
+		target.inventory.insert({name=k, count=v})
+	end
+	if ( saved.burnt_result_inventory ) then
+		for k,v in pairs(saved.burnt_result_inventory) do
+			target.burnt_result_inventory.insert({name=k, count=v})
+		end
+	end
+end
+
+
+return saveBurner,restoreBurner
