@@ -523,6 +523,20 @@ local function QueueAllTrains()
 	ProcessTrainQueue()
 end
 
+
+--== ON_RESEARCH_COMPLETED EVENT ==--
+-- Forces a scrub after researching MUTC technologies
+-- Moving trains will be queued until they stop.
+local function OnResearchCompleted(event)
+	if (event.technology.name == "multiple-unit-train-control") or
+	   (event.technology.name == "adv-multiple-unit-train-control") then
+		-- Reprocess all trains with the new technology setting
+		QueueAllTrains()  -- This will execute some replacements immediately
+		StartTrainWatcher()
+	end
+end
+
+
 ---- Bootstrap ----
 do
 local function init_events()
@@ -530,6 +544,9 @@ local function init_events()
 	-- Subscribe to Blueprint activity
 	script.on_event({defines.events.on_player_setup_blueprint,defines.events.on_player_configured_blueprint}, OnPlayerSetupBlueprint)
 	script.on_event(defines.events.on_player_pipette, OnPlayerPipette)
+	
+	-- Subscribe to Technology activity
+	script.on_event({defines.events.on_research_completed,defines.events.on_research_uncompleted}, OnResearchCompleted)
 
 	-- Subscribe to On_Nth_Tick according to saved global and settings
 	StartBalanceUpdates()
