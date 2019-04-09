@@ -18,6 +18,8 @@
  *
  --]]
 
+require("util.mapPipette")
+require("util.mapBlueprint")
 require("util.saveItemRequestProxy")
 require("util.saveGrid")
 require("util.restoreGrid")
@@ -97,42 +99,6 @@ local function InitEntityMaps()
 end
 
 
-
-------------------------- BLUEPRINT HANDLING ---------------------------------------
--- Finds the blueprint a player created and changes all MU locos to standard
-local function purgeBlueprint(bp)
-	-- Get Entity table from blueprint
-	local entities = bp.get_blueprint_entities()
-	-- Find any downgradable items and downgrade them
-	if entities and next(entities) then
-		for _,e in pairs(entities) do
-			if global.downgrade_pairs[e.name] then
-				--game.print("MU Control fixing blueprint by changing ".. e.name .." to ".. global.downgrade_pairs[e.name])
-				e.name = global.downgrade_pairs[e.name]
-			end
-		end
-		-- Write tables back to the blueprint
-		bp.set_blueprint_entities(entities)
-	end
-	-- Find icons too
-	local icons = bp.blueprint_icons
-	if icons and next(icons) then
-		for _,i in pairs(icons) do
-			if i.signal.type == "item" then
-				if global.downgrade_pairs[i.signal.name] then
-					--game.print("MU Control fixing blueprint icons by changing ".. i.signal.name .." to ".. global.downgrade_pairs[i.signal.name])
-					i.signal.name = global.downgrade_pairs[i.signal.name]
-				end
-			end
-		end
-		-- Write tables back to the blueprint
-		bp.blueprint_icons = icons
-	end
-end
-
-
-
-
 ------------------------- FUEL BALANCING CODE --------------------------------------
 -- Takes inventories from the queue and process them, one per tick
 local function ProcessInventoryQueue()
@@ -175,7 +141,6 @@ local function ProcessReplacement(r)
 end
 
 
-
 -- Read train state and determine if it is safe to replace
 local function isTrainStopped(train)
 	local state = train.state
@@ -201,9 +166,8 @@ local function getAllowedMode(force)
 end
 
 
-
-
--- Process up to one valid train. Do replacemnts immediately.
+------------
+-- Process one valid train. Do replacemnts immediately.
 local function ProcessTrain(t)
 	local found_pairs = {}
 	local upgrade_locos = {}
@@ -428,20 +392,7 @@ end
 --== ON_PLAYER_SETUP_BLUEPRINT EVENT ==--
 -- ID 68, fires when you select an area to make a blueprint or copy
 local function OnPlayerSetupBlueprint(event)
-	--game.print("MU Control handling Blueprint from ".. event.name .." event.")
-	
-	-- Get Blueprint from player (LuaItemStack object)
-	-- If this is a Copy operation, BP is in cursor_stack
-	-- If this is a Blueprint operation, BP is in blueprint_to_setup
-	-- Need to use "valid_for_read" because "valid" returns true for empty LuaItemStack
-	
-	local item1 = game.get_player(event.player_index).blueprint_to_setup
-	local item2 = game.get_player(event.player_index).cursor_stack
-	if item1 and item1.valid_for_read==true then
-		purgeBlueprint(item1)
-	elseif item2 and item2.valid_for_read==true and item2.is_blueprint==true then
-		purgeBlueprint(item2)
-	end
+	mapBlueprint(event,global.downgrade_pairs)
 end
 
 
@@ -449,38 +400,7 @@ end
 -- Fires when player presses 'Q'.  We need to sneakily grab the correct item from inventory if it exists,
 --  or sneakily give the correct item in cheat mode.
 local function OnPlayerPipette(event)
-	--game.print("MUTC: OnPlayerPipette, cheat mode="..tostring(event.used_cheat_mode))
-	local item = event.item
-	if item and item.valid then
-		--game.print("item: " .. item.name)
-		if global.downgrade_pairs[item.name] then
-			local player = game.players[event.player_index]
-			local newName = global.downgrade_pairs[item.name]
-			local cursor = player.cursor_stack
-			local inventory = player.get_main_inventory()
-			-- Check if the player got MU versions from inventory, and convert them
-			if cursor.valid_for_read == true and event.used_cheat_mode == false then
-				-- Huh, he actually had MU items.
-				--game.print("Converting cursor to "..newName)
-				cursor.set_stack({name=newName,count=cursor.count})
-			else
-				-- Check if the player could have gotten the right thing from inventory/cheat, otherwise clear the cursor
-				--game.print("Looking for " .. newName .. " in inventory")
-				local newItemStack = inventory.find_item_stack(newName)
-				cursor.set_stack(newItemStack)
-				if not cursor.valid_for_read then
-					--game.print("Not found!")
-					if player.cheat_mode==true then
-						--game.print("Giving free " .. newName)
-						cursor.set_stack({name=newName, count=game.item_prototypes[newName].stack_size})
-					end
-				else
-					--game.print("Found!")
-					inventory.remove(newItemStack)
-				end
-			end
-		end
-	end
+	mapPipette(event,global.downgrade_pairs)
 end
 
 -------------
@@ -523,7 +443,7 @@ local function QueueAllTrains()
 	ProcessTrainQueue()
 end
 
-
+--[[
 --== ON_RESEARCH_COMPLETED EVENT ==--
 -- Forces a scrub after researching MUTC technologies
 -- Moving trains will be queued until they stop.
@@ -535,7 +455,7 @@ local function OnResearchCompleted(event)
 		StartTrainWatcher()
 	end
 end
-
+--]]
 
 ---- Bootstrap ----
 do
@@ -546,7 +466,7 @@ local function init_events()
 	script.on_event(defines.events.on_player_pipette, OnPlayerPipette)
 	
 	-- Subscribe to Technology activity
-	script.on_event({defines.events.on_research_completed,defines.events.on_research_uncompleted}, OnResearchCompleted)
+	--script.on_event({defines.events.on_research_completed,defines.events.on_research_uncompleted}, OnResearchCompleted)
 
 	-- Subscribe to On_Nth_Tick according to saved global and settings
 	StartBalanceUpdates()
