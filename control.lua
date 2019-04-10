@@ -196,31 +196,86 @@ local function ProcessTrain(t)
 	end
 end
 
--- Try to process new trains immediately
+
+----------------------------------------------
+------ EVENT HANDLING ---
+
+--== ON_TRAIN_CHANGED_STATE EVENT ==--
+-- Fires when train pathfinder changes state, executes if the train is in the update list.
+-- Use this to replace locomotives at a safe (stopped) time.
+local function OnTrainChangedState(event)	
+	local id = event.train.id
+			
+	--game.print("Train ".. id .. " In OnTrainChangedState!")
+	-- Event contains train, old_train_state
+	-- If this train is queued for replacement, check state and maybe process now
+	if global.moving_trains[id] then
+		local t = event.train
+		-- We are waitng to process it, check everything!
+		if t and t.valid then
+			-- Check if this train is in a safe state
+			if isTrainStopped(t) then
+				-- Immediately replace these locomotives
+				--game.print("Train " .. id .. " being processed.")
+				if train_queue_semaphore == false then
+					train_queue_semaphore = true
+					ProcessTrain(t)
+					global.moving_trains[id] = nil
+					train_queue_semaphore = false
+				else
+					-- It's stopped, but we're busy. Put it back in the OnTick queue (might work?)
+					game.print("OnChange Train " .. id .. " event ignored because semaphore is occupied")
+				end
+			end
+		end
+	end
+	if not next(global.moving_trains) then
+		script.on_event(defines.events.on_train_changed_state, nil)
+	end
+	
+	--game.print("Train " .. id .. " Exiting OnTrainChangedState")
+end
+
+
+-------------
+-- Enables the on_train_changed_state event according to current variables
+local function StartTrainWatcher()
+	if global.moving_trains and next(global.moving_trains) then
+		-- Set up the action to process train after it comes to a stop
+		script.on_event(defines.events.on_train_changed_state, OnTrainChangedState)
+	else
+		script.on_event(defines.events.on_train_changed_state, nil)
+	end
+end
+
+
+----------
+-- Try to process newly created trains immediately
 local function ProcessTrainQueue()
 	-- Check if we are already processing a train.
 	-- Don't execute this again if it was triggered by an intermediate on_train_created event.
 	if train_queue_semaphore==false then
 		train_queue_semaphore = true
 		
-		if global.trains_in_queue then
+		if global.created_trains then
 			--game.print("ProcessTrainQueue has a train in the queue")
 			-- Keep looping until we discard all the invalid intermediate trains
 			local moving_trains = {}
-			for id,t in pairs(global.trains_in_queue) do
+			while next(global.created_trains) do
+				local t = table.remove(global.created_trains,1)
 				if t and t.valid then
 					-- Check if this train is in a safe state
 					if isTrainStopped(t) then
 						-- Immediately replace these locomotives
 						--game.print("Train " .. id .. " being processed.")
 						ProcessTrain(t)
-						global.trains_in_queue[id] = nil
+						-- Don't process any more trains this tick
+						break
 					else
+						-- Flag this train to be processed on a ChangedState event
+						global.moving_trains[t.id] = t
 						--game.print("Train " .. id .. " still moving.")
 					end
-				else
-					global.trains_in_queue[id] = nil
-					--game.print("Train " .. id .. " purged.")
 				end
 			end
 		end
@@ -234,40 +289,28 @@ local function ProcessTrainQueue()
 end
 
 
-----------------------------------------------
------- EVENT HANDLING ---
 
---== ON_TRAIN_CHANGED_STATE EVENT ==--
--- Fires when train pathfinder changes state, executes if the train is in the update list.
--- Use this to replace locomotives at a safe (stopped) time.
-local function OnTrainChangedState(event)
-	local id = event.train.id
-	--game.print("Train ".. id .. " In OnTrainChangedState!")
-	-- Event contains train, old_train_state
-	-- If this train is queued for replacement, check state and maybe process now
-	if global.trains_in_queue[id] then
-		-- We are waitng to process it, check everything!
-		ProcessTrainQueue()
-		-- If there are still trains left after processing, wait for them to come to a stop
-		if not next(global.trains_in_queue) then
-			script.on_event(defines.events.on_train_changed_state, nil)
-		end
+--== ONTICK EVENT ==--
+-- Process items queued up by other actions
+-- Only one action allowed per tick
+local function OnTick(event)
+	
+	-- Process created trains one per tick
+	ProcessTrainQueue()
+	-- Enable state change handler if we found moving trains
+	StartTrainWatcher()
+	
+	-- Balancing inventories has third priority
+	ProcessInventoryQueue()
+	
+	if (not next(global.inventories_to_balance)) and 
+	   (not next(global.created_trains)) then
+		-- All on_tick queues are empty, unsubscribe from OnTick to save UPS
+		--game.print("Turning off OnTick")
+		script.on_event(defines.events.on_tick, nil)
 	end
-	--game.print("Train " .. id .. " Exiting OnTrainChangedState")
+	
 end
-
-
--------------
--- Enables the on_train_changed_state event according to current variables
-local function StartTrainWatcher()
-	if global.trains_in_queue and next(global.trains_in_queue) then
-		-- Set up the action to process train after it comes to a stop
-		script.on_event(defines.events.on_train_changed_state, OnTrainChangedState)
-	else
-		script.on_event(defines.events.on_train_changed_state, nil)
-	end
-end
-
 
 
 --== ON_TRAIN_CREATED EVENT ==--
@@ -279,41 +322,15 @@ local function OnTrainCreated(event)
 	-- Event contains train, old_train_id_1, old_train_id_2
 	local id = event.train.id
 	--game.print("Train "..id.." In OnTrainCreated!")
-	-- These are a hack to make sure our global variables get created.
-	if not global.trains_in_queue then
-		global.trains_in_queue = {}
-	end
-	if not global.mu_pairs then
-		global.mu_pairs = {}
-	end
-	
+
 	-- Add this train to the train processing list, wait for it to stop
-	global.trains_in_queue[event.train.id] = event.train
+	table.insert(global.created_trains, event.train)
+	
 	--game.print("Train " .. event.train.id .. " queued.")
 	
 	-- Try to process it immediately. Will exit if we are already processing stuff
-	if ProcessTrainQueue() then
-		StartTrainWatcher()
-	end
+	script.on_event(defines.events.on_tick, OnTick)
 	--game.print("Train "..id.." Exiting OnTrainCreated!")
-end
-
-
---== ONTICK EVENT ==--
--- Process items queued up by other actions
--- Only one action allowed per tick
-local function OnTick(event)
-	local idle = true
-	
-	-- Balancing inventories has third priority
-	idle = ProcessInventoryQueue()
-	
-	if idle or (not next(global.inventories_to_balance)) then
-		-- All on_tick queues are empty, unsubscribe from OnTick to save UPS
-		--game.print("Turning off OnTick")
-		script.on_event(defines.events.on_tick, nil)
-	end
-	
 end
 
 
@@ -431,13 +448,13 @@ local function QueueAllTrains()
 		local trains = surface.get_trains()
 		for _,train in pairs(trains) do
 			-- Pretend this train was just created. Don't worry how long it takes.
-			global.trains_in_queue[train.id] = train
+			table.insert(global.created_trains, train)
 			game.print("Train " .. train.id .. " queued for scrub.")
 		end
 	end
-	
-	-- Try to process it immediately. Will exit if we are already processing stuff
-	ProcessTrainQueue()
+	if next(global.created_trains) then
+		script.on_event(defines.events.on_tick, OnTick)
+	end
 end
 
 
@@ -449,7 +466,6 @@ local function OnResearchFinished(event)
 	   (event.research.name == "adv-multiple-unit-train-control") then
 		-- Reprocess all trains with the new technology setting
 		QueueAllTrains()  -- This will execute some replacements immediately
-		StartTrainWatcher() -- This will make sure the remainder are done eventually
 	end
 end
 
@@ -477,7 +493,8 @@ local function init_events()
 	end
 	
 	-- Set conditional OnTick event handler correctly on load based on global queues, so we can sync with a multiplayer game.
-	if (global.inventories_to_balance and next(global.inventories_to_balance)) then
+	if (global.inventories_to_balance and next(global.inventories_to_balance)) or
+		(global.created_trains and next(global.created_trains)) then
 		script.on_event(defines.events.on_tick, OnTick)
 	end
 	
@@ -515,7 +532,8 @@ end)
 -- When game is created, initialize globals and events
 script.on_init(function()
 	--game.print("In on_init!")
-	global.trains_in_queue = {}
+	global.created_trains = {}
+	global.moving_trains = {}
 	global.mu_pairs = {}
 	global.inventories_to_balance = {}
 	InitEntityMaps()
@@ -526,13 +544,18 @@ end)
 -- When mod list/versions change, reinitialize globals and scrub existing trains
 script.on_configuration_changed(function(data)
 	--game.print("In on_configuration_changed!")
-	global.trains_in_queue = global.trains_in_queue or {}
+	global.created_trains = global.created_trains or {}
+	global.moving_trains = global.moving_trains or {}
 	global.mu_pairs = global.mu_pairs or {}
 	global.inventories_to_balance = global.inventories_to_balance or {}
 	InitEntityMaps()
 	-- On config change, scrub the list of trains
 	QueueAllTrains()
 	init_events()
+	
+	-- Migrate by clearing old globals
+	global.trains_in_queue = nil
+	global.replacement_queue = nil
 end)
 
 end
