@@ -8,9 +8,9 @@ Factorio mod written in Lua.  Lets locomotives provide backwards force in automa
 - License: MIT
 - Source: GitHub
 - Download: mods.factorio.com
-- Version: 0.1.12
-- Release: 2019-04-06
-- Tested-With-Factorio-Version: 0.17.25
+- Version: 0.1.13
+- Release: 2019-04-10
+- Tested-With-Factorio-Version: 0.17.26
 - Category: Helper, Train
 - Tags: Train
 
@@ -39,6 +39,7 @@ This mod is meant to be an alternative to [Noxy's Multidirectional Trains](url=h
   - [Schall's Armoured Train](https://mods.factorio.com/mod/SchallArmouredTrain)
   - [Electric Vehicles: Reborn](https://mods.factorio.com/mod/electric-vehicles-reborn)
   - [5dim's mod - Trains](https://mods.factorio.com/mod/5dim_trains)
+  - [Armored Train (Wagon Turrets)](https://mods.factorio.com/mod/Armored-train)
 
 ## Planned Features
 - Support additional modded locomotives.  If you want more, please send me suggestions!
@@ -51,13 +52,12 @@ Since the game still thinks only one locomotive is driving, but with twice the p
 Four modes can be selected in the mod settings:
 - Basic mode: Locomotives that are adjacent or separated by other locomotives can form MU consists.  Examples:  <L-L>, <L-<L-L>-L>
 - Advanced (Wireless) mode: Locomotives can form MU consists anywhere in the train.  Examples:  <L-W-W-W-W-L>, <L-<L-W-W-L>-W-W-L>
-- Tech Unlock mode (default): MU upgrades remain disabled until you complete research MU Control technology.  Unlock Wireless mode with a second research technology.  Note: After researching a new level, you must manually trigger an MU Control update on each existing train by coupling and uncoupling a wagon. This is to prevent instant upgrades from destroying trains if they are currently moving over a junction.
+- Tech Unlock mode (default): MU upgrades remain disabled until you complete research MU Control technology.  Unlock Wireless mode with a second research technology.
 - Disabled mode: Reverts all MU locomotives to normal.
 
 ## Known Issues
-- When installing, enabling, or disabling the mod on an existing map, trains that are moving across an intersection during the upgrade may be disconnected, damaged or destroyed in the process.
+- If a locomotive is stopped on a junction when it is replaced, the train may not be reassembled correctly and will still be set to automatic, possibly causing collisions.
 - The MU version of each locomotive type is not craftable and should never end up in your inventory, but sometimes it does. It will revert as soon as you place it on a track.
-- When a locomotive is replaced, the train is changed to manual mode.  Since you cannot automatically couple two locomotives without them running into each other, creation of an MU consist is expected to be a manual process, but after upgrading a save file you will have to set trains back to automatic.
 - Train kill statistics may not be preserved when upgrading/downgrading locomotives.
 - Mode is currently a runtime setting, so MU Control technologies will be available to research even if you have set MU Control to ignore them.
 - The MU version has a separate item-type circuit signal, which is a separate signal from LTN stops when outputting train rolling stock descriptions. Not a bug, but don't click the wrong one by accident.

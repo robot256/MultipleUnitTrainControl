@@ -18,11 +18,10 @@
  *
  --]]
 
+require("util.mapBlueprint")
 require("util.saveItemRequestProxy")
-require("util.saveGrid")
-require("util.restoreGrid")
 require("util.saveBurner")
-require("util.restoreBurner")
+require("util.saveGrid")
 require("util.replaceLocomotive")
 require("util.balanceInventories")
 require("script.processTrainPurge")
@@ -36,6 +35,7 @@ local settings_mode = settings.global["multiple-unit-train-control-mode"].value
 local settings_nth_tick = settings.global["multiple-unit-train-control-on_nth_tick"].value
 local current_nth_tick = settings_nth_tick
 
+local train_queue_semaphore = false
 
 
 ------------------------- GLOBAL TABLE INITIALIZATION ---------------------------------------
@@ -96,42 +96,6 @@ local function InitEntityMaps()
 end
 
 
-
-------------------------- BLUEPRINT HANDLING ---------------------------------------
--- Finds the blueprint a player created and changes all MU locos to standard
-local function purgeBlueprint(bp)
-	-- Get Entity table from blueprint
-	local entities = bp.get_blueprint_entities()
-	-- Find any downgradable items and downgrade them
-	if entities and next(entities) then
-		for _,e in pairs(entities) do
-			if global.downgrade_pairs[e.name] then
-				--game.print("MU Control fixing blueprint by changing ".. e.name .." to ".. global.downgrade_pairs[e.name])
-				e.name = global.downgrade_pairs[e.name]
-			end
-		end
-		-- Write tables back to the blueprint
-		bp.set_blueprint_entities(entities)
-	end
-	-- Find icons too
-	local icons = bp.blueprint_icons
-	if icons and next(icons) then
-		for _,i in pairs(icons) do
-			if i.signal.type == "item" then
-				if global.downgrade_pairs[i.signal.name] then
-					--game.print("MU Control fixing blueprint icons by changing ".. i.signal.name .." to ".. global.downgrade_pairs[i.signal.name])
-					i.signal.name = global.downgrade_pairs[i.signal.name]
-				end
-			end
-		end
-		-- Write tables back to the blueprint
-		bp.blueprint_icons = icons
-	end
-end
-
-
-
-
 ------------------------- FUEL BALANCING CODE --------------------------------------
 -- Takes inventories from the queue and process them, one per tick
 local function ProcessInventoryQueue()
@@ -151,41 +115,38 @@ end
 
 ------------------------- LOCOMOTIVE REPLACEMENT CODE -------------------------------
 
-
--- Process replacement orders from the queue
+-- Process replacement order immediately
 --   Need to preserve mu_pairs across replacement
-local function ProcessReplacementQueue()
-	local idle = true
-	
-	if global.replacement_queue then
-		while next(global.replacement_queue) do
-			local r = table.remove(global.replacement_queue, 1)
-			if r[1] and r[1].valid then
-				-- Replace the locomotive
-				--game.print("MU Control is replacing ".. r[1].name .. " '"..r[1].backer_name.."' with " .. r[2])
-				game.print({"debug-message.mu-replacement-message",r[1].name,r[1].backer_name,r[2]})
-				
-				local newLoco = replaceLocomotive(r[1], r[2])
-				-- Find which mu_pair the old one was in and put the new one instead
-				for _,p in pairs(global.mu_pairs) do
-					if p[1] == r[1] then
-						p[1] = newLoco
-						break
-					elseif p[2] == r[1] then
-						p[2] = newLoco
-						break
-					end
-				end
-				
-				idle = false  -- Tell OnTick that we did something useful
+local function ProcessReplacement(r)
+	if r[1] and r[1].valid then
+		-- Replace the locomotive
+		--game.print("MU Control is replacing ".. r[1].name .. " '"..r[1].backer_name.."' with " .. r[2])
+		game.print({"debug-message.mu-replacement-message",r[1].name,r[1].backer_name,r[2]})
+		
+		local newLoco = replaceLocomotive(r[1], r[2])
+		-- Find which mu_pair the old one was in and put the new one instead
+		for _,p in pairs(global.mu_pairs) do
+			if p[1] == r[1] then
+				p[1] = newLoco
+				break
+			elseif p[2] == r[1] then
+				p[2] = newLoco
 				break
 			end
 		end
 	end
-	
-	return idle
 end
 
+
+-- Read train state and determine if it is safe to replace
+local function isTrainStopped(train)
+	local state = train.state
+	return (state == defines.train_state.wait_station) or 
+	       (state == defines.train_state.wait_signal) or 
+	       (state == defines.train_state.no_path) or 
+	       (state == defines.train_state.no_schedule) or 
+	       (state == defines.train_state.manual_control)
+end
 
 
 -- Read the mod settings and technology of the given force to decide what mode we're in
@@ -202,87 +163,155 @@ local function getAllowedMode(force)
 end
 
 
--- Process up to one valid train from the queue per tick
---   The queue prevents us from processing another train until we finish with the first one.
---   That way we don't process "intermediate" trains created while replacing a locomotive by the script.
-local function ProcessTrainQueue()
-	local idle = true
+------------
+-- Process one valid train. Do replacemnts immediately.
+local function ProcessTrain(t)
 	local found_pairs = {}
 	local upgrade_locos = {}
 	local unpaired_locos = {}
 	
-	if global.trains_in_queue then
-		--game.print("ProcessTrainQueue has a train in the queue")
-		while next(global.trains_in_queue) do
-			local t = table.remove(global.trains_in_queue,1)
-			if t and t.valid then
-				local mode = getAllowedMode(t.carriages[1].force)
-				if mode=="advanced" then
-					found_pairs,upgrade_locos,unpaired_locos = processTrainWireless(t)
-				elseif mode=="basic" then
-					found_pairs,upgrade_locos,unpaired_locos = processTrainBasic(t)
-				else
-					-- Mod disabled, go through the process of reverting every engine
-					found_pairs,upgrade_locos,unpaired_locos = processTrainPurge(t)
-				end
-				
-				-- Add replacements to the replacement queue
-				for _,entry in pairs(upgrade_locos) do
-					table.insert(global.replacement_queue,entry)
-				end
-				
-				-- Remove pairs involving the now-unpaired locos.
-				for _,entry in pairs(unpaired_locos) do
-					purgeLocoFromPairs(entry)
-				end
-				
-				-- Add pairs to the pair lists.  (pairs will need to be updated when the replacements are made)
-				for _,entry in pairs(found_pairs) do
-					addPairToGlobal(entry)
-				end
-				
-				idle = false  -- Make sure OnTick stays enabled to process our queued replacements
-				break
-			end
-		end
-		
+	local mode = getAllowedMode(t.carriages[1].force)
+	if mode=="advanced" then
+		found_pairs,upgrade_locos,unpaired_locos = processTrainWireless(t)
+	elseif mode=="basic" then
+		found_pairs,upgrade_locos,unpaired_locos = processTrainBasic(t)
+	else
+		-- Mod disabled, go through the process of reverting every engine
+		found_pairs,upgrade_locos,unpaired_locos = processTrainPurge(t)
 	end
 	
-	return idle
+	-- Remove pairs involving the now-unpaired locos.
+	for _,entry in pairs(unpaired_locos) do
+		purgeLocoFromPairs(entry)
+	end
+	
+	-- Add pairs to the pair lists.  (pairs will need to be updated when the replacements are made)
+	for _,entry in pairs(found_pairs) do
+		addPairToGlobal(entry)
+	end
+	
+	-- Replace locomotives immediately
+	for _,entry in pairs(upgrade_locos) do
+		ProcessReplacement(entry)
+	end
 end
 
 
 ----------------------------------------------
 ------ EVENT HANDLING ---
 
+--== ON_TRAIN_CHANGED_STATE EVENT ==--
+-- Fires when train pathfinder changes state, executes if the train is in the update list.
+-- Use this to replace locomotives at a safe (stopped) time.
+local function OnTrainChangedState(event)	
+	local id = event.train.id
+			
+	--game.print("Train ".. id .. " In OnTrainChangedState!")
+	-- Event contains train, old_train_state
+	-- If this train is queued for replacement, check state and maybe process now
+	if global.moving_trains[id] then
+		local t = event.train
+		-- We are waitng to process it, check everything!
+		if t and t.valid then
+			-- Check if this train is in a safe state
+			if isTrainStopped(t) then
+				-- Immediately replace these locomotives
+				--game.print("Train " .. id .. " being processed.")
+				if train_queue_semaphore == false then
+					train_queue_semaphore = true
+					ProcessTrain(t)
+					global.moving_trains[id] = nil
+					train_queue_semaphore = false
+				else
+					-- It's stopped, but we're busy. Put it back in the OnTick queue (might work?)
+					game.print("OnChange Train " .. id .. " event ignored because semaphore is occupied")
+				end
+			end
+		end
+	end
+	if not next(global.moving_trains) then
+		script.on_event(defines.events.on_train_changed_state, nil)
+	end
+	
+	--game.print("Train " .. id .. " Exiting OnTrainChangedState")
+end
+
+
+-------------
+-- Enables the on_train_changed_state event according to current variables
+local function StartTrainWatcher()
+	if global.moving_trains and next(global.moving_trains) then
+		-- Set up the action to process train after it comes to a stop
+		script.on_event(defines.events.on_train_changed_state, OnTrainChangedState)
+	else
+		script.on_event(defines.events.on_train_changed_state, nil)
+	end
+end
+
+
+----------
+-- Try to process newly created trains immediately
+local function ProcessTrainQueue()
+	-- Check if we are already processing a train.
+	-- Don't execute this again if it was triggered by an intermediate on_train_created event.
+	if train_queue_semaphore==false then
+		train_queue_semaphore = true
+		
+		if global.created_trains then
+			--game.print("ProcessTrainQueue has a train in the queue")
+			-- Keep looping until we discard all the invalid intermediate trains
+			local moving_trains = {}
+			while next(global.created_trains) do
+				local t = table.remove(global.created_trains,1)
+				if t and t.valid then
+					-- Check if this train is in a safe state
+					if isTrainStopped(t) then
+						-- Immediately replace these locomotives
+						--game.print("Train " .. id .. " being processed.")
+						ProcessTrain(t)
+						-- Don't process any more trains this tick
+						break
+					else
+						-- Flag this train to be processed on a ChangedState event
+						global.moving_trains[t.id] = t
+						--game.print("Train " .. id .. " still moving.")
+					end
+				end
+			end
+		end
+		
+		train_queue_semaphore = false
+		return true
+	else
+		--game.print("Queue already being processed")
+		return false
+	end
+end
+
+
+
 --== ONTICK EVENT ==--
 -- Process items queued up by other actions
 -- Only one action allowed per tick
 local function OnTick(event)
-	local idle = true
 	
-	-- Replacing Locomotives has first priority
-	idle = ProcessReplacementQueue()
-	
-	-- Processing new Trains has second priority
-	if idle then
-		idle = ProcessTrainQueue()
-	end
+	-- Process created trains one per tick
+	ProcessTrainQueue()
+	-- Enable state change handler if we found moving trains
+	StartTrainWatcher()
 	
 	-- Balancing inventories has third priority
-	if idle then
-		idle = ProcessInventoryQueue()
-	end
+	ProcessInventoryQueue()
 	
-	if idle or ((not next(global.replacement_queue)) and 
-	            (not next(global.trains_in_queue)) and 
-				(not next(global.inventories_to_balance))) then
-		-- All three queues are empty, unsubscribe from OnTick to save UPS
+	if (not next(global.inventories_to_balance)) and 
+	   (not next(global.created_trains)) then
+		-- All on_tick queues are empty, unsubscribe from OnTick to save UPS
 		--game.print("Turning off OnTick")
 		script.on_event(defines.events.on_tick, nil)
 	end
 	
 end
+
 
 --== ON_TRAIN_CREATED EVENT ==--
 -- Record every new train in global queue, so we can process them one at a time.
@@ -291,28 +320,19 @@ end
 --   This is the desired behavior. 
 local function OnTrainCreated(event)
 	-- Event contains train, old_train_id_1, old_train_id_2
-	
-	-- These are a hack to make sure our global variables get created.
-	if not global.trains_in_queue then
-		global.trains_in_queue = {}
-	end
-	if not global.mu_pairs then
-		global.mu_pairs = {}
-	end
-	if not global.replacement_queue then
-		global.replacement_queue = {}
-	end
-	
-	
-	-- Add this train to the train processing queue
-	table.insert(global.trains_in_queue,event.train)
+	local id = event.train.id
+	--game.print("Train "..id.." In OnTrainCreated!")
+
+	-- Add this train to the train processing list, wait for it to stop
+	table.insert(global.created_trains, event.train)
 	
 	--game.print("Train " .. event.train.id .. " queued.")
 	
-	-- Set up the on_tick action to process trains
+	-- Try to process it immediately. Will exit if we are already processing stuff
 	script.on_event(defines.events.on_tick, OnTick)
-	
+	--game.print("Train "..id.." Exiting OnTrainCreated!")
 end
+
 
 --== ON_NTH_TICK EVENT ==--
 -- Initiates balancing of fuel inventories in every MU consist
@@ -386,20 +406,7 @@ end
 --== ON_PLAYER_SETUP_BLUEPRINT EVENT ==--
 -- ID 68, fires when you select an area to make a blueprint or copy
 local function OnPlayerSetupBlueprint(event)
-	--game.print("MU Control handling Blueprint from ".. event.name .." event.")
-	
-	-- Get Blueprint from player (LuaItemStack object)
-	-- If this is a Copy operation, BP is in cursor_stack
-	-- If this is a Blueprint operation, BP is in blueprint_to_setup
-	-- Need to use "valid_for_read" because "valid" returns true for empty LuaItemStack
-	
-	local item1 = game.get_player(event.player_index).blueprint_to_setup
-	local item2 = game.get_player(event.player_index).cursor_stack
-	if item1 and item1.valid_for_read==true then
-		purgeBlueprint(item1)
-	elseif item2 and item2.valid_for_read==true and item2.is_blueprint==true then
-		purgeBlueprint(item2)
-	end
+	mapBlueprint(event,global.downgrade_pairs)
 end
 
 
@@ -407,44 +414,8 @@ end
 -- Fires when player presses 'Q'.  We need to sneakily grab the correct item from inventory if it exists,
 --  or sneakily give the correct item in cheat mode.
 local function OnPlayerPipette(event)
-	--game.print("MUTC: OnPlayerPipette, cheat mode="..tostring(event.used_cheat_mode))
-	local item = event.item
-	if item and item.valid then
-		--game.print("item: " .. item.name)
-		if global.downgrade_pairs[item.name] then
-			local player = game.players[event.player_index]
-			local newName = global.downgrade_pairs[item.name]
-			local cursor = player.cursor_stack
-			local inventory = player.get_main_inventory()
-			-- Check if the player got MU versions from inventory, and convert them
-			if cursor.valid_for_read == true and event.used_cheat_mode == false then
-				-- Huh, he actually had MU items.
-				--game.print("Converting cursor to "..newName)
-				cursor.set_stack({name=newName,count=cursor.count})
-			else
-				-- Check if the player could have gotten the right thing from inventory/cheat, otherwise clear the cursor
-				--game.print("Looking for " .. newName .. " in inventory")
-				local newItemStack = inventory.find_item_stack(newName)
-				cursor.set_stack(newItemStack)
-				if not cursor.valid_for_read then
-					--game.print("Not found!")
-					if player.cheat_mode==true then
-						--game.print("Giving free " .. newName)
-						cursor.set_stack({name=newName, count=game.item_prototypes[newName].stack_size})
-					end
-				else
-					--game.print("Found!")
-					inventory.remove(newItemStack)
-				end
-			end
-		end
-	end
-
-
+	mapPipette(event,global.downgrade_pairs)
 end
-
-
-
 
 -------------
 -- Enables the on_nth_tick event according to the mod setting value
@@ -469,31 +440,52 @@ local function StartBalanceUpdates()
 	end
 end
 
+
 -----------
 -- Queues all existing trains for updating with new settings
 local function QueueAllTrains()
-	if not global.replacement_queue then
-		global.replacement_queue = {}
-	end
 	for _, surface in pairs(game.surfaces) do
 		local trains = surface.get_trains()
 		for _,train in pairs(trains) do
-			table.insert(global.trains_in_queue,train)
+			-- Pretend this train was just created. Don't worry how long it takes.
+			table.insert(global.created_trains, train)
+			game.print("Train " .. train.id .. " queued for scrub.")
 		end
 	end
-	script.on_event(defines.events.on_tick, OnTick)
+	if next(global.created_trains) then
+		script.on_event(defines.events.on_tick, OnTick)
+	end
 end
+
+
+--== ON_RESEARCH_FINISHED EVENT ==--
+-- Forces a scrub after researching MUTC technologies
+-- Moving trains will be queued until they stop.
+local function OnResearchFinished(event)
+	if (event.research.name == "multiple-unit-train-control") or
+	   (event.research.name == "adv-multiple-unit-train-control") then
+		-- Reprocess all trains with the new technology setting
+		QueueAllTrains()  -- This will execute some replacements immediately
+	end
+end
+
 
 ---- Bootstrap ----
 do
 local function init_events()
 
-	-- Subscribe to Blueprint activity always
+	-- Subscribe to Blueprint activity
 	script.on_event({defines.events.on_player_setup_blueprint,defines.events.on_player_configured_blueprint}, OnPlayerSetupBlueprint)
 	script.on_event(defines.events.on_player_pipette, OnPlayerPipette)
+	
+	-- Subscribe to Technology activity
+	script.on_event(defines.events.on_research_finished, OnResearchFinished)
 
 	-- Subscribe to On_Nth_Tick according to saved global and settings
 	StartBalanceUpdates()
+	
+	-- Subscribe to On_Train_Changed_state according to global queue
+	StartTrainWatcher()
 	
 	-- Subscribe to On_Train_Created according to mod enabled setting
 	if settings_mode ~= "disabled" then
@@ -501,9 +493,8 @@ local function init_events()
 	end
 	
 	-- Set conditional OnTick event handler correctly on load based on global queues, so we can sync with a multiplayer game.
-	if (global.trains_in_queue and next(global.trains_in_queue)) or
-	      (global.replacement_queue and next(global.replacement_queue)) or
-	      (global.inventories_to_balance and next(global.inventories_to_balance)) then
+	if (global.inventories_to_balance and next(global.inventories_to_balance)) or
+		(global.created_trains and next(global.created_trains)) then
 		script.on_event(defines.events.on_tick, OnTick)
 	end
 	
@@ -513,28 +504,17 @@ script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
 	--game.print("in mod_settings_changed!")
 	if event.setting == "multiple-unit-train-control-mode" then
 		settings_mode = settings.global["multiple-unit-train-control-mode"].value
-		if settings_mode ~= "disabled" then
-			-- Scrub existing trains and add MU locomotives when necessary
-			QueueAllTrains()
-			
-			-- Enable or disable events based on setting state
-			init_events()
-		else
-			-- Mod is disabled
-			-- Revert the MU locomotives using the on_train_created and on_tick handlers
-			QueueAllTrains()
-			
-			-- Clean globals
+		-- Scrub existing trains according to new settings
+		QueueAllTrains()  -- This will execute some replacements immediately
+		if settings_mode == "disabled" then
+			-- Clean globals when disabled
 			global.mu_pairs = {}
 			global.inventories_to_balance = {}
-			
-			-- Enable or disable events based on setting state
-			init_events()
 		end
-		
-	end
+		-- Enable or disable events based on setting state
+		init_events()
 	
-	if event.setting == "multiple-unit-train-control-on_nth_tick" then
+	elseif event.setting == "multiple-unit-train-control-on_nth_tick" then
 		-- When interval changes, clear the saved update rate and start over
 		settings_nth_tick = settings.global["multiple-unit-train-control-on_nth_tick"].value
 		global.current_nth_tick = nil
@@ -543,16 +523,17 @@ script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
 	
 end)
 
-
-
+----------
+-- When game is loaded (from save or server), only set up events to match previous state
 script.on_load(function()
 	init_events()
 end)
 
+-- When game is created, initialize globals and events
 script.on_init(function()
 	--game.print("In on_init!")
-	global.replacement_queue = {}
-	global.trains_in_queue = {}
+	global.created_trains = {}
+	global.moving_trains = {}
 	global.mu_pairs = {}
 	global.inventories_to_balance = {}
 	InitEntityMaps()
@@ -560,16 +541,21 @@ script.on_init(function()
 	
 end)
 
+-- When mod list/versions change, reinitialize globals and scrub existing trains
 script.on_configuration_changed(function(data)
 	--game.print("In on_configuration_changed!")
-	global.replacement_queue = global.replacement_queue or {}
-	global.trains_in_queue = global.trains_in_queue or {}
+	global.created_trains = global.created_trains or {}
+	global.moving_trains = global.moving_trains or {}
 	global.mu_pairs = global.mu_pairs or {}
 	global.inventories_to_balance = global.inventories_to_balance or {}
 	InitEntityMaps()
 	-- On config change, scrub the list of trains
 	QueueAllTrains()
 	init_events()
-
+	
+	-- Migrate by clearing old globals
+	global.trains_in_queue = nil
+	global.replacement_queue = nil
 end)
+
 end

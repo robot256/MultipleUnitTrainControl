@@ -3,6 +3,7 @@
  * File: replaceLocomotive.lua
  * Description: Replaces one Locomotive Entity with a new one of a different entity-name.
  *    Preserves as many properties of the original as possible.
+ * Dependencies:  saveGrid.lua, saveBurner.lua, saveItemRequestProxy.lua
 --]]
 
 
@@ -38,6 +39,7 @@ function replaceLocomotive(loco, newName)
 	
 	-- Save the train schedule.  If we are replacing a lone MU with a regular loco, the train schedule will be lost when we delete it.
 	local train_schedule = loco.train.schedule
+	local manual_mode = loco.train.manual_mode
 	
 	-- Save its coupling state.  By default, created locos couple to everything nearby, which we have to undo
 	--   if we're replacing after intentional uncoupling.
@@ -45,7 +47,7 @@ function replaceLocomotive(loco, newName)
 	local disconnected_front = loco.disconnect_rolling_stock(defines.rail_direction.front)
 	
 	-- Destroy the old Locomotive so we have space to make the new one
-	loco.destroy({raise_destroy=true})
+	loco.destroy{raise_destroy=true}
 	
 	-- Create the new locomotive in the same spot and orientation
 	local newLoco = surface.create_entity{name=newName, position=position, direction=newDirection, force=force, create_build_effect_smoke=false}
@@ -86,13 +88,14 @@ function replaceLocomotive(loco, newName)
 		newLoco.set_driver(player_driving)
 	end
 	
-	-- Restore the train schedule and mode
-	newLoco.train.schedule = train_schedule
 	
 	-- After all that, fire an event so other scripts can reconnect to it
 	script.raise_event(defines.events.script_raised_built, {entity = newLoco})
-				
 	
+	-- Restore the train schedule and mode
+	newLoco.train.schedule = train_schedule
+	newLoco.train.manual_mode = manual_mode
+		
 	--game.print("Finished replacing. Used direction "..newDirection..", new orientation: " .. newLoco.orientation)
 	return newLoco
 end
