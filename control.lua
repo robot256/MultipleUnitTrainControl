@@ -224,7 +224,7 @@ local function OnTrainChangedState(event)
 					train_queue_semaphore = false
 				else
 					-- It's stopped, but we're busy. Put it back in the OnTick queue (might work?)
-					game.print("OnChange Train " .. id .. " event ignored because semaphore is occupied")
+					game.print("OnChange Train " .. id .. " event ignored because semaphore is occupied (this is weird!)")
 				end
 			end
 		end
@@ -449,7 +449,7 @@ local function QueueAllTrains()
 		for _,train in pairs(trains) do
 			-- Pretend this train was just created. Don't worry how long it takes.
 			table.insert(global.created_trains, train)
-			game.print("Train " .. train.id .. " queued for scrub.")
+			--game.print("Train " .. train.id .. " queued for scrub.")
 		end
 	end
 	if next(global.created_trains) then
