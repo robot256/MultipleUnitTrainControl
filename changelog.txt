@@ -1,8 +1,13 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.13
-Date: 2019-04-06
+Date: 2019-04-09
   Features:
     - Added support for Angel's Industries (Crawler Train).
+    - Added support for Armored Train (Wagon Turrets).
+  Bugfixes:
+    - Changed locomotive replacement to happen only when trains are stopped,, to prevent decoupling while moving.
+    - Fixed that automatic mode was not preserved on replacement, to prevent collisions after replacement.
+    - Fixed that trains were not upgraded after technology research.
 
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.12

@@ -212,11 +212,11 @@ local function ProcessTrainQueue()
 					-- Check if this train is in a safe state
 					if isTrainStopped(t) then
 						-- Immediately replace these locomotives
-						game.print("Train " .. id .. " being processed.")
+						--game.print("Train " .. id .. " being processed.")
 						ProcessTrain(t)
 						global.trains_in_queue[id] = nil
 					else
-						game.print("Train " .. id .. " still moving.")
+						--game.print("Train " .. id .. " still moving.")
 					end
 				else
 					global.trains_in_queue[id] = nil
@@ -242,7 +242,7 @@ end
 -- Use this to replace locomotives at a safe (stopped) time.
 local function OnTrainChangedState(event)
 	local id = event.train.id
-	game.print("Train ".. id .. " In OnTrainChangedState!")
+	--game.print("Train ".. id .. " In OnTrainChangedState!")
 	-- Event contains train, old_train_state
 	-- If this train is queued for replacement, check state and maybe process now
 	if global.trains_in_queue[id] then
@@ -253,7 +253,7 @@ local function OnTrainChangedState(event)
 			script.on_event(defines.events.on_train_changed_state, nil)
 		end
 	end
-	game.print("Train " .. id .. " Exiting OnTrainChangedState")
+	--game.print("Train " .. id .. " Exiting OnTrainChangedState")
 end
 
 
@@ -289,7 +289,7 @@ local function OnTrainCreated(event)
 	
 	-- Add this train to the train processing list, wait for it to stop
 	global.trains_in_queue[event.train.id] = event.train
-	game.print("Train " .. event.train.id .. " queued.")
+	--game.print("Train " .. event.train.id .. " queued.")
 	
 	-- Try to process it immediately. Will exit if we are already processing stuff
 	if ProcessTrainQueue() then
@@ -440,19 +440,19 @@ local function QueueAllTrains()
 	ProcessTrainQueue()
 end
 
---[[
---== ON_RESEARCH_COMPLETED EVENT ==--
+
+--== ON_RESEARCH_FINISHED EVENT ==--
 -- Forces a scrub after researching MUTC technologies
 -- Moving trains will be queued until they stop.
-local function OnResearchCompleted(event)
-	if (event.technology.name == "multiple-unit-train-control") or
-	   (event.technology.name == "adv-multiple-unit-train-control") then
+local function OnResearchFinished(event)
+	if (event.research.name == "multiple-unit-train-control") or
+	   (event.research.name == "adv-multiple-unit-train-control") then
 		-- Reprocess all trains with the new technology setting
 		QueueAllTrains()  -- This will execute some replacements immediately
-		StartTrainWatcher()
+		StartTrainWatcher() -- This will make sure the remainder are done eventually
 	end
 end
---]]
+
 
 ---- Bootstrap ----
 do
@@ -463,7 +463,7 @@ local function init_events()
 	script.on_event(defines.events.on_player_pipette, OnPlayerPipette)
 	
 	-- Subscribe to Technology activity
-	--script.on_event({defines.events.on_research_completed,defines.events.on_research_uncompleted}, OnResearchCompleted)
+	script.on_event(defines.events.on_research_finished, OnResearchFinished)
 
 	-- Subscribe to On_Nth_Tick according to saved global and settings
 	StartBalanceUpdates()
