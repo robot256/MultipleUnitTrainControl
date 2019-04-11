@@ -7,7 +7,7 @@
 if mods["Realistic_Electric_Trains"] then
 
 	-- Generate an MU version of the Electric and Electric Mk2 Locomotives
-	createMuLoco("ret-electric-locomotive","ret-electric-locomotive-mu","item",false)
-	createMuLoco("ret-electric-locomotive-mk2","ret-electric-locomotive-mk2-mu","item",false)
+	createMuLoco("ret-electric-locomotive","ret-electric-locomotive-mu","item-with-entity-data",false)
+	createMuLoco("ret-electric-locomotive-mk2","ret-electric-locomotive-mk2-mu","item-with-entity-data",false)
 	
 end

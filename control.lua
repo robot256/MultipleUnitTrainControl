@@ -71,12 +71,12 @@ local function InitEntityMaps()
 			------------
 			-- RET Compatibility
 			local mod_name = ""
-			if remote.interfaces["Realistic_Electric_Trains"] then
+			if remote.interfaces["realistic_electric_trains"] then
 				-- Check if this is an RET loco, and what fuel the std version uses
-				local fuel_item = remote.call("Realistic_Electric_Trains", "get_locomotive_fuel", std)
+				local fuel_item = remote.call("realistic_electric_trains", "get_locomotive_fuel", std)
 				if fuel_item then
 					-- Add the MU version to RET's global map, with the same fuel item as the std version.
-					remote.call("Realistic_Electric_Trains", "register_locomotive_type", {loco_name=mu, fuel_item=fuel_item})
+					remote.call("realistic_electric_trains", "register_locomotive_type", {loco_name=mu, fuel_item=fuel_item})
 				end
 				mod_name = "Realistic Electric Trains "
 			end
