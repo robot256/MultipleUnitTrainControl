@@ -43,15 +43,14 @@ local train_queue_semaphore = false
 -- Interacts with other mods based on what MU locomotives were created
 local function CallRemoteInterface()
     -- Make sure FuelTrainStop plays nice with ElectricTrain in the MU versions
-	if game.active_mods["ElectricTrain"] then
-		if remote.interfaces["FuelTrainStop"] then
-			for std,mu in global.upgrade_pairs do
-				if std:match("^et%-electric%-locomotive%-%d$") then
-					remote.call("FuelTrainStop", "exclude_from_fuel_schedule", mu)
-				end
+	if remote.interfaces["FuelTrainStop"] then
+		for std,mu in global.upgrade_pairs do
+			if std:match("^et%-electric%-locomotive%-%d$") then
+				remote.call("FuelTrainStop", "exclude_from_fuel_schedule", mu)
 			end
 		end
 	end
+	
 end
 
 -- Set up the mapping between normal and MU locomotives
@@ -60,11 +59,6 @@ local function InitEntityMaps()
 
 	global.upgrade_pairs = {}
 	global.downgrade_pairs = {}
-	if game.active_mods["Realistic_Electric_Trains"] then
-		global.ret_locos = {}
-	else
-		global.ret_locos = nil
-	end
 	
 	-- Retrieve entity names from dummy technology, store in global variable
 	for _,effect in pairs(game.technology_prototypes["multiple-unit-train-control-locomotives"].effects) do
@@ -77,14 +71,14 @@ local function InitEntityMaps()
 			------------
 			-- RET Compatibility
 			local mod_name = ""
-			if game.active_mods["Realistic_Electric_Trains"] and recipe.ingredients[2] then
-				global.ret_locos[std] = recipe.ingredients[2].name
-				global.ret_locos[mu] = recipe.ingredients[2].name
+			if remote.interfaces["Realistic_Electric_Trains"] then
+				-- Check if this is an RET loco, and what fuel the std version uses
+				local fuel_item = remote.call("Realistic_Electric_Trains", "get_locomotive_fuel", std)
+				if fuel_item then
+					-- Add the MU version to RET's global map, with the same fuel item as the std version.
+					remote.call("Realistic_Electric_Trains", "register_locomotive_type", {loco_name=mu, fuel_item=fuel_item})
+				end
 				mod_name = "Realistic Electric Trains "
-				--game.print("MU Control registered Realistic Electric Trains upgrade mapping " 
-				--            .. std .. " to " .. mu .. " with fuel " .. recipe.ingredients[2].name)
-			--else
-				--game.print("MU Control registered upgrade mapping " .. std .. " to " .. mu)
 			end
 			game.print({"debug-message.mu-mapping-message",mod_name,std,mu})
 		end
