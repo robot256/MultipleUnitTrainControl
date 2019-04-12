@@ -77,9 +77,9 @@ local function InitEntityMaps()
 				local fuel_item = remote.call("realistic_electric_trains", "get_locomotive_fuel", std)
 				if fuel_item then
 					-- Add the MU version to RET's global map, with the same fuel item as the std version.
-					remote.call("realistic_electric_trains", "register_locomotive_type", {loco_name=mu, fuel_item=fuel_item})
+					remote.call("realistic_electric_trains", "register_locomotive_type", mu, fuel_item)
+					mod_name = "Realistic Electric Trains "
 				end
-				mod_name = "Realistic Electric Trains "
 			end
 			game.print({"debug-message.mu-mapping-message",mod_name,std,mu})
 		end
