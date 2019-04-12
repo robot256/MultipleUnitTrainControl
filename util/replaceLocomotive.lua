@@ -20,6 +20,7 @@ function replaceLocomotive(loco, newName)
 	local health = loco.health
 	local to_be_deconstructed = loco.to_be_deconstructed(force)
 	local player_driving = loco.get_driver()
+	local last_user = loco.last_user
 	
 	-- Save equipment grid contents
 	local grid_equipment = saveGrid(loco.grid)
@@ -48,7 +49,7 @@ function replaceLocomotive(loco, newName)
 	
 	-- Destroy the old Locomotive so we have space to make the new one
 	loco.destroy{raise_destroy=true}
-	
+	------------------------------
 	-- Create the new locomotive in the same spot and orientation
 	local newLoco = surface.create_entity{name=newName, position=position, direction=newDirection, force=force, create_build_effect_smoke=false}
 	
@@ -62,6 +63,7 @@ function replaceLocomotive(loco, newName)
 	
 	-- Restore parameters
 	newLoco.backer_name = backer_name
+	newLoco.last_user = last_user
 	if color then   -- color is nil if you never changed it!
 		newLoco.color = color
 	end
