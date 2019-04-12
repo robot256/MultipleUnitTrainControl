@@ -1,3 +1,9 @@
+--[[ Copyright (c) 2019 robot256 (MIT License)
+ * Project: Multiple Unit Train Control
+ * File: checkModuleMatching.lua
+ * Description: Checks if a pair of locos are RET modular type, and if the module configurations match.
+ *   Returns true if they are not modular locos.
+ --]]
 
 
 function checkModuleMatching(loco1, loco2)

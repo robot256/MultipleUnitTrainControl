@@ -1,3 +1,8 @@
+--[[ Copyright (c) 2019 robot256 (MIT License)
+ * Project: Multiple Unit Train Control
+ * File: addPairToGlobal.lua
+ * Description: Takes a new pair of MU locomotives, removes their former pairs, and adds the new one to global.mu_pairs.
+--]]
 
 
 function addPairToGlobal(new_pair)
