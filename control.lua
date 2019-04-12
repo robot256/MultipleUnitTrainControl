@@ -136,11 +136,13 @@ end
 -- Read train state and determine if it is safe to replace
 local function isTrainStopped(train)
 	local state = train.state
-	return (state == defines.train_state.wait_station) or 
-	       (state == defines.train_state.wait_signal) or 
-	       (state == defines.train_state.no_path) or 
-	       (state == defines.train_state.no_schedule) or 
-	       (state == defines.train_state.manual_control)
+	return train.speed==0 and (
+	            (state == defines.train_state.wait_station) or 
+	            (state == defines.train_state.wait_signal) or 
+	            (state == defines.train_state.no_path) or 
+	            (state == defines.train_state.no_schedule) or 
+	            (state == defines.train_state.manual_control)
+			)
 end
 
 
