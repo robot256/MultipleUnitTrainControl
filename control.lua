@@ -24,6 +24,7 @@ require("util.saveBurner")
 require("util.saveGrid")
 require("util.replaceLocomotive")
 require("util.balanceInventories")
+require("script.checkModuleMatching")
 require("script.processTrainPurge")
 require("script.processTrainBasic")
 require("script.processTrainWireless")
@@ -328,6 +329,16 @@ local function OnTrainCreated(event)
 end
 
 
+--== ON_GUI_CLOSED and ON_PLAYER_FAST_TRANSFERRED ==--
+-- Events trigger when player changes module contents of a modular locomotive
+local function OnModuleChanged(event)
+	local e = event.entity
+	if e and e.valid and e.type=="locomotive" then
+		table.insert(global.created_trains, e.train)
+		script.on_event(defines.events.on_tick, OnTick)
+	end
+end
+
 --== ON_NTH_TICK EVENT ==--
 -- Initiates balancing of fuel inventories in every MU consist
 local function OnNthTick(event)
@@ -484,6 +495,7 @@ local function init_events()
 	-- Subscribe to On_Train_Created according to mod enabled setting
 	if settings_mode ~= "disabled" then
 		script.on_event(defines.events.on_train_created, OnTrainCreated)
+		script.on_event({defines.events.on_gui_closed, defines.events.on_player_fast_transferred}, OnModuleChanged)
 	end
 	
 	-- Set conditional OnTick event handler correctly on load based on global queues, so we can sync with a multiplayer game.
