@@ -36,7 +36,7 @@ function processTrainWireless(t)
 							break
 						end
 					end
-					if loco2_free then
+					if loco2_free and checkModuleMatching(loco1,loco2) then
 						-- Found an MU twin, they are already a pair
 						table.insert(found_pairs,{loco1,loco2})
 						loco1_done = true
@@ -56,7 +56,7 @@ function processTrainWireless(t)
 								break
 							end
 						end
-						if loco2_free then
+						if loco2_free and checkModuleMatching(loco1,loco2) then
 							-- Found a normal twin, upgrade loco2
 							table.insert(found_pairs,{loco1,loco2})
 							table.insert(upgrade_locos,{loco2,mu_name})
@@ -87,7 +87,7 @@ function processTrainWireless(t)
 							break
 						end
 					end
-					if loco2_free then
+					if loco2_free and checkModuleMatching(loco1,loco2) then
 						-- Found an MU twin, upgrade loco1
 						table.insert(found_pairs,{loco1,loco2})
 						table.insert(upgrade_locos,{loco1,mu_name})
@@ -108,7 +108,7 @@ function processTrainWireless(t)
 								break
 							end
 						end
-						if loco2_free then
+						if loco2_free and checkModuleMatching(loco1,loco2) then
 							-- Found a normal twin, upgrade loco1 and loco2
 							table.insert(found_pairs,{loco1,loco2})
 							table.insert(upgrade_locos,{loco1,mu_name})

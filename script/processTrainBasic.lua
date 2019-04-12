@@ -87,7 +87,7 @@ function processTrainBasic(t)
 										break
 									end
 								end
-								if loco2_free then
+								if loco2_free and checkModuleMatching(loco1,loco2) then
 									-- Found an MU twin, they are already a pair
 									--game.print("Adding pair [" .. loco1.backer_name .. ", " .. loco2.backer_name .. "]")
 									table.insert(found_pairs,{loco1,loco2})
@@ -117,7 +117,7 @@ function processTrainBasic(t)
 											break
 										end
 									end
-									if loco2_free then
+									if loco2_free and checkModuleMatching(loco1,loco2) then
 										-- Found a normal twin, upgrade loco2
 										--game.print("Adding pair [" .. loco1.backer_name .. ", " .. loco2.backer_name .. "]")
 										table.insert(found_pairs,{loco1,loco2})
@@ -160,7 +160,7 @@ function processTrainBasic(t)
 										break
 									end
 								end
-								if loco2_free then
+								if loco2_free and checkModuleMatching(loco1,loco2) then
 									-- Found an MU twin, upgrade loco1
 									--game.print("Adding pair [" .. loco1.backer_name .. ", " .. loco2.backer_name .. "]")
 									table.insert(found_pairs,{loco1,loco2})
@@ -192,7 +192,7 @@ function processTrainBasic(t)
 											break
 										end
 									end
-									if loco2_free then
+									if loco2_free and checkModuleMatching(loco1,loco2) then
 										-- Found a normal twin, upgrade loco1 and loco2
 										--game.print("Adding pair [" .. loco1.backer_name .. ", " .. loco2.backer_name .. "]")
 										table.insert(found_pairs,{loco1,loco2})

@@ -6,33 +6,15 @@
 
 if mods["Realistic_Electric_Trains"] then
 
-	-- Generate an MU version of the Electric and Electric Mk2 Locomotives
-	
-	-- Create Item prototypes
-	local electricMuItem = createMuLocoItemPrototype("item", "ret-electric-locomotive", "ret-electric-locomotive-mu")
-	local advElectricMuItem = createMuLocoItemPrototype("item", "ret-electric-locomotive-mk2", "ret-electric-locomotive-mk2-mu")
-	data:extend({electricMuItem,
-				 advElectricMuItem})
-	
-	-- Create Entity prototypes
-	local electricMuEntity = createMuLocoEntityPrototype("ret-electric-locomotive", "ret-electric-locomotive-mu", true)
-	local advElectricMuEntity = createMuLocoEntityPrototype("ret-electric-locomotive-mk2", "ret-electric-locomotive-mk2-mu", true)
-	data:extend({electricMuEntity,
-				 advElectricMuEntity})
-	
-	-- Create Dummy recipe prototypes
-	-- Second ingredient is the fuel item to use for this type of locomotive
-	local electricMuRecipe = createMuLocoRecipePrototype("ret-electric-locomotive", "ret-electric-locomotive-mu")
-	table.insert(electricMuRecipe.ingredients, {"ret-dummy-fuel-1",1})
-	local advElectricMuRecipe = createMuLocoRecipePrototype("ret-electric-locomotive-mk2", "ret-electric-locomotive-mk2-mu")
-	table.insert(advElectricMuRecipe.ingredients, {"ret-dummy-fuel-2",1})
-	data:extend({electricMuRecipe,
-				 advElectricMuRecipe})
-	
-	-- Add Recipes to Dummy technology
-	table.insert(data.raw.technology["multiple-unit-train-control-locomotives"].effects, {type = "unlock-recipe", recipe = "ret-electric-locomotive-mu"})
-	table.insert(data.raw.technology["multiple-unit-train-control-locomotives"].effects, {type = "unlock-recipe", recipe = "ret-electric-locomotive-mk2-mu"})
-	
-	
+	local r = {0,4,2} -- required version
+	local ver = mods["Realistic_Electric_Trains"]
+	local f = {tonumber(string.match(ver,"^(%d+)%.")),  -- found version
+	           tonumber(string.match(ver,"%.(%d+)%.")),
+			   tonumber(string.match(ver,"%.(%d+)$"))}
+	if (f[1] > r[1]) or (f[1] == r[1] and f[2] > r[2]) or (f[1] == r[1] and f[2] == r[2] and f[3] >= r[3]) then
+		-- Generate an MU version of the Electric and Electric Mk2 Locomotives
+		createMuLoco("ret-electric-locomotive","ret-electric-locomotive-mu","item-with-entity-data",false)
+		createMuLoco("ret-electric-locomotive-mk2","ret-electric-locomotive-mk2-mu","item-with-entity-data",false)
+		createMuLoco("ret-modular-locomotive","ret-modular-locomotive-mu","item-with-entity-data",false)
+	end
 end
-

@@ -24,6 +24,7 @@ require("util.saveBurner")
 require("util.saveGrid")
 require("util.replaceLocomotive")
 require("util.balanceInventories")
+require("script.checkModuleMatching")
 require("script.processTrainPurge")
 require("script.processTrainBasic")
 require("script.processTrainWireless")
@@ -43,15 +44,14 @@ local train_queue_semaphore = false
 -- Interacts with other mods based on what MU locomotives were created
 local function CallRemoteInterface()
     -- Make sure FuelTrainStop plays nice with ElectricTrain in the MU versions
-	if game.active_mods["ElectricTrain"] then
-		if remote.interfaces["FuelTrainStop"] then
-			for std,mu in global.upgrade_pairs do
-				if std:match("^et%-electric%-locomotive%-%d$") then
-					remote.call("FuelTrainStop", "exclude_from_fuel_schedule", mu)
-				end
+	if remote.interfaces["FuelTrainStop"] then
+		for std,mu in global.upgrade_pairs do
+			if std:match("^et%-electric%-locomotive%-%d$") then
+				remote.call("FuelTrainStop", "exclude_from_fuel_schedule", mu)
 			end
 		end
 	end
+	
 end
 
 -- Set up the mapping between normal and MU locomotives
@@ -60,11 +60,6 @@ local function InitEntityMaps()
 
 	global.upgrade_pairs = {}
 	global.downgrade_pairs = {}
-	if game.active_mods["Realistic_Electric_Trains"] then
-		global.ret_locos = {}
-	else
-		global.ret_locos = nil
-	end
 	
 	-- Retrieve entity names from dummy technology, store in global variable
 	for _,effect in pairs(game.technology_prototypes["multiple-unit-train-control-locomotives"].effects) do
@@ -77,14 +72,14 @@ local function InitEntityMaps()
 			------------
 			-- RET Compatibility
 			local mod_name = ""
-			if game.active_mods["Realistic_Electric_Trains"] and recipe.ingredients[2] then
-				global.ret_locos[std] = recipe.ingredients[2].name
-				global.ret_locos[mu] = recipe.ingredients[2].name
-				mod_name = "Realistic Electric Trains "
-				--game.print("MU Control registered Realistic Electric Trains upgrade mapping " 
-				--            .. std .. " to " .. mu .. " with fuel " .. recipe.ingredients[2].name)
-			--else
-				--game.print("MU Control registered upgrade mapping " .. std .. " to " .. mu)
+			if remote.interfaces["realistic_electric_trains"] then
+				-- Check if this is an RET loco, and what fuel the std version uses
+				local fuel_item = remote.call("realistic_electric_trains", "get_locomotive_fuel", std)
+				if fuel_item then
+					-- Add the MU version to RET's global map, with the same fuel item as the std version.
+					remote.call("realistic_electric_trains", "register_locomotive_type", mu, fuel_item)
+					mod_name = "Realistic Electric Trains "
+				end
 			end
 			game.print({"debug-message.mu-mapping-message",mod_name,std,mu})
 		end
@@ -141,11 +136,13 @@ end
 -- Read train state and determine if it is safe to replace
 local function isTrainStopped(train)
 	local state = train.state
-	return (state == defines.train_state.wait_station) or 
-	       (state == defines.train_state.wait_signal) or 
-	       (state == defines.train_state.no_path) or 
-	       (state == defines.train_state.no_schedule) or 
-	       (state == defines.train_state.manual_control)
+	return train.speed==0 and (
+	            (state == defines.train_state.wait_station) or 
+	            (state == defines.train_state.wait_signal) or 
+	            (state == defines.train_state.no_path) or 
+	            (state == defines.train_state.no_schedule) or 
+	            (state == defines.train_state.manual_control)
+			)
 end
 
 
@@ -334,6 +331,16 @@ local function OnTrainCreated(event)
 end
 
 
+--== ON_GUI_CLOSED and ON_PLAYER_FAST_TRANSFERRED ==--
+-- Events trigger when player changes module contents of a modular locomotive
+local function OnModuleChanged(event)
+	local e = event.entity
+	if e and e.valid and e.type=="locomotive" then
+		table.insert(global.created_trains, e.train)
+		script.on_event(defines.events.on_tick, OnTick)
+	end
+end
+
 --== ON_NTH_TICK EVENT ==--
 -- Initiates balancing of fuel inventories in every MU consist
 local function OnNthTick(event)
@@ -490,6 +497,7 @@ local function init_events()
 	-- Subscribe to On_Train_Created according to mod enabled setting
 	if settings_mode ~= "disabled" then
 		script.on_event(defines.events.on_train_created, OnTrainCreated)
+		script.on_event({defines.events.on_gui_closed, defines.events.on_player_fast_transferred}, OnModuleChanged)
 	end
 	
 	-- Set conditional OnTick event handler correctly on load based on global queues, so we can sync with a multiplayer game.
