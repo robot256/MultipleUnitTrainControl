@@ -62,11 +62,9 @@ function replaceLocomotive(loco, newName)
 	end
 	
 	-- Restore parameters
-	newLoco.backer_name = backer_name
-	newLoco.last_user = last_user
-	if color then   -- color is nil if you never changed it!
-		newLoco.color = color
-	end
+	if backer_name then newLoco.backer_name = backer_name end
+	if last_user then newLoco.last_user = last_user end
+	if color then newLoco.color = color end
 	newLoco.health = health
 	if to_be_deconstructed == true then
 		newLoco.order_deconstruction(force)
