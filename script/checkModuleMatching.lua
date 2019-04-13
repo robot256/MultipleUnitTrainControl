@@ -5,6 +5,33 @@
  *   Returns true if they are not modular locos.
  --]]
 
+local moduleTypes = nil
+
+local function isRelevantModule(name)
+	
+	if moduleTypes == nil then
+		moduleTypes = {}
+		game.print("MUTC is Caching RET module types")
+		-- Cache table of allowable modules
+		if game.technology_prototypes["ret-modular-locomotives"] then
+			for _,effect in pairs(game.technology_prototypes["ret-modular-locomotives"].effects) do
+				if effect.type == "unlock-recipe" and game.equipment_prototypes[effect.recipe] then
+					moduleTypes[effect.recipe] = true
+					--game.print("Cached module type " .. effect.recipe)
+				end
+			end
+		end
+	end
+	
+	if moduleTypes[name] then
+		return true
+	else
+		return false
+	end
+	
+end
+ 
+ 
 
 function checkModuleMatching(loco1, loco2)
 
@@ -16,14 +43,14 @@ function checkModuleMatching(loco1, loco2)
 		local gridTwo = loco2.grid.get_contents()
 		local matched = true
 		for k,v in pairs(gridOne) do
-			if not(gridTwo[k] and gridTwo[k]==v) then
+			if isRelevantModule(k) and not(gridTwo[k] and gridTwo[k]==v) then
 				matched = false
 				break
 			end
 		end
 		if matched then
 			for k,v in pairs(gridTwo) do
-				if not(gridOne[k] and gridOne[k]==v) then
+				if isRelevantModule(k) and not(gridOne[k] and gridOne[k]==v) then
 					matched = false
 					break
 				end
