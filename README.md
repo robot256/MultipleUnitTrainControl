@@ -8,9 +8,9 @@ Factorio mod written in Lua.  Lets locomotives provide backwards force in automa
 - License: MIT
 - Source: GitHub
 - Download: mods.factorio.com
-- Version: 0.1.13
-- Release: 2019-04-10
-- Tested-With-Factorio-Version: 0.17.26
+- Version: 0.1.14
+- Release: 2019-04-14
+- Tested-With-Factorio-Version: 0.17.31
 - Category: Helper, Train
 - Tags: Train
 
@@ -40,12 +40,13 @@ This mod is meant to be an alternative to [Noxy's Multidirectional Trains](url=h
   - [Electric Vehicles: Reborn](https://mods.factorio.com/mod/electric-vehicles-reborn)
   - [5dim's mod - Trains](https://mods.factorio.com/mod/5dim_trains)
   - [Armored Train (Wagon Turrets)](https://mods.factorio.com/mod/Armored-train)
+  - [Realistic Electric Trains](https://mods.factorio.com/mod/Realistic_Electric_Trains)
 
 ## Planned Features
 - Support additional modded locomotives.  If you want more, please send me suggestions!
 
 ## Details
-Under the hood, MU Control detects when a train is created with opposite-facing locomotives of the same type, and silently replaces them with a different entity, the "MU version", that have twice as much power as before.  As long as those two locomotives do not separate, MU Control never changes the train again.  If an MU locomotive is found to be without its twin, MU Control will immediately replace it with the normal version.
+Under the hood, MU Control detects when a train is created with opposite-facing locomotives of the same type, and silently replaces them with a different entity, the "MU version", that have twice as much power as before.  As long as those two locomotives do not separate, MU Control never changes the train again.  If an MU locomotive is found to be without its twin, MU Control will immediately replace it with the normal version.  It always waits until the train has come to a stop before making replacements, to prevent most issues with automatic mode and collisions.
 
 Since the game still thinks only one locomotive is driving, but with twice the power, the front locomotive will use twice as much fuel and the back won't use any.  MU Control automatically balances fuel between them periodically, so the single-direction range of the two together is the same as if they were both facing forward.  You can set the frequency of balancing or disable it in the mod settings.  If you let it drain to empty, it won't balance the last unit of fuel.
 
