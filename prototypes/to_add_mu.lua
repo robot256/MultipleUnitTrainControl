@@ -8,8 +8,8 @@
 if mods["TrainOverhaul"] then
 
 	-- Generate an MU version of the Heavy, Express, and Nuclear Locomotives
-	createMuLoco("heavy-locomotive","heavy-locomotive-mu","item-with-entity-data",true)
-	createMuLoco("express-locomotive","express-locomotive-mu","item-with-entity-data",true)
-	createMuLoco("nuclear-locomotive","nuclear-locomotive-mu","item-with-entity-data",true)
+	createMuLoco{std="heavy-locomotive",mu="heavy-locomotive-mu",item="item-with-entity-data",hasDescription=true}
+	createMuLoco{std="express-locomotive",mu="express-locomotive-mu",item="item-with-entity-data",hasDescription=true}
+	createMuLoco{std="nuclear-locomotive",mu="nuclear-locomotive-mu",item="item-with-entity-data",hasDescription=true}
 	
 end

@@ -8,6 +8,6 @@
 if mods["angelsaddons-petrotrain"] then
 
 	-- Generate an MU version of the Petrochem Locomotives
-	createMuLoco("petro-locomotive-1","petro-locomotive-1-mu","item-with-entity-data",false)
+	createMuLoco{std="petro-locomotive-1",mu="petro-locomotive-1-mu",item="item-with-entity-data"}
 	
 end

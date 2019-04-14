@@ -7,6 +7,6 @@
 
 if mods["angelsindustries"] then
 	-- Generate an MU version of the Angel's Crawler Locomotive
-	createMuLoco("crawler-locomotive","crawler-locomotive-mu","item-with-entity-data",false)
-	createMuLoco("crawler-locomotive-wagon","crawler-locomotive-wagon-mu","item-with-entity-data",false)
+	createMuLoco{std="crawler-locomotive",mu="crawler-locomotive-mu",item="item-with-entity-data"}
+	createMuLoco{std="crawler-locomotive-wagon",mu="crawler-locomotive-wagon-mu",item="item-with-entity-data"}
 end

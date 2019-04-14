@@ -6,15 +6,9 @@
 
 if mods["Realistic_Electric_Trains"] then
 
-	local r = {0,4,2} -- required version
-	local ver = mods["Realistic_Electric_Trains"]
-	local f = {tonumber(string.match(ver,"^(%d+)%.")),  -- found version
-	           tonumber(string.match(ver,"%.(%d+)%.")),
-			   tonumber(string.match(ver,"%.(%d+)$"))}
-	if (f[1] > r[1]) or (f[1] == r[1] and f[2] > r[2]) or (f[1] == r[1] and f[2] == r[2] and f[3] >= r[3]) then
-		-- Generate an MU version of the Electric and Electric Mk2 Locomotives
-		createMuLoco("ret-electric-locomotive","ret-electric-locomotive-mu","item-with-entity-data",false)
-		createMuLoco("ret-electric-locomotive-mk2","ret-electric-locomotive-mk2-mu","item-with-entity-data",false)
-		createMuLoco("ret-modular-locomotive","ret-modular-locomotive-mu","item-with-entity-data",false)
-	end
+	-- Generate an MU version of the Electric and Electric Mk2 Locomotives
+	createMuLoco{std="ret-electric-locomotive",mu="ret-electric-locomotive-mu",item="item-with-entity-data",fuel_item="ret-dummy-fuel-1",hasDescription=true}
+	createMuLoco{std="ret-electric-locomotive-mk2",mu="ret-electric-locomotive-mk2-mu",item="item-with-entity-data",fuel_item="ret-dummy-fuel-2",hasDescription=true}
+	createMuLoco{std="ret-modular-locomotive",mu="ret-modular-locomotive-mu",item="item-with-entity-data",hasDescription=true}
+		
 end

@@ -8,5 +8,5 @@
 
 
 -- Generate an MU version of the base locomotive
-createMuLoco("locomotive","locomotive-mu","item-with-entity-data",true)
+createMuLoco{std="locomotive",mu="locomotive-mu",item="item-with-entity-data",hasDescription=true}
 

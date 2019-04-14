@@ -7,5 +7,5 @@
 
 if mods["FARL"] then
 	-- Generate an MU version of the Fully Automated Rail Layer
-	createMuLoco("farl","farl-mu","item-with-entity-data",true)
+	createMuLoco{std="farl",mu="farl-mu",item="item-with-entity-data",hasDescription=true}
 end

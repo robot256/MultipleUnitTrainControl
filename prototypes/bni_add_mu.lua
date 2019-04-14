@@ -8,6 +8,6 @@
 if mods["BatteriesNotIncluded"] then
 
 	-- Generate an MU version of the BNI Electric Locomotive
-	createMuLoco("bni_electric-locomotive","bni_electric-locomotive-mu","item-with-entity-data",true)
+	createMuLoco{std="bni_electric-locomotive",mu="bni_electric-locomotive-mu",item="item-with-entity-data",hasDescription=true}
 	
 end

@@ -8,6 +8,6 @@
 if mods["Armored-train"] then
 
 	-- Generate an MU version of the 5dim Locomotive
-	createMuLoco("armored-locomotive-mk1","armored-locomotive-mk1-mu","item",false)
+	createMuLoco{std="armored-locomotive-mk1",mu="armored-locomotive-mk1-mu",item="item"}
 	
 end

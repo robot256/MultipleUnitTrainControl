@@ -8,9 +8,9 @@
 if mods["boblogistics"] then
 
 	-- Generate an MU version of the new locomotives
-	createMuLoco("bob-locomotive-2","bob-locomotive-2-mu","item-with-entity-data",false)
-	createMuLoco("bob-locomotive-3","bob-locomotive-3-mu","item-with-entity-data",false)
-	createMuLoco("bob-armoured-locomotive","bob-armoured-locomotive-mu","item-with-entity-data",false)
-	createMuLoco("bob-armoured-locomotive-2","bob-armoured-locomotive-2-mu","item-with-entity-data",false)
+	createMuLoco{std="bob-locomotive-2",mu="bob-locomotive-2-mu",item="item-with-entity-data"}
+	createMuLoco{std="bob-locomotive-3",mu="bob-locomotive-3-mu",item="item-with-entity-data"}
+	createMuLoco{std="bob-armoured-locomotive",mu="bob-armoured-locomotive-mu",item="item-with-entity-data"}
+	createMuLoco{std="bob-armoured-locomotive-2",mu="bob-armoured-locomotive-2-mu",item="item-with-entity-data"}
 	
 end

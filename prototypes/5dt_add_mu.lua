@@ -8,7 +8,7 @@
 if mods["5dim_trains"] then
 
 	-- Generate an MU version of the 5dim Locomotive
-	createMuLoco("5d-locomotive-hs","5d-locomotive-hs-mu","item-with-entity-data",false)
-	createMuLoco("5d-locomotive-reinforced","5d-locomotive-reinforced-mu","item-with-entity-data",false)
+	createMuLoco{std="5d-locomotive-hs",mu="5d-locomotive-hs-mu",item="item-with-entity-data"}
+	createMuLoco{std="5d-locomotive-reinforced",mu="5d-locomotive-reinforced-mu",item="item-with-entity-data"}
 	
 end

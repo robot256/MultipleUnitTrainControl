@@ -8,11 +8,11 @@
 if mods["SchallArmouredTrain"] then
 
 	-- Generate an MU version of the Armoured Locomotives
-	createMuLoco("Schall-armoured-locomotive","Schall-armoured-locomotive-mu","item-with-entity-data",false)
-	createMuLoco("Schall-armoured-locomotive-mk1","Schall-armoured-locomotive-mk1-mu","item-with-entity-data",false)
-	createMuLoco("Schall-armoured-locomotive-mk2","Schall-armoured-locomotive-mk2-mu","item-with-entity-data",false)
+	createMuLoco{std="Schall-armoured-locomotive",mu="Schall-armoured-locomotive-mu",item="item-with-entity-data"}
+	createMuLoco{std="Schall-armoured-locomotive-mk1",mu="Schall-armoured-locomotive-mk1-mu",item="item-with-entity-data"}
+	createMuLoco{std="Schall-armoured-locomotive-mk2",mu="Schall-armoured-locomotive-mk2-mu",item="item-with-entity-data"}
 	if data.raw["locomotive"]["Schall-armoured-locomotive-mk3"] then
-		createMuLoco("Schall-armoured-locomotive-mk3","Schall-armoured-locomotive-mk3-mu","item-with-entity-data",false)
+		createMuLoco{std="Schall-armoured-locomotive-mk3",mu="Schall-armoured-locomotive-mk3-mu",item="item-with-entity-data"}
 	end
 	
 end

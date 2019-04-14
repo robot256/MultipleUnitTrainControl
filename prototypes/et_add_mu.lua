@@ -8,8 +8,8 @@
 if mods["ElectricTrain"] then
 
 	-- Generate an MU version of the Electric Train 1, 2, and 3
-	createMuLoco("et-electric-locomotive-1","et-electric-locomotive-1-mu","item-with-entity-data",false)
-	createMuLoco("et-electric-locomotive-2","et-electric-locomotive-2-mu","item-with-entity-data",false)
-	createMuLoco("et-electric-locomotive-3","et-electric-locomotive-3-mu","item-with-entity-data",false)
+	createMuLoco{std="et-electric-locomotive-1",mu="et-electric-locomotive-1-mu",item="item-with-entity-data"}
+	createMuLoco{std="et-electric-locomotive-2",mu="et-electric-locomotive-2-mu",item="item-with-entity-data"}
+	createMuLoco{std="et-electric-locomotive-3",mu="et-electric-locomotive-3-mu",item="item-with-entity-data"}
 	
 end
