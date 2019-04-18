@@ -1,4 +1,17 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.1.15
+Date: 2019-04-17
+  Features:
+    - Added support for Fusion Train.
+    - Added icon overlay for MU Locomotives so they can be easily distinguished in the signal list.
+  Changes:
+    - Reworked to use functions from OpteraLib.
+    - Changed MU Locomotive item signals to sort directly after their normal counterpart.
+  Bugfixes:
+    - Fixed some missing dependencies.
+    - Fixed compatibility with Automatic Train Fuel Stop.
+
+---------------------------------------------------------------------------------------------------
 Version: 0.1.14
 Date: 2019-04-14
   Features:
