@@ -45,7 +45,7 @@ local train_queue_semaphore = false
 local function CallRemoteInterface()
     -- Make sure FuelTrainStop plays nice with ElectricTrain in the MU versions
 	if remote.interfaces["FuelTrainStop"] then
-		for std,mu in global.upgrade_pairs do
+		for std,mu in pairs(global.upgrade_pairs) do
 			if std:match("^et%-electric%-locomotive%-%d$") then
 				remote.call("FuelTrainStop", "exclude_from_fuel_schedule", mu)
 			end
