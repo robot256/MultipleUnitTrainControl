@@ -7,20 +7,12 @@
 
 function createMuLocoRETFuelItem(oldFuel, newFuel, power_multiplier)
 	power_multiplier = power_multiplier or 2
-	-- Check that source exists
-	if not data.raw.item[oldFuel] then
-		error("item " .. oldFuel .. " doesn't exist")
-	end
-	
 	
 	-- Generate dummy fuel items for base locos, because they are sized based on power consumption and we don't balance burner heat between pairs
-	local dummy_fuel_mu = table.deepcopy(data.raw.item[oldFuel])
-	dummy_fuel_mu.name = newFuel
+	local dummy_fuel_mu = copy_prototype(data.raw["item"][oldFuel],newFuel)
 	
 	-- Change the power level (string contains suffix "kW"). This also increases fuel consumption.
-	local max_power = string.sub(dummy_fuel_mu.fuel_value ,1,-3) * 2
-	local power_suffix = string.sub(dummy_fuel_mu.fuel_value ,-2,-1)
-	dummy_fuel_mu.fuel_value = max_power .. power_suffix
+	dummy_fuel_mu.fuel_value = multiply_energy_value(dummy_fuel_mu.fuel_value, power_multiplier)
 	
 	return dummy_fuel_mu
 end

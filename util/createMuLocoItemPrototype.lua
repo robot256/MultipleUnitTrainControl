@@ -7,15 +7,8 @@
 
 
 function createMuLocoItemPrototype(item_type,name,newName)
-	-- Check that source exists
-	if not data.raw[item_type][name] then
-		error("locomotive item " .. name .. " doesn't exist")
-	end
-	
 	-- Copy source locomotive prototype
-	local newItem = copyPrototype(item_type, name, newName)
-	
-	newItem.order = "a[train-system]-fz[locomotive-mu]" -- this doesn't get copied??
+	local newItem = copy_prototype(data.raw[item_type][name], newName)
 	
 	-- Fix the localization
 	newItem.localised_name = {'template.mu-name',{'entity-name.'..name}}

@@ -11,7 +11,8 @@
  *  fuel_item= item name string of Realistic Electric Trains dummy fuel item used by the standard version
 --]]
 
-require ("util.copyPrototype")
+multiply_energy_value = require("__OpteraLib__.data.utilities").multiply_energy_value
+copy_prototype = require("__OpteraLib__.data.utilities").copy_prototype
 require ("util.createMuLocoRETFuelItem")
 require ("util.createMuLocoEntityPrototype")
 require ("util.createMuLocoItemPrototype")

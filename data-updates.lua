@@ -4,7 +4,6 @@
  * Description: Add the MU locomotives
 --]]
 
-
 require ("util.createMuLoco")
 
 require ("prototypes.base_add_mu")
