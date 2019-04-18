@@ -76,7 +76,9 @@ function replaceLocomotive(loco, newName)
 	end
 	
 	-- Restore the partially-used burner fuel
-	restoreBurner(newLoco.burner, saved_burner)
+	if saved_burner then
+		restoreBurner(newLoco.burner, saved_burner)
+	end
 	
 	-- Restore the equipment grid
 	if grid_equipment and newLoco.grid and newLoco.grid.valid then

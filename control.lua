@@ -353,22 +353,24 @@ local function OnNthTick(event)
 		for i=1,n do
 			entry = global.mu_pairs[i]
 			if (entry[1] and entry[2] and entry[1].valid and entry[2].valid) then
-				-- This pair is good, balance if there is burner fuel inventories (only check one, since they are identical prototypes)
-				local inventoryOne = entry[1].burner.inventory
-				local inventoryTwo = entry[2].burner.inventory
-				if inventoryOne.valid and inventoryOne.valid and #inventoryOne > 0 then
-					table.insert(global.inventories_to_balance, {inventoryOne, inventoryTwo})
-					numInventories = numInventories + 1
-					-- if it burns stuff, it might have a result
-					inventoryOne = entry[1].burner.burnt_result_inventory
-					inventoryTwo = entry[2].burner.burnt_result_inventory
+				-- This pair is good, balance if there are burner fuel inventories (only check one, since they are identical prototypes)
+				if entry[1].burner then
+					local inventoryOne = entry[1].burner.inventory
+					local inventoryTwo = entry[2].burner.inventory
 					if inventoryOne.valid and inventoryOne.valid and #inventoryOne > 0 then
 						table.insert(global.inventories_to_balance, {inventoryOne, inventoryTwo})
 						numInventories = numInventories + 1
+						-- if it burns stuff, it might have a result
+						inventoryOne = entry[1].burner.burnt_result_inventory
+						inventoryTwo = entry[2].burner.burnt_result_inventory
+						if inventoryOne.valid and inventoryOne.valid and #inventoryOne > 0 then
+							table.insert(global.inventories_to_balance, {inventoryOne, inventoryTwo})
+							numInventories = numInventories + 1
+						end
 					end
 				end
 			else
-				-- This pair has one or more invalid locomotives, remove it from the list
+				-- This pair has one or more invalid locomotives, or they don't have burners at all, remove it from the list
 				global.mu_pairs[i] = nil
 			end
 		end
