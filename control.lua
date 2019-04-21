@@ -116,8 +116,8 @@ end
 local function ProcessReplacement(r)
 	if r[1] and r[1].valid then
 		-- Replace the locomotive
-		--game.print("MU Control is replacing ".. r[1].name .. " '"..r[1].backer_name.."' with " .. r[2])
 		game.print({"debug-message.mu-replacement-message",r[1].name,r[1].backer_name,r[2]})
+		local errorString = {"debug-message.mu-replacement-failed",r[1].name,r[1].backer_name,r[1].position.x,r[1].position.y}
 		
 		local newLoco = replaceLocomotive(r[1], r[2])
 		-- Find which mu_pair the old one was in and put the new one instead
@@ -129,6 +129,10 @@ local function ProcessReplacement(r)
 				p[2] = newLoco
 				break
 			end
+		end
+		-- Make sure it was actually replaced, show error message if not.
+		if not newLoco then
+			game.print(errorString)
 		end
 	end
 end

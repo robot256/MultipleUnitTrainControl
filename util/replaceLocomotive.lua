@@ -3,6 +3,8 @@
  * File: replaceLocomotive.lua
  * Description: Replaces one Locomotive Entity with a new one of a different entity-name.
  *    Preserves as many properties of the original as possible.
+ * Parameters: loco (locomotive entity to be replaced), newName (name of locomotive entity to replace it)
+ * Returns: newLoco entity if successful, nil if unsuccessful
  * Dependencies:  saveGrid.lua, saveBurner.lua, saveItemRequestProxy.lua
 --]]
 
@@ -52,6 +54,10 @@ function replaceLocomotive(loco, newName)
 	------------------------------
 	-- Create the new locomotive in the same spot and orientation
 	local newLoco = surface.create_entity{name=newName, position=position, direction=newDirection, force=force, create_build_effect_smoke=false}
+	-- make sure it was actually created
+	if not newLoco then
+		return nil
+	end
 	
 	-- Restore coupling state
 	if not disconnected_back then
