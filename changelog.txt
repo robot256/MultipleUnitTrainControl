@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.1.16
+Date: 2019-04-21
+  Changes:
+    - Added setting to adjust console message frequency.
+  Bugfixes:
+    - Fixed crash when unable to create replacement locomotive.
+
+---------------------------------------------------------------------------------------------------
 Version: 0.1.15
 Date: 2019-04-17
   Features:

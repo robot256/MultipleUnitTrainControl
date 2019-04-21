@@ -8,9 +8,9 @@ Factorio mod written in Lua.  Lets locomotives provide backwards force in automa
 - License: MIT
 - Source: GitHub
 - Download: mods.factorio.com
-- Version: 0.1.15
-- Release: 2019-04-17
-- Tested-With-Factorio-Version: 0.17.31
+- Version: 0.1.16
+- Release: 2019-04-21
+- Tested-With-Factorio-Version: 0.17.32
 - Category: Helper, Train
 - Tags: Train
 
@@ -60,6 +60,7 @@ Four modes can be selected in the mod settings:
 
 ## Known Issues
 - If a locomotive is stopped on a junction when it is replaced, the train may not be reassembled correctly and will still be set to automatic, possibly causing collisions.
+- In rare cases, the locomotive is deleted but the replacement cannot be placed, so it is lost. This normally only happens under heavy biter attack, but might happen at the end of a track.
 - The MU version of each locomotive type is not craftable and should never end up in your inventory, but sometimes it does. It will revert as soon as you place it on a track.
 - Train kill statistics may not be preserved when upgrading/downgrading locomotives.
 - Mode is currently a runtime setting, so MU Control technologies will be available to research even if you have set MU Control to ignore them.
