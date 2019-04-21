@@ -21,4 +21,12 @@ data:extend({
 	minimum_value = 0,
 	default_value = 300
   },
+  {
+    type = "string-setting",
+	name = "multiple-unit-train-control-debug",
+	order = "ac",
+	setting_type = "runtime-global",
+	default_value = "info",
+	allowed_values = {"none","error","info"}
+  },
 })

@@ -34,6 +34,7 @@ require("script.purgeLocoFromPairs")
 
 local settings_mode = settings.global["multiple-unit-train-control-mode"].value
 local settings_nth_tick = settings.global["multiple-unit-train-control-on_nth_tick"].value
+local settings_debug = settings.global["multiple-unit-train-control-debug"].value
 local current_nth_tick = settings_nth_tick
 
 local train_queue_semaphore = false
@@ -82,7 +83,9 @@ local function InitEntityMaps()
 					mod_name = "Realistic Electric Trains "
 				end
 			end
-			game.print({"debug-message.mu-mapping-message",mod_name,std,mu})
+			if settings_debug == "info" then
+				game.print({"debug-message.mu-mapping-message",mod_name,std,mu})
+			end
 		end
 	end
 	
@@ -116,7 +119,9 @@ end
 local function ProcessReplacement(r)
 	if r[1] and r[1].valid then
 		-- Replace the locomotive
-		game.print({"debug-message.mu-replacement-message",r[1].name,r[1].backer_name,r[2]})
+		if settings_debug == "info" then
+			game.print({"debug-message.mu-replacement-message",r[1].name,r[1].backer_name,r[2]})
+		end
 		local errorString = {"debug-message.mu-replacement-failed",r[1].name,r[1].backer_name,r[1].position.x,r[1].position.y}
 		
 		local newLoco = replaceLocomotive(r[1], r[2])
@@ -131,7 +136,7 @@ local function ProcessReplacement(r)
 			end
 		end
 		-- Make sure it was actually replaced, show error message if not.
-		if not newLoco then
+		if not newLoco and (settings_debug == "info" or settings_debug == "error") then
 			game.print(errorString)
 		end
 	end
@@ -224,8 +229,7 @@ local function OnTrainChangedState(event)
 					ProcessTrain(t)
 					global.moving_trains[id] = nil
 					train_queue_semaphore = false
-				else
-					-- It's stopped, but we're busy. Put it back in the OnTick queue (might work?)
+				elseif (settings_debug == "info" or settings_debug == "error") then
 					game.print("OnChange Train " .. id .. " event ignored because semaphore is occupied (this is weird!)")
 				end
 			end
@@ -405,7 +409,9 @@ local function OnNthTick(event)
 			end
 			if newVal ~= current_nth_tick then
 				--game.print("Changing MU Control Nth Tick duration to " .. newVal)
-				game.print({"debug-message.mu-changing-tick-message",newVal})
+				if settings_debug == "info" then
+					game.print({"debug-message.mu-changing-tick-message",newVal})
+				end
 				current_nth_tick = newVal
 				global.current_nth_tick = current_nth_tick
 				script.on_nth_tick(nil)
@@ -534,6 +540,10 @@ script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
 		settings_nth_tick = settings.global["multiple-unit-train-control-on_nth_tick"].value
 		global.current_nth_tick = nil
 		StartBalanceUpdates()
+	
+	elseif event.setting == "multiple-unit-train-control-debug" then
+		settings_debug = settings.global["multiple-unit-train-control-debug"].value
+		
 	end
 	
 end)
