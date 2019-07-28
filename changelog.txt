@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.1.17
+Date: 2019-07-28
+  Bugfixes:
+    - Fixed placed locomotive would snap to train stop instead of where it was located before.
+  Modding:
+    - Added script_raised_build event to replaced locomotive.
+
+---------------------------------------------------------------------------------------------------
 Version: 0.1.16
 Date: 2019-04-21
   Changes:
