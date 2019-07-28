@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.1.17
+Date: 2019-07-28
+  Bugfixes:
+    - Fixed crash in 0.17.59 when replacing locomotives in trains with empty schedules.
+    - Added "snap_to_train_stop=false" flag to reduce movement during replacement.
+
+---------------------------------------------------------------------------------------------------
 Version: 0.1.16
 Date: 2019-04-21
   Changes:

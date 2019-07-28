@@ -53,7 +53,14 @@ function replaceLocomotive(loco, newName)
 	loco.destroy{raise_destroy=true}
 	------------------------------
 	-- Create the new locomotive in the same spot and orientation
-	local newLoco = surface.create_entity{name=newName, position=position, direction=newDirection, force=force, create_build_effect_smoke=false}
+	local newLoco = surface.create_entity{
+		name = newName, 
+		position = position, 
+		direction = newDirection, 
+		force = force, 
+		create_build_effect_smoke = false,
+		raise_built = false,
+		snap_to_train_stop = false}
 	-- make sure it was actually created
 	if not newLoco then
 		return nil
@@ -96,14 +103,23 @@ function replaceLocomotive(loco, newName)
 		newLoco.set_driver(player_driving)
 	end
 	
-	
 	-- After all that, fire an event so other scripts can reconnect to it
 	script.raise_event(defines.events.script_raised_built, {entity = newLoco})
 	
 	-- Restore the train schedule and mode
-	newLoco.train.schedule = train_schedule
-	newLoco.train.manual_mode = manual_mode
-		
+	if train_schedule.records ~= nil then
+		local num_stops = 0
+		for k,v in pairs(train_schedule.records) do
+			num_stops = num_stops + 1
+		end
+		-- If the schedule is not empty, assign it and restore manual/automatic mode
+		if num_stops > 0 then
+			newLoco.train.schedule = train_schedule
+			newLoco.train.manual_mode = manual_mode
+		end
+		-- If the saved schedule has no stops, do not write to train.schedule.  In 0.17.59, this will cause a script error.
+	end
+	
 	--game.print("Finished replacing. Used direction "..newDirection..", new orientation: " .. newLoco.orientation)
 	return newLoco
 end
