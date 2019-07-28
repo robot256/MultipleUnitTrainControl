@@ -59,7 +59,8 @@ function replaceLocomotive(loco, newName)
 		direction=newDirection,
 		force=force,
 		create_build_effect_smoke=false,
-		raise_built = true}
+		raise_built = true,
+		snap_to_train_stop = false}
 	-- make sure it was actually created
 	if not newLoco then
 		return nil
