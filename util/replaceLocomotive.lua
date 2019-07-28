@@ -53,7 +53,13 @@ function replaceLocomotive(loco, newName)
 	loco.destroy{raise_destroy=true}
 	------------------------------
 	-- Create the new locomotive in the same spot and orientation
-	local newLoco = surface.create_entity{name=newName, position=position, direction=newDirection, force=force, create_build_effect_smoke=false}
+	local newLoco = surface.create_entity{
+		name=newName,
+		position=position,
+		direction=newDirection,
+		force=force,
+		create_build_effect_smoke=false,
+		raise_built = true}
 	-- make sure it was actually created
 	if not newLoco then
 		return nil
