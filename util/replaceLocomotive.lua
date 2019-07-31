@@ -107,7 +107,7 @@ function replaceLocomotive(loco, newName)
 	script.raise_event(defines.events.script_raised_built, {entity = newLoco})
 	
 	-- Restore the train schedule and mode
-	if train_schedule.records ~= nil then
+	if train_schedule and train_schedule.records ~= nil then
 		local num_stops = 0
 		for k,v in pairs(train_schedule.records) do
 			num_stops = num_stops + 1
@@ -115,11 +115,11 @@ function replaceLocomotive(loco, newName)
 		-- If the schedule is not empty, assign it and restore manual/automatic mode
 		if num_stops > 0 then
 			newLoco.train.schedule = train_schedule
-			newLoco.train.manual_mode = manual_mode
 		end
 		-- If the saved schedule has no stops, do not write to train.schedule.  In 0.17.59, this will cause a script error.
 	end
-	
+	newLoco.train.manual_mode = manual_mode
+		
 	--game.print("Finished replacing. Used direction "..newDirection..", new orientation: " .. newLoco.orientation)
 	return newLoco
 end
