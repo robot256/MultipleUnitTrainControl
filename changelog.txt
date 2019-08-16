@@ -1,4 +1,18 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.1.19
+Date: 2019-08-16
+  Bugfixes:
+    - Changed Electric Trains required version numbers.  Presently MUTC only works with ET 0.17.12 and 0.17.13.
+  Features:
+    - Added support for "Yuoki Industries - Railways".
+
+---------------------------------------------------------------------------------------------------
+Version: 0.1.18
+Date: 2019-07-30
+  Bugfixes:
+    - Fixed crash in 0.17.60 when replacing locomotives since they fixed the bug that was introduced in 0.17.59.
+
+---------------------------------------------------------------------------------------------------
 Version: 0.1.17
 Date: 2019-07-28
   Bugfixes:
