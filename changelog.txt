@@ -1,6 +1,12 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.19
 Date: 2019-08-16
+  Changes:
+    - Removed version dependency on "Electric Train".  Latest versions of both mods play nice together, please update ET to 0.17.28.
+
+---------------------------------------------------------------------------------------------------
+Version: 0.1.19
+Date: 2019-08-16
   Bugfixes:
     - Changed Electric Trains required version numbers.  Presently MUTC only works with ET 0.17.12 and 0.17.13.
   Features:

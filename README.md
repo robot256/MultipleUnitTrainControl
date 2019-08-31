@@ -8,8 +8,8 @@ Factorio mod written in Lua.  Lets locomotives provide backwards force in automa
 - License: MIT
 - Source: GitHub
 - Download: mods.factorio.com
-- Version: 0.1.19
-- Release: 2019-08-16
+- Version: 0.1.20
+- Release: 2019-08-31
 - Tested-With-Factorio-Version: 0.17.66
 - Category: Helper, Train
 - Tags: Train
@@ -29,7 +29,7 @@ This mod is meant to be an alternative to [Noxy's Multidirectional Trains](url=h
 - Currently supports: 
   - Vanilla
   - [Train & Fuel Overhaul](https://mods.factorio.com/mods/Optera/TrainOverhaul)
-  - [Electric Train](https://mods.factorio.com/mod/ElectricTrain)
+  - [Electric Train](https://mods.factorio.com/mod/ElectricTrain) (version 0.17.28 and up)
   - [Batteries Not Included](https://mods.factorio.com/mod/BatteriesNotIncluded)
   - [Fully Automated Rail Layer](https://mods.factorio.com/mod/FARL)
   - [Angel's Industries](https://mods.factorio.com/mod/angelsindustries) Crawler Train
