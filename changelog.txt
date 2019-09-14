@@ -1,6 +1,13 @@
 ---------------------------------------------------------------------------------------------------
-Version: 0.1.19
-Date: 2019-08-16
+Version: 0.1.21
+Date: 2019-09-13
+  Changes:
+    - Hid optional dependencies that only provide standard MU compatibility features.
+    - Added support for Industrial Revolution battery-powered locomotive.  (Next IR update will properly incorporate MUTC in the technology tree.)
+
+---------------------------------------------------------------------------------------------------
+Version: 0.1.20
+Date: 2019-08-31
   Changes:
     - Removed version dependency on "Electric Train".  Latest versions of both mods play nice together, please update ET to 0.17.28.
 

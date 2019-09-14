@@ -8,9 +8,9 @@ Factorio mod written in Lua.  Lets locomotives provide backwards force in automa
 - License: MIT
 - Source: GitHub
 - Download: mods.factorio.com
-- Version: 0.1.20
-- Release: 2019-08-31
-- Tested-With-Factorio-Version: 0.17.66
+- Version: 0.1.21
+- Release: 2019-09-13
+- Tested-With-Factorio-Version: 0.17.68
 - Category: Helper, Train
 - Tags: Train
 
@@ -47,6 +47,7 @@ This mod is meant to be an alternative to [Noxy's Multidirectional Trains](url=h
   - [YIR - Yuoki-Industries-Railroads](https://mods.factorio.com/mod/z_yira_yuokirails)
   - [YIR - Americans](https://mods.factorio.com/mod/z_yira_american)
   - [YIR - Uranium Power Trains](https://mods.factorio.com/mod/z_yira_UP)
+  - [Industrial Revolution](https://mods.factorio.com/mod/IndustrialRevolution)
 
 ## Planned Features
 - Support additional modded locomotives.  If you want more, please send me suggestions!
