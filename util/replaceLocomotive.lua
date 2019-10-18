@@ -33,13 +33,6 @@ function replaceLocomotive(loco, newName)
 	-- Save the burner progress
 	local saved_burner = saveBurner(loco.burner)
 	
-	-- Adjust the direction of the new locomotive
-	-- This mapping was determined by brute force because direction and orientation for trains are stupid.
-	local newDirection = 0
-	if orientation > 0 and orientation <= 0.5 then
-		newDirection = 2
-	end
-	
 	-- Save the train schedule.  If we are replacing a lone MU with a regular loco, the train schedule will be lost when we delete it.
 	local train_schedule = loco.train.schedule
 	local manual_mode = loco.train.manual_mode
@@ -56,7 +49,7 @@ function replaceLocomotive(loco, newName)
 	local newLoco = surface.create_entity{
 		name = newName, 
 		position = position, 
-		direction = newDirection, 
+		orientation = orientation, 
 		force = force, 
 		create_build_effect_smoke = false,
 		raise_built = false,

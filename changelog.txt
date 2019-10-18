@@ -1,9 +1,17 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.1.22
+Date: 2019-10-17
+  Bugfixes:
+    - Fixed for 0.17.71.  Apparently in the create_entity API they fixed the "orientation=" parameter and broke "direction=" for locomotives.
+  Features:
+    - Added compatibility with Bigger Slower Trains via hidden dependency.
+
+---------------------------------------------------------------------------------------------------
 Version: 0.1.21
 Date: 2019-09-13
   Changes:
     - Hid optional dependencies that only provide standard MU compatibility features.
-    - Added support for Industrial Revolution battery-powered locomotive.  (Next IR update will properly incorporate MUTC in the technology tree.)
+    - Added support for Industrial Revolution battery-powered locomotive.
 
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.20
