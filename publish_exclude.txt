@@ -2,4 +2,4 @@
 .gitignore
 .git
 example.png
-mutc_exclude.txt
+publish_exclude.txt
