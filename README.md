@@ -8,9 +8,9 @@ Factorio mod written in Lua.  Lets locomotives provide backwards force in automa
 - License: MIT
 - Source: GitHub
 - Download: mods.factorio.com
-- Version: 0.1.22
-- Release: 2019-10-17
-- Tested-With-Factorio-Version: 0.17.71
+- Version: 0.1.24
+- Release: 2019-12-19
+- Tested-With-Factorio-Version: 0.17.79
 - Category: Helper, Train
 - Tags: Train
 
@@ -42,13 +42,15 @@ This mod is meant to be an alternative to [Noxy's Multidirectional Trains](url=h
   - [Armored Train (Wagon Turrets)](https://mods.factorio.com/mod/Armored-train)
   - [Realistic Electric Trains](https://mods.factorio.com/mod/Realistic_Electric_Trains)
   - [Fusion Train](https://mods.factorio.com/mod/FusionTrain)
-  - [Automatic Train Fuel Stop](https://mods.factorio.com/mod/FuelTrainStop)
+  - [Nuclear Locomotives](https://mods.factorio.com/mod/Nuclear%20Locomotives)
   - [Yuoki Industries - Railways](https://mods.factorio.com/mod/yi_railway)
   - [YIR - Yuoki-Industries-Railroads](https://mods.factorio.com/mod/z_yira_yuokirails)
   - [YIR - Americans](https://mods.factorio.com/mod/z_yira_american)
   - [YIR - Uranium Power Trains](https://mods.factorio.com/mod/z_yira_UP)
   - [Industrial Revolution](https://mods.factorio.com/mod/IndustrialRevolution)
   - [Bigger Slower Trains](https://mods.factorio.com/mod/bigger_slower_trains-M)
+  - [Automatic Train Fuel Stop](https://mods.factorio.com/mod/FuelTrainStop)
+  - [Bob's Vehicle Equipment](https://mods.factorio.com/mod/bobvehicleequipment)
 
 ## Planned Features
 - Support additional modded locomotives.  If you want more, please send me suggestions!
