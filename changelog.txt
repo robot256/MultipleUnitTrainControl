@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.1.25
+Date: 2019-12-29
+  Features:
+    - Added support for X-12 Nuclear Locomotives mod (up and coming).
+  Changes:
+    - Moved locomotive replacement code to Robot256Lib.
+
+---------------------------------------------------------------------------------------------------
 Version: 0.1.24
 Date: 2019-12-19
   Features:

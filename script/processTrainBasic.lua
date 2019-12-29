@@ -20,7 +20,8 @@ function processTrainBasic(t)
 	for i,c in ipairs(t.carriages) do
 		if unit_start == 0 then
 			-- Look for first locomotive in the unit, skip wagons
-			if c.type == "locomotive" then
+			-- For compatibility with X-12 Nuclear Locomotive mod, x12-nuclear-tender is a fluid wagon that acts as part of a locomotive.
+			if c.type == "locomotive" or c.name == "x12-nuclear-tender" then
 				-- start unit that is length 1
 				unit_start = i
 				unit_end = i
@@ -28,7 +29,7 @@ function processTrainBasic(t)
 			end
 		else
 			-- Look for the last locomotive in the unit
-			if c.type == "locomotive" then
+			if c.type == "locomotive" or c.name == "x12-nuclear-tender" then
 				-- update end of unit to this index
 				unit_end = i
 				table.insert(loco_units[#loco_units],c)
