@@ -18,12 +18,11 @@
  *
  --]]
 
-require("util.mapBlueprint")
-require("util.saveItemRequestProxy")
-require("util.saveBurner")
-require("util.saveGrid")
-require("util.replaceLocomotive")
-require("util.balanceInventories")
+replaceCarriage = require("__Robot256Lib__/script/carriage_replacement").replaceCarriage
+blueprintLib = require("__Robot256Lib__/script/blueprint_replacement")
+
+
+require("script.balanceInventories")
 require("script.checkModuleMatching")
 require("script.processTrainPurge")
 require("script.processTrainBasic")
@@ -124,7 +123,7 @@ local function ProcessReplacement(r)
 		end
 		local errorString = {"debug-message.mu-replacement-failed",r[1].name,r[1].backer_name,r[1].position.x,r[1].position.y}
 		
-		local newLoco = replaceLocomotive(r[1], r[2])
+		local newLoco = replaceCarriage(r[1], r[2])
 		-- Find which mu_pair the old one was in and put the new one instead
 		for _,p in pairs(global.mu_pairs) do
 			if p[1] == r[1] then
@@ -426,7 +425,7 @@ end
 --== ON_PLAYER_SETUP_BLUEPRINT EVENT ==--
 -- ID 68, fires when you select an area to make a blueprint or copy
 local function OnPlayerSetupBlueprint(event)
-	mapBlueprint(event,global.downgrade_pairs)
+	blueprintLib.mapBlueprint(event,global.downgrade_pairs)
 end
 
 
@@ -434,7 +433,7 @@ end
 -- Fires when player presses 'Q'.  We need to sneakily grab the correct item from inventory if it exists,
 --  or sneakily give the correct item in cheat mode.
 local function OnPlayerPipette(event)
-	mapPipette(event,global.downgrade_pairs)
+	blueprintLib.mapPipette(event,global.downgrade_pairs)
 end
 
 -------------
