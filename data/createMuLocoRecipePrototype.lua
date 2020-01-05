@@ -11,27 +11,28 @@
 
 
 function createMuLocoRecipePrototype(name, newName, newFuel)
-	-- Check that source exists
-	if not data.raw["locomotive"][name] then
-		error("locomotive " .. name .. " doesn't exist")
-	end
-	
-	-- Don't copy anything, make it directly convertible
-	local newRecipe = 
-	{
-		type = "recipe",
-		name = newName,
-		ingredients = {{newName, 1}},
-		result = name,
-		hidden = true
-	}
-	
-	-- Add dummy fuel item if needed
-	if newFuel then
-		table.insert(newRecipe.ingredients, {newFuel,1})
-	end
-	
-	return newRecipe
+  -- Check that source exists
+  if not data.raw["locomotive"][name] then
+    error("locomotive " .. name .. " doesn't exist")
+  end
+  
+  -- Don't copy anything, make it directly convertible
+  local newRecipe = 
+  {
+    type = "recipe",
+    name = newName,
+    ingredients = {{newName, 1}},
+    result = name,
+    hidden = true,
+    allow_as_intermediate = false
+  }
+  
+  -- Add dummy fuel item if needed
+  if newFuel then 
+    table.insert(newRecipe.ingredients, {newFuel,1})
+  end
+  
+  return newRecipe
 end
 
 return createMuLocoRecipePrototype

@@ -17,6 +17,10 @@ function createMuLocoItemPrototype(item_type,name,newName)
 	-- Fix the localization
 	newItem.localised_name = {'template.mu-name',{'entity-name.'..name}}
 	newItem.localised_description = {'template.mu-item-description',{'entity-name.'..name}}
+  
+  -- Make the item hidden
+  newItem.flags = newItem.flags or {}
+  table.insert(newItem.flags, "hidden")
 	
 	return newItem
 end
