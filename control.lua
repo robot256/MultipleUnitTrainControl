@@ -436,6 +436,34 @@ local function OnPlayerPipette(event)
 	blueprintLib.mapPipette(event,global.downgrade_pairs)
 end
 
+
+--== ON_PICKED_UP_ITEM ==--
+-- When player picks up an item, change -mu to normal loco items.
+function OnPickedUpItem(event)
+  if global.downgrade_pairs[event.item_stack.name] then
+    game.players[event.player_index].remove_item(event.item_stack)
+    game.players[event.player_index].insert({name=global.downgrade_pairs[event.item_stack.name], count=event.item_stack.count})
+  end
+end
+script.on_event(defines.events.on_picked_up_item, OnPickedUpItem)
+
+
+--== ON_PRE_PLAYER_MINED_ITEM ==--
+--== ON_ROBOT_PRE_MINED ==--
+-- Before player or robot mines an item on the ground, change -mu to normal loco items.
+function OnPreMined(event)
+  if event.entity.name == "item-on-ground" then
+    -- Change item-on-ground to unloaded wagon before robot picks it up
+    if event.entity.stack.valid_for_read and global.downgrade_pairs[event.entity.stack.name] then
+      event.entity.stack.set_stack({name=global.downgrade_pairs[event.entity.stack.name], count=entity.stack.count})
+    end
+  end
+end
+script.on_event(defines.events.on_robot_pre_mined, OnPreMined)
+script.on_event(defines.events.on_pre_player_mined_item, OnPreMined)
+
+
+
 -------------
 -- Enables the on_nth_tick event according to the mod setting value
 --   Safe to run inside on_load().
