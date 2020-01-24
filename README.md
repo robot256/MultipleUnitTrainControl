@@ -8,9 +8,9 @@ Factorio mod written in Lua.  Lets locomotives provide backwards force in automa
 - License: MIT
 - Source: GitHub
 - Download: mods.factorio.com
-- Version: 0.1.26
-- Release: 2020-01-23
-- Tested-With-Factorio-Version: 0.17.79
+- Version: 0.2.0
+- Release: 2020-01-24
+- Tested-With-Factorio-Version: 0.18.1
 - Category: Helper, Train
 - Tags: Train
 
