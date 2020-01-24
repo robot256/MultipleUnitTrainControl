@@ -1,14 +1,14 @@
 {
   "name": "MultipleUnitTrainControl",
-  "version": "0.1.26",
-  "factorio_version": "0.17",
+  "version": "0.2.0",
+  "factorio_version": "0.18",
   "title": "Multiple Unit Train Control",
   "author": "robot256",
   "contact": "",
   "homepage": "https://github.com/robot256/MultipleUnitTrainControl",
   "description": "Replaces bidirectional trains with ones twice as powerful, to simulate real locomotives driving backwards.",
   "dependencies": [
-    "base >= 0.17.71", 
+    "base >= 0.18.0", 
     "OpteraLib >= 0.1.5",
     "Robot256Lib >= 0.1.0",
     "(?)FARL >= 3.1.3", 
