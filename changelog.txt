@@ -7,7 +7,6 @@ Date: 2020-01-23
   Changes:
     - Updated for compatibility with Robot256Lib version 0.1.1.
     - MU locomotive items now have the "hidden" flag set so they will not show up as circuit network signals or intermediate products.
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.25
 Date: 2019-12-29
@@ -15,19 +14,16 @@ Date: 2019-12-29
     - Added support for X-12 Nuclear Locomotives mod (up and coming).
   Changes:
     - Moved locomotive replacement code to Robot256Lib.
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.24
 Date: 2019-12-19
   Features:
     - Added support for Nuclear Locomotives mod.
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.23
 Date: 2019-11-30
   Features:
     - Added compatibility with Bob's Vehicle Equipment via hidden dependency.
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.22
 Date: 2019-10-17
@@ -35,7 +31,6 @@ Date: 2019-10-17
     - Fixed for 0.17.71.  Apparently in the create_entity API they fixed the "orientation=" parameter and broke "direction=" for locomotives.
   Features:
     - Added compatibility with Bigger Slower Trains via hidden dependency.
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.21
 Date: 2019-09-13
@@ -48,7 +43,6 @@ Version: 0.1.20
 Date: 2019-08-31
   Changes:
     - Removed version dependency on "Electric Train".  Latest versions of both mods play nice together, please update ET to 0.17.28.
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.19
 Date: 2019-08-16
@@ -59,20 +53,17 @@ Date: 2019-08-16
     - Added support for "YIR - Yuoki-Industries-Railroads".
     - Added support for "YIR - Americans".
     - Added support for "YIR - Uranium Power Trains".
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.18
 Date: 2019-07-30
   Bugfixes:
     - Fixed crash in 0.17.60 when replacing locomotives since devs fixed the bug that was introduced in 0.17.59.
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.17
 Date: 2019-07-28
   Bugfixes:
     - Fixed crash in 0.17.59 when replacing locomotives in trains with empty schedules.
     - Added "snap_to_train_stop=false" flag to reduce movement during replacement.
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.16
 Date: 2019-04-21
@@ -80,7 +71,6 @@ Date: 2019-04-21
     - Added setting to adjust console message frequency.
   Bugfixes:
     - Fixed crash when unable to create replacement locomotive.
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.15
 Date: 2019-04-17
@@ -93,7 +83,6 @@ Date: 2019-04-17
   Bugfixes:
     - Fixed some missing dependencies.
     - Fixed compatibility with Automatic Train Fuel Stop.
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.14
 Date: 2019-04-14
@@ -101,7 +90,6 @@ Date: 2019-04-14
     - Added support for Realistic Electric Trains (requires version 0.4.2), including Modular Locomotive.
   Bugfixes:
     - Fixed that last_user was not preserved on replacement.
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.13
 Date: 2019-04-10
@@ -112,7 +100,6 @@ Date: 2019-04-10
     - Changed locomotive replacement to happen only when trains are stopped.
     - Fixed that automatic mode was not preserved on replacement.
     - Fixed that trains were not upgraded after technology research.
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.12
 Date: 2019-04-06
@@ -121,19 +108,16 @@ Date: 2019-04-06
     - Added support for 5dim's mod - Trains.
   Bugfixes:
     - Fixed changelog formatting.
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.11
 Date: 2019-04-05
   Bugfixes:
     - Fixed crash on replacement (missed a file that changed in 0.1.9).
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.10
 Date: 2019-04-05
   Bugfixes:
     - Fixed typo in dependencies by removing unnecessary dependencies.
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.9
 Date: 2019-04-04
@@ -143,7 +127,6 @@ Date: 2019-04-04
     - Fixed string in French locale (thanks kryshnar!)
     - Fixed that equipment state (energy,shield,burner contents) was lost on replacement.
     - Disabled build smoke effect when replacing locomotives.
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.8
 Date: 2019-04-01
@@ -151,7 +134,6 @@ Date: 2019-04-01
     - Added support for Batteries Not Included electric locomotives.
   Bugfixes:
     - Fixed crash when saving an existing blueprint while holding an item.
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.7
 Date: 2019-03-31
@@ -160,7 +142,6 @@ Date: 2019-03-31
   Bugfixes:
     - Overhaul of fuel balancing code to fix lots of potentially wierd behavior, including not starting until you change the Nth Tick setting at least once.
     - Fixed player being kicked from locomotive on replacement.
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.6
 Date: 2019-03-30
@@ -172,7 +153,6 @@ Date: 2019-03-30
   Bugfixes:
     - Changed MU Item sort order to work a little better in the signal selection dialog. Still kind of mess with many mods installed.
     - Added MU versions of Electric Train locomotives to the exclude list of the Fuel Train Stop mod.
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.5
 Date: 2019-03-30
@@ -188,7 +168,6 @@ Date: 2019-03-30
     - Fixed crash when selecting just rolling stock with the copy tool.
     - Fixed concatenation of localised_description that broke in 0.1.4 by explicitly listing which mods have descriptions and which don't.
     - Fixed pipette tool trying to give MU versions.
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.4
 Date: 2019-03-27
@@ -198,7 +177,6 @@ Date: 2019-03-27
     - Fixed that MU versions were created inside blueprints (thanks for the tip, GotLag!).
     - Fixed that deconstruction orders were not preserved on replacement (only works if being deconstructed by the owning force).
     - Fixed that equipment grids were not preserved on replacement (only tested with FARL module).
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.3
 Date: 2019-03-25
@@ -211,7 +189,6 @@ Date: 2019-03-25
   Bugfixes:
     - Fixed some issues relating to multiplayer-safe save/load event handling.
     - Fixed formatting in changelog.txt for automatic parsing.
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.2
 Date: 2019-03-24
@@ -224,7 +201,6 @@ Date: 2019-03-24
     - Rewrite of the locomotive pairing algorithms.
     - Moved the mapping of standard and buffed locomotive versions to a dummy technology per Optera's suggestion. Makes adding support for other mods much easier.
     - More work towards compatibility with Realistic Electric Trains.
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.1
 Date: 2019-03-20
@@ -234,7 +210,6 @@ Date: 2019-03-20
   Bugfixes:
     - Fixed that train schedules were not preserved during replacement of a single MU locomotive to a normal locomotive.
     - Fixed that locomotive health was not preserved on replacement.
-
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.0
 Date: 2019-03-17
