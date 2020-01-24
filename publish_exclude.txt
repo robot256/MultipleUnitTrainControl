@@ -3,3 +3,4 @@
 .git
 example.png
 publish_exclude.txt
+.bat

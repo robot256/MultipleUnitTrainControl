@@ -1,4 +1,14 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.1.26
+Date: 2020-01-23
+  Features:
+    - Fuel balancing now moves odd-numbered items between front and back locomotives, so your last nuclear fuel doesn't get stuck in one spot anymore.
+    - If for any reason a locomotive is deleted and its replacement cannot be built, or its grid contents cannot be restored, items will be spilled on the ground instead of lost.
+  Changes:
+    - Updated for compatibility with Robot256Lib version 0.1.1.
+    - MU locomotive items now have the "hidden" flag set so they will not show up as circuit network signals or intermediate products.
+
+---------------------------------------------------------------------------------------------------
 Version: 0.1.25
 Date: 2019-12-29
   Features:
