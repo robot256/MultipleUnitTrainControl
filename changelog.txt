@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.1.27
+Date: 2020-01-25
+  Changes:
+    - Revert fuel balancing ping-pong because it breaks "Inactivity" schedule conditions, especially at LTN Depots.
+---------------------------------------------------------------------------------------------------
 Version: 0.1.26
 Date: 2020-01-23
   Features:
