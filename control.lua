@@ -102,7 +102,7 @@ local function ProcessInventoryQueue()
 	if global.inventories_to_balance and next(global.inventories_to_balance) then
 		--game.print("Taking from inventory queue, " .. #global.inventories_to_balance .. " remaining")
 		local inventories = table.remove(global.inventories_to_balance, 1)
-		balanceInventories(inventories[1], inventories[2])
+		balanceInventories(inventories)
 		
 		idle = false  -- Tell OnTick that we did something useful
 	end
@@ -359,21 +359,15 @@ local function OnNthTick(event)
 		local done = false
 		for i=1,n do
 			entry = global.mu_pairs[i]
+      entry[3] = entry[3] or 0  -- "previous" value of 
 			if (entry[1] and entry[2] and entry[1].valid and entry[2].valid) then
 				-- This pair is good, balance if there are burner fuel inventories (only check one, since they are identical prototypes)
 				if entry[1].burner then
 					local inventoryOne = entry[1].burner.inventory
 					local inventoryTwo = entry[2].burner.inventory
-					if inventoryOne.valid and inventoryOne.valid and #inventoryOne > 0 then
-						table.insert(global.inventories_to_balance, {inventoryOne, inventoryTwo})
+					if inventoryOne.valid and #inventoryOne > 0 then
+						table.insert(global.inventories_to_balance, entry)
 						numInventories = numInventories + 1
-						-- if it burns stuff, it might have a result
-						inventoryOne = entry[1].burner.burnt_result_inventory
-						inventoryTwo = entry[2].burner.burnt_result_inventory
-						if inventoryOne.valid and inventoryOne.valid and #inventoryOne > 0 then
-							table.insert(global.inventories_to_balance, {inventoryOne, inventoryTwo})
-							numInventories = numInventories + 1
-						end
 					end
 				end
 			else
@@ -549,7 +543,6 @@ local function init_events()
 end
 
 script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
-	--game.print("in mod_settings_changed!")
 	if event.setting == "multiple-unit-train-control-mode" then
 		settings_mode = settings.global["multiple-unit-train-control-mode"].value
 		-- Scrub existing trains according to new settings
@@ -583,7 +576,6 @@ end)
 
 -- When game is created, initialize globals and events
 script.on_init(function()
-	--game.print("In on_init!")
 	global.created_trains = {}
 	global.moving_trains = {}
 	global.mu_pairs = {}
@@ -595,11 +587,12 @@ end)
 
 -- When mod list/versions change, reinitialize globals and scrub existing trains
 script.on_configuration_changed(function(data)
-	--game.print("In on_configuration_changed!")
 	global.created_trains = global.created_trains or {}
 	global.moving_trains = global.moving_trains or {}
 	global.mu_pairs = global.mu_pairs or {}
-	global.inventories_to_balance = global.inventories_to_balance or {}
+  -- Always clear the balancing queue so it gets regenerated properly
+	global.inventories_to_balance = {}
+  -- Load new entity maps in case mods were added or removed
 	InitEntityMaps()
 	-- On config change, scrub the list of trains
 	QueueAllTrains()

@@ -26,18 +26,18 @@ function balanceInventories(inventoryOne, inventoryTwo)
 			  locoTwoInventory[k] = 0
 			end
       
-      local itemsToMove = (locoOneInventory[k] - locoTwoInventory[k])/2
+      local itemsToMove = math.floor((locoOneInventory[k] - locoTwoInventory[k])/2)
 			if itemsToMove > 0 then
-				-- locoOne has more items. Round up to continuously swap the odd item
-				local itemsMoved = inventoryTwo.insert({name=k, count=math.ceil(itemsToMove)})
-				if itemsMoved > 0 then
-					inventoryOne.remove({name=k, count=itemsMoved})  -- Remove what we actually inserted
+				-- locoOne has more items. insert up to this number in locoTwo
+				itemsToMove = inventoryTwo.insert({name=k,count=itemsToMove})
+				if itemsToMove > 0 then  -- Can't remove zero items :D
+					inventoryOne.remove({name=k,count=itemsToMove})
 				end
 			elseif itemsToMove < 0 then
-				-- locoTwo has more items. Round up to continuously swap the odd item
-				local itemsMoved = inventoryOne.insert({name=k, count=math.ceil(-1*itemsToMove)})
-				if itemsMoved > 0 then
-					inventoryTwo.remove({name=k, count=itemsMoved})  -- Remove what we actually inserted
+				-- locoTwo has more items
+				itemsToMove = inventoryOne.insert({name=k,count=-1*itemsToMove})
+				if itemsToMove > 0 then
+					inventoryTwo.remove({name=k,count=itemsToMove})
 				end
 			end
 		end
