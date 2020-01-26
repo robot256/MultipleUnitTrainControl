@@ -22,7 +22,7 @@ replaceCarriage = require("__Robot256Lib__/script/carriage_replacement").replace
 blueprintLib = require("__Robot256Lib__/script/blueprint_replacement")
 
 
-require("script.balanceInventories")
+require("script.balanceLocomotives")
 require("script.checkModuleMatching")
 require("script.processTrainPurge")
 require("script.processTrainBasic")
@@ -101,8 +101,8 @@ local function ProcessInventoryQueue()
 	
 	if global.inventories_to_balance and next(global.inventories_to_balance) then
 		--game.print("Taking from inventory queue, " .. #global.inventories_to_balance .. " remaining")
-		local inventories = table.remove(global.inventories_to_balance, 1)
-		balanceInventories(inventories)
+		local entry = table.remove(global.inventories_to_balance, 1)
+		balanceInventories(entry)
 		
 		idle = false  -- Tell OnTick that we did something useful
 	end
@@ -359,19 +359,16 @@ local function OnNthTick(event)
 		local done = false
 		for i=1,n do
 			entry = global.mu_pairs[i]
-      entry[3] = entry[3] or 0  -- "previous" value of 
+      entry[3] = entry[3] or 0  -- previous count of loco1 inventory
+      entry[4] = entry[4] or 0  -- previous count of loco2 inventory
 			if (entry[1] and entry[2] and entry[1].valid and entry[2].valid) then
 				-- This pair is good, balance if there are burner fuel inventories (only check one, since they are identical prototypes)
 				if entry[1].burner then
-					local inventoryOne = entry[1].burner.inventory
-					local inventoryTwo = entry[2].burner.inventory
-					if inventoryOne.valid and #inventoryOne > 0 then
-						table.insert(global.inventories_to_balance, entry)
-						numInventories = numInventories + 1
-					end
+					table.insert(global.inventories_to_balance, entry)
+					numInventories = numInventories + 1
 				end
 			else
-				-- This pair has one or more invalid locomotives, or they don't have burners at all, remove it from the list
+				-- This pair has one or more invalid locomotives
 				global.mu_pairs[i] = nil
 			end
 		end
