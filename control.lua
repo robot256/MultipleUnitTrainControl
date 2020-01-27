@@ -102,7 +102,7 @@ local function ProcessInventoryQueue()
 	if global.inventories_to_balance and next(global.inventories_to_balance) then
 		--game.print("Taking from inventory queue, " .. #global.inventories_to_balance .. " remaining")
 		local entry = table.remove(global.inventories_to_balance, 1)
-		balanceInventories(entry)
+		balanceLocomotives(entry)
 		
 		idle = false  -- Tell OnTick that we did something useful
 	end
