@@ -1,6 +1,6 @@
---[[ Copyright (c) 2019 robot256 (MIT License)
+--[[ Copyright (c) 2020 robot256 (MIT License)
  * Project: Multiple Unit Train Control
- * File: data.lua
+ * File: data-updates.lua
  * Description: Add the MU locomotives
 --]]
 
@@ -27,4 +27,5 @@ require ("prototypes.yira_add_mu")
 require ("prototypes.yiru_add_mu")
 require ("prototypes.ir_add_mu")
 require ("prototypes.nl_add_mu")
+require ("prototypes.k2_add_mu")
 require ("prototypes.x12_add_mu")
