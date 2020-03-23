@@ -61,8 +61,12 @@ function balanceLocomotives(entry)
   local loco1_burnt_inv = loco1.get_burnt_result_inventory()
   if loco1_burnt_inv then
     local loco2_burnt_inv = loco2.get_burnt_result_inventory()
-    local loco1_burnt_full = loco1.burner.currently_burning and not loco1_burnt_inv.can_insert(loco1.burner.currently_burning.burnt_result.name)
-    local loco2_burnt_full = loco2.burner.currently_burning and not loco2_burnt_inv.can_insert(loco2.burner.currently_burning.burnt_result.name)
+    local loco1_burnt_full = loco1.burner.currently_burning and 
+                             loco1.burner.currently_burning.burnt_result and 
+                             (not loco1_burnt_inv.can_insert(loco1.burner.currently_burning.burnt_result.name))
+    local loco2_burnt_full = loco2.burner.currently_burning and 
+                             loco2.burner.currently_burning.burnt_result and 
+                             (not loco2_burnt_inv.can_insert(loco2.burner.currently_burning.burnt_result.name))
     -- Only balance burnt result if absolutely necessary: when there is no energy left, there is fuel that could be used,
     --        and the current_burning item is stuck in the burner because it cannot be inserted into burnt_result.
     if (loco1_fuel == 0 and loco1_count > 0 and loco1_burnt_full) or (loco2_fuel == 0 and loco2_count > 0 and loco2_burnt_full) then
