@@ -358,7 +358,7 @@ local function OnNthTick(event)
 		local n = #global.mu_pairs
 		local done = false
 		for i=1,n do
-			entry = global.mu_pairs[i]
+			local entry = global.mu_pairs[i]
 			if (entry[1] and entry[2] and entry[1].valid and entry[2].valid) then
 				-- This pair is good, balance if there are burner fuel inventories (only check one, since they are identical prototypes)
 				if entry[1].burner then
