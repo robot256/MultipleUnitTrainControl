@@ -4,20 +4,6 @@
  * Description: Procedurally generate MU Locomotives for any remaining locos that we have not addressed
 --]]
 
-local blacklist = {
--- YIR Industries Railways
-  "y_loco_fs_steam_green",
-  "yir_loco_sel_blue",
-  "y_loco_steam_wt450",
-  "y_loco_ses_std",
-  "y_loco_ses_red",
--- YIR Railwas Addons
-  "yir_mre044",
-  "yir_loco_steam_wt580of",
-  "yir_kr_green",
--- Laser Tank (MU is broken when 
---  "electric-vehicles-electric-locomotive",
-}
 
 
 local has_description = {
@@ -82,22 +68,56 @@ local has_description = {
   "nt-train-nuclear",
 }
 
-
-
-
-local mu_blacklist = {}
-for _,name in pairs(blacklist) do
-  mu_blacklist[name] = true
-end
-
+-- Convert entity-description list to dictionary
 local mu_has_description = {}
 for _,name in pairs(has_description) do
   mu_has_description[name] = true
 end
 
 
-local mu_make_new = {}
 
+local blacklist = {
+-- Laser Tank (MU is broken when Electric Vehicles Lib: Reborn is *not* installed)
+--  "electric-vehicles-electric-locomotive",
+-- RailPowerSystem (mod is too broken to test, and mod needs modification to accept MU loco)
+  "hybrid-train",
+-- Steam Locomotive (this is the old non-working entity that must be mined to be migrated)
+  "steam-locomotive",
+}
+
+local yuoki_blacklist = {
+-- YIR Industries Railways
+  "y_loco_fs_steam_green",
+  "yir_loco_sel_blue",
+  "y_loco_steam_wt450",
+  "y_loco_ses_std",
+  "y_loco_ses_red",
+-- YIR Railwas Addons
+  "yir_mre044",
+  "yir_loco_steam_wt580of",
+  "yir_kr_green",
+}
+
+-- Convert blacklist to dictionary
+local mu_blacklist = {}
+for _,name in pairs(blacklist) do
+  mu_blacklist[name] = true
+end
+-- Add names from blacklist startup setting
+local blacklist_setting = settings.startup["multiple-unit-train-control-blacklist"].value
+for name in string.gmatch(blacklist_setting, "([^,]+)") do
+  mu_blacklist[name] = true
+end
+-- Add Yuoki Steam Engines if setting is disabled
+if settings.startup["multiple-unit-train-control-allow_yuoki_steam"].value == false then
+  for _,name in pairs(yuoki_blacklist) do
+    mu_blacklist[name] = true
+  end
+end
+
+
+-- Make a list of locomotives to add (can't modify data.raw while iterating over it)
+local mu_make_new = {}
 for name,loco in pairs(data.raw["locomotive"]) do
   local make_mu = true
   -- Check if this is a MU or if it already has a MU
@@ -120,6 +140,7 @@ for name,loco in pairs(data.raw["locomotive"]) do
   end
 end
 
+-- Create the identified MU locomotives
 for _,name in pairs(mu_make_new) do
   createMuLoco{std=name, mu=name.."-mu", hasDescription=mu_has_description[name]}
 end
