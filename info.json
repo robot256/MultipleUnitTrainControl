@@ -19,6 +19,8 @@
     "(?)bigger_slower_trains-M",
 	"(?)bobvehicleequipment",
     "(?)Krastorio2 >= 0.9.0",
+    "(?)Electronic_Locomotives",
+    "(?)fluidTrains",
     "!Noxys_Multidirectional_Trains"
   ]
 }
