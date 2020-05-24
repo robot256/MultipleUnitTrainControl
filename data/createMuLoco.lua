@@ -1,11 +1,10 @@
---[[ Copyright (c) 2019 robot256 (MIT License)
+--[[ Copyright (c) 2020 robot256 (MIT License)
  * Project: Multiple Unit Train Control
  * File: createMuLoco.lua
  * Description: Creates new prototypes for a burner-type MU locomotive version.
  * Arguments:
  *  std= entity name string of the standard version
  *  mu= entity name string of the mu version to be created
- *  item= data.raw category string of the standard version's item
  *  hasDescription= boolean indicating whether standard version has entity-description locale entry
  *  power_multiplier= power buff to multiply, defaults to 2
  *  fuel_item= item name string of Realistic Electric Trains dummy fuel item used by the standard version
@@ -20,7 +19,6 @@ require ("data.createMuLocoRecipePrototype")
 function createMuLoco(arg)
 	local oldName = arg.std
 	local newName = arg.mu
-	local itemType = arg.item
 	local hasDescription = arg.hasDescription or false
 	local power_multiplier = arg.power_multiplier or 2
 	local fuel_item = arg.fuel_item
@@ -40,7 +38,7 @@ function createMuLoco(arg)
 	end
 	
 	data:extend{
-		createMuLocoItemPrototype(itemType, oldName, newName),
+		createMuLocoItemPrototype(oldName, newName),
 		createMuLocoEntityPrototype(oldName, newName, hasDescription, power_multiplier),
 		createMuLocoRecipePrototype(oldName, newName, mu_fuel_item_name)
 	}

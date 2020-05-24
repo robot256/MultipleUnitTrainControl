@@ -1,4 +1,4 @@
---[[ Copyright (c) 2019 robot256 (MIT License)
+--[[ Copyright (c) 2020 robot256 (MIT License)
  * Project: Multiple Unit Train Control
  * File: createMuLocoItemPrototype.lua
  * Description: Copies a locomotive item and creates the "-mu" version with:
@@ -7,9 +7,13 @@
 
 local icon_overlay = { { icon = "__MultipleUnitTrainControl__/graphics/icons/mu-overlay.png", icon_size = 32, tint = {r=255, g=255, b=0, a=196} } }
 
-function createMuLocoItemPrototype(item_type,name,newName)
+function createMuLocoItemPrototype(name,newName)
+  local item = data.raw["item-with-entity-data"][name]
+  if not item then
+    item = data.raw["item"][name]
+  end
 	-- Copy source locomotive prototype
-	local newItem = optera_lib.copy_prototype(data.raw[item_type][name], newName)
+	local newItem = optera_lib.copy_prototype(item, newName)
 	
 	-- Make the new icon
 	newItem.icons = optera_lib.create_icons(newItem,icon_overlay) or icon_overlay

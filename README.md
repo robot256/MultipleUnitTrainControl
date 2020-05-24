@@ -8,9 +8,9 @@ Factorio mod written in Lua.  Lets locomotives provide backwards force in automa
 - License: MIT
 - Source: GitHub
 - Download: mods.factorio.com
-- Version: 0.1.26
-- Release: 2020-01-23
-- Tested-With-Factorio-Version: 0.17.79
+- Version: 0.2.0
+- Release: 2020-01-24
+- Tested-With-Factorio-Version: 0.18.1
 - Category: Helper, Train
 - Tags: Train
 
@@ -32,11 +32,10 @@ This mod is meant to be an alternative to [Noxy's Multidirectional Trains](url=h
   - [Electric Train](https://mods.factorio.com/mod/ElectricTrain) (version 0.17.28 and up)
   - [Batteries Not Included](https://mods.factorio.com/mod/BatteriesNotIncluded)
   - [Fully Automated Rail Layer](https://mods.factorio.com/mod/FARL)
-  - [Angel's Industries](https://mods.factorio.com/mod/angelsindustries) Crawler Train
   - [Angel's Petrochem Train](https://mods.factorio.com/mod/angelsaddons-petrotrain)
   - [Angel's Smelting Train](https://mods.factorio.com/mod/angelsaddons-smeltingtrain)
   - [Bob's Logistics](https://mods.factorio.com/mod/boblogistics)
-  - [Schall's Armoured Train](https://mods.factorio.com/mod/SchallArmouredTrain)
+  - [Schall Armoured Train](https://mods.factorio.com/mod/SchallArmouredTrain)
   - [Electric Vehicles: Reborn](https://mods.factorio.com/mod/electric-vehicles-reborn)
   - [5dim's mod - Trains](https://mods.factorio.com/mod/5dim_trains)
   - [Armored Train (Wagon Turrets)](https://mods.factorio.com/mod/Armored-train)
@@ -51,6 +50,14 @@ This mod is meant to be an alternative to [Noxy's Multidirectional Trains](url=h
   - [Bigger Slower Trains](https://mods.factorio.com/mod/bigger_slower_trains-M)
   - [Automatic Train Fuel Stop](https://mods.factorio.com/mod/FuelTrainStop)
   - [Bob's Vehicle Equipment](https://mods.factorio.com/mod/bobvehicleequipment)
+  - Battle Locomotives
+  - Electronic Locomotives
+  - Electronic Battle Locomotives
+  - Electronic Angel's Locomotives
+  - Angel's Crawler Train
+  - Steam Locomotive
+  - Diesel Locomotive
+  - Neocky's Trains
 
 ## Planned Features
 - Support additional modded locomotives.  If you want more, please send me suggestions!
