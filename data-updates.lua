@@ -6,10 +6,8 @@
 
 require ("data.createMuLoco")
 
-
 -- Special code
-require ("prototypes.evr_add_mu")
 require ("prototypes.ret_add_mu")
 
-
+-- Generate procedurally
 require ("data.generate_all_mu")

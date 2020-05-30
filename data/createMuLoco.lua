@@ -22,6 +22,8 @@ function createMuLoco(arg)
 	local hasDescription = arg.hasDescription or false
 	local power_multiplier = arg.power_multiplier or 2
 	local fuel_item = arg.fuel_item
+  
+  log("Creating locomotive \""..newName.."\"")
 	
 	-- Check that source exists
 	if not data.raw["locomotive"][oldName] then
@@ -37,13 +39,14 @@ function createMuLoco(arg)
 		data:extend{mu_fuel_item}
 	end
 	
-	data:extend{
-		createMuLocoItemPrototype(oldName, newName),
-		createMuLocoEntityPrototype(oldName, newName, hasDescription, power_multiplier),
-		createMuLocoRecipePrototype(oldName, newName, mu_fuel_item_name)
-	}
-	table.insert(data.raw.technology["multiple-unit-train-control-locomotives"].effects, {type = "unlock-recipe", recipe = newName})
-	
+  local mu_item = createMuLocoItemPrototype(oldName, newName)
+  if mu_item then
+    data:extend{ mu_item,
+      createMuLocoEntityPrototype(oldName, newName, hasDescription, power_multiplier),
+      createMuLocoRecipePrototype(oldName, newName, mu_fuel_item_name)
+    }
+    table.insert(data.raw.technology["multiple-unit-train-control-locomotives"].effects, {type = "unlock-recipe", recipe = newName})
+	end
 end
 
 return createMuLoco

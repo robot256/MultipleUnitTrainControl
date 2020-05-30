@@ -66,6 +66,8 @@ local has_description = {
   "nt-train-electric",
   "nt-train-fusion",
   "nt-train-nuclear",
+-- Electric Vehicles Reborn
+  "electric-vehicles-electric-locomotive",
 }
 
 -- Convert entity-description list to dictionary
@@ -83,6 +85,8 @@ local blacklist = {
   "hybrid-train",
 -- Steam Locomotive (this is the old non-working entity that must be mined to be migrated)
   "steam-locomotive",
+-- Train Construction Site (this is a dummy entity used when generating trains)
+  "trainassembly-placeable",
 }
 
 local yuoki_blacklist = {
@@ -123,6 +127,7 @@ for name,loco in pairs(data.raw["locomotive"]) do
   -- Check if this is a MU or if it already has a MU
   if mu_blacklist[name] then
     make_mu = false
+    log("Ignoring locomotive \""..name.."\"")
   elseif string.find(name, "%-mu$") ~= nil then
     -- ends in MU, make sure regular loco exists. If not, then the vanilla loco ended with -mu, and the new one will be -mu-mu
     if data.raw["locomotive"][string.sub(name, 1, -4)] then

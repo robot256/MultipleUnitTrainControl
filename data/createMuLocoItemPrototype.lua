@@ -12,6 +12,10 @@ function createMuLocoItemPrototype(name,newName)
   if not item then
     item = data.raw["item"][name]
   end
+  if not item then
+    log("Can't find item prototype for \""..name.."\"")
+    return nil
+  end
 	-- Copy source locomotive prototype
 	local newItem = optera_lib.copy_prototype(item, newName)
 	
