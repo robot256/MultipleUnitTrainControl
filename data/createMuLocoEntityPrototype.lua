@@ -29,7 +29,7 @@ function createMuLocoEntityPrototype(name, newName, has_description, power_multi
 	loco.additional_pastable_entities = {name}
 	
 	-- Change the power level (string contains suffix "kW"). This also increases fuel consumption.
-	loco.max_power = optera_lib.multiply_energy_value(loco.max_power, power_multiplier)
+	loco.max_power = multiply_energy_value(loco.max_power, power_multiplier)
 	
 	-- Concatenate the localized name and description string of the source loco with our template.
 	loco.localised_name = {'template.mu-name',{'entity-name.'..name}}

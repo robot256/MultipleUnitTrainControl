@@ -50,4 +50,3 @@ function createMuLoco(arg)
 end
 
 return createMuLoco
-

@@ -17,10 +17,10 @@ function createMuLocoItemPrototype(name,newName)
     return nil
   end
 	-- Copy source locomotive prototype
-	local newItem = optera_lib.copy_prototype(item, newName)
+	local newItem = flib.copy_prototype(item, newName)
 	
 	-- Make the new icon
-	newItem.icons = optera_lib.create_icons(newItem,icon_overlay) or icon_overlay
+	newItem.icons = flib.create_icons(newItem,icon_overlay) or icon_overlay
 	
 	-- Fix the localization
 	newItem.localised_name = {'template.mu-name',{'entity-name.'..name}}
