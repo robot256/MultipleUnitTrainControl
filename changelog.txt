@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.2.4
+Date: 2020-05-29
+  Features:
+    - Fixed compatibility with Train Construction Site.
+    - Changed dependency from deprecated OpteraLib to new Factorio Library.
+---------------------------------------------------------------------------------------------------
 Version: 0.2.3
 Date: 2020-05-24
   Features:
