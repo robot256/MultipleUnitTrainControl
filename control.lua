@@ -20,6 +20,7 @@
 
 replaceCarriage = require("__Robot256Lib__/script/carriage_replacement").replaceCarriage
 blueprintLib = require("__Robot256Lib__/script/blueprint_replacement")
+filterLib = require("__Robot256Lib__/script/event_filters")
 
 
 require("script.balanceInventories")
@@ -488,8 +489,11 @@ function OnPreMined(event)
     end
   end
 end
-script.on_event(defines.events.on_robot_pre_mined, OnPreMined)
-script.on_event(defines.events.on_pre_player_mined_item, OnPreMined)
+script.on_event( { defines.events.on_robot_pre_mined, 
+                   defines.events.on_pre_player_mined_item },
+                 OnPreMined,
+                 filterLib.generateNameFilter("item-on-ground")
+               )
 
 
 
