@@ -489,8 +489,11 @@ function OnPreMined(event)
     end
   end
 end
-script.on_event( { defines.events.on_robot_pre_mined, 
-                   defines.events.on_pre_player_mined_item },
+script.on_event( defines.events.on_robot_pre_mined,
+                 OnPreMined,
+                 filterLib.generateNameFilter("item-on-ground")
+               )
+script.on_event( defines.events.on_pre_player_mined_item,
                  OnPreMined,
                  filterLib.generateNameFilter("item-on-ground")
                )
@@ -572,6 +575,27 @@ local function init_events()
 		script.on_event(defines.events.on_train_created, OnTrainCreated)
 		script.on_event({defines.events.on_gui_closed, defines.events.on_player_fast_transferred}, OnModuleChanged)
 	end
+  
+  -- Update technology visible state
+    if settings_mode == "tech-unlock" then
+      for _,force in pairs(game.forces) do
+        if force.technologies["adv-multiple-unit-train-control"] then
+          force.technologies["adv-multiple-unit-train-control"].enabled = true
+        end
+        if force.technologies["multiple-unit-train-control"] then
+          force.technologies["multiple-unit-train-control"].enabled = true
+        end
+      end
+    else
+      for _,force in pairs(game.forces) do
+        if force.technologies["adv-multiple-unit-train-control"] then
+          force.technologies["adv-multiple-unit-train-control"].enabled = false
+        end
+        if force.technologies["multiple-unit-train-control"] then
+          force.technologies["multiple-unit-train-control"].enabled = false
+        end
+      end
+    end
 	
 	-- Set conditional OnTick event handler correctly on load based on global queues, so we can sync with a multiplayer game.
 	if (global.inventories_to_balance and next(global.inventories_to_balance)) or
@@ -585,13 +609,36 @@ script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
 	--game.print("in mod_settings_changed!")
 	if event.setting == "multiple-unit-train-control-mode" then
 		settings_mode = settings.global["multiple-unit-train-control-mode"].value
-		-- Scrub existing trains according to new settings
+		
+    -- Scrub existing trains according to new settings
 		QueueAllTrains()  -- This will execute some replacements immediately
 		if settings_mode == "disabled" then
 			-- Clean globals when disabled
 			global.mu_pairs = {}
 			global.inventories_to_balance = {}
 		end
+    
+    -- Update technology visible state
+    if settings_mode == "tech-unlock" then
+      for _,force in pairs(game.forces) do
+        if force.technologies["adv-multiple-unit-train-control"] then
+          force.technologies["adv-multiple-unit-train-control"].enabled = true
+        end
+        if force.technologies["multiple-unit-train-control"] then
+          force.technologies["multiple-unit-train-control"].enabled = true
+        end
+      end
+    else
+      for _,force in pairs(game.forces) do
+        if force.technologies["adv-multiple-unit-train-control"] then
+          force.technologies["adv-multiple-unit-train-control"].enabled = false
+        end
+        if force.technologies["multiple-unit-train-control"] then
+          force.technologies["multiple-unit-train-control"].enabled = false
+        end
+      end
+    end
+    
 		-- Enable or disable events based on setting state
 		init_events()
 	
