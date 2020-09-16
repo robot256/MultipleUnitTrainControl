@@ -540,6 +540,31 @@ local function QueueAllTrains()
 	end
 end
 
+----------
+-- Shows or hides technologies based on runtime setting
+local function UpdateTechnologyState()
+-- Update technology visible state
+  if settings_mode == "tech-unlock" then
+    for _,force in pairs(game.forces) do
+      if force.technologies["adv-multiple-unit-train-control"] then
+        force.technologies["adv-multiple-unit-train-control"].enabled = true
+      end
+      if force.technologies["multiple-unit-train-control"] then
+        force.technologies["multiple-unit-train-control"].enabled = true
+      end
+    end
+  else
+    for _,force in pairs(game.forces) do
+      if force.technologies["adv-multiple-unit-train-control"] then
+        force.technologies["adv-multiple-unit-train-control"].enabled = false
+      end
+      if force.technologies["multiple-unit-train-control"] then
+        force.technologies["multiple-unit-train-control"].enabled = false
+      end
+    end
+  end
+end
+
 
 --== ON_RESEARCH_FINISHED EVENT ==--
 -- Forces a scrub after researching MUTC technologies
@@ -575,27 +600,6 @@ local function init_events()
 		script.on_event(defines.events.on_train_created, OnTrainCreated)
 		script.on_event({defines.events.on_gui_closed, defines.events.on_player_fast_transferred}, OnModuleChanged)
 	end
-  
-  -- Update technology visible state
-    if settings_mode == "tech-unlock" then
-      for _,force in pairs(game.forces) do
-        if force.technologies["adv-multiple-unit-train-control"] then
-          force.technologies["adv-multiple-unit-train-control"].enabled = true
-        end
-        if force.technologies["multiple-unit-train-control"] then
-          force.technologies["multiple-unit-train-control"].enabled = true
-        end
-      end
-    else
-      for _,force in pairs(game.forces) do
-        if force.technologies["adv-multiple-unit-train-control"] then
-          force.technologies["adv-multiple-unit-train-control"].enabled = false
-        end
-        if force.technologies["multiple-unit-train-control"] then
-          force.technologies["multiple-unit-train-control"].enabled = false
-        end
-      end
-    end
 	
 	-- Set conditional OnTick event handler correctly on load based on global queues, so we can sync with a multiplayer game.
 	if (global.inventories_to_balance and next(global.inventories_to_balance)) or
@@ -619,25 +623,7 @@ script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
 		end
     
     -- Update technology visible state
-    if settings_mode == "tech-unlock" then
-      for _,force in pairs(game.forces) do
-        if force.technologies["adv-multiple-unit-train-control"] then
-          force.technologies["adv-multiple-unit-train-control"].enabled = true
-        end
-        if force.technologies["multiple-unit-train-control"] then
-          force.technologies["multiple-unit-train-control"].enabled = true
-        end
-      end
-    else
-      for _,force in pairs(game.forces) do
-        if force.technologies["adv-multiple-unit-train-control"] then
-          force.technologies["adv-multiple-unit-train-control"].enabled = false
-        end
-        if force.technologies["multiple-unit-train-control"] then
-          force.technologies["multiple-unit-train-control"].enabled = false
-        end
-      end
-    end
+    UpdateTechnologyState()
     
 		-- Enable or disable events based on setting state
 		init_events()
@@ -669,6 +655,7 @@ script.on_init(function()
 	global.mu_pairs = {}
 	global.inventories_to_balance = {}
 	InitEntityMaps()
+  UpdateTechnologyState()
 	init_events()
 	
 end)
