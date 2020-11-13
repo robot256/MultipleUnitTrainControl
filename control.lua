@@ -295,7 +295,6 @@ local function ProcessTrainQueue()
 		if global.created_trains then
 			--game.print("ProcessTrainQueue has a train in the queue")
 			-- Keep looping until we discard all the invalid intermediate trains
-			local moving_trains = {}
 			while next(global.created_trains) do
 				local t = table.remove(global.created_trains,1)
 				if t and t.valid then
@@ -360,7 +359,17 @@ local function OnTrainCreated(event)
 
 	-- Add this train to the train processing list, wait for it to stop
 	table.insert(global.created_trains, event.train)
-	
+    
+    -- Remove old trains from moving_trains list
+    if global.moving_trains then
+        if event.old_train_id_1 then
+            global.moving_trains[event.old_train_id_1] = nil
+        end
+        if event.old_train_id_2 then
+            global.moving_trains[event.old_train_id_2] = nil
+        end
+    end
+    
 	--game.print("Train " .. event.train.id .. " queued.")
 	
 	-- Try to process it immediately. Will exit if we are already processing stuff
