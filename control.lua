@@ -271,6 +271,34 @@ local function OnTrainChangedState(event)
 	--game.print("Train " .. id .. " Exiting OnTrainChangedState")
 end
 
+--== ON_NTH_TICK (longer duration) EVENT ==--
+-- Periodically purges global.moving_trains because some mods make train ids
+-- go invalid while still in motion, that would otherwise never be deleted.
+-- This could probably happen if trains get attacked and partially destroyed as well.
+local function OnNthTickPurgeMovingList(event)
+
+  local purged = 0
+  local saved = 0
+  for id,train in pairs(global.moving_trains) do
+    if not train or not train.valid then
+      global.moving_trains[id] = nil
+      purged = purged + 1
+    else
+      saved = saved + 1
+    end
+  end
+  
+  if settings_debug == "debug" then
+		if purged > 1 then
+      if saved > 0 then
+        game.print("MUTC Purged "..tostring(purged).." dead trains from global.moving_trains. "..tostring(saved).." moving trains are still valid.")
+      else
+        game.print("MUTC Purged "..tostring(purged).." dead trains from global.moving_trains.")
+      end
+    end
+  end
+end
+
 
 -------------
 -- Enables the on_train_changed_state event according to current variables
@@ -278,8 +306,11 @@ local function StartTrainWatcher()
 	if global.moving_trains and next(global.moving_trains) then
 		-- Set up the action to process train after it comes to a stop
 		script.on_event(defines.events.on_train_changed_state, OnTrainChangedState)
+    -- Set up the action to purge the moving_trains list periodically
+    script.on_nth_tick(settings_nth_tick*2, OnNthTickPurgeMovingList)
 	else
 		script.on_event(defines.events.on_train_changed_state, nil)
+    script.on_nth_tick(settings_nth_tick*2, nil)
 	end
 end
 
@@ -359,17 +390,25 @@ local function OnTrainCreated(event)
 
 	-- Add this train to the train processing list, wait for it to stop
 	table.insert(global.created_trains, event.train)
-    
-    -- Remove old trains from moving_trains list
+  
+  -- Remove old trains from moving_trains list
+  -- When using Renai transportation Train Jumps, this will take care of 99% of the spurious entries 
+  --   from long trains that get disconnected and reconnected while in motion.
     if global.moving_trains then
         if event.old_train_id_1 then
-            global.moving_trains[event.old_train_id_1] = nil
+            if global.moving_trains[event.old_train_id_1] then
+              --game.print("Removed old train "..tostring(event.old_train_id_1).." from moving_trains list")
+              global.moving_trains[event.old_train_id_1] = nil
+            end
         end
         if event.old_train_id_2 then
-            global.moving_trains[event.old_train_id_2] = nil
+            if global.moving_trains[event.old_train_id_2] then
+              --game.print("Removed old train "..tostring(event.old_train_id_2).." from moving_trains list")
+              global.moving_trains[event.old_train_id_2] = nil
+            end
         end
     end
-    
+	
 	--game.print("Train " .. event.train.id .. " queued.")
 	
 	-- Try to process it immediately. Will exit if we are already processing stuff
@@ -642,6 +681,7 @@ script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
 		settings_nth_tick = settings.global["multiple-unit-train-control-on_nth_tick"].value
 		global.current_nth_tick = nil
 		StartBalanceUpdates()
+    StartTrainWatcher()
 	
 	elseif event.setting == "multiple-unit-train-control-debug" then
 		settings_debug = settings.global["multiple-unit-train-control-debug"].value
@@ -687,6 +727,50 @@ script.on_configuration_changed(function(data)
 end)
 
 end
+
+
+
+------------------------------------------
+-- Debug (print text to player console)
+function print_game(...)
+  local text = ""
+  for _, v in ipairs{...} do
+    if type(v) == "table" then
+      text = text..serpent.block(v)
+    else
+      text = text..tostring(v)
+    end
+  end
+  game.print(text)
+end
+
+function print_file(...)
+  local text = ""
+  for _, v in ipairs{...} do
+    if type(v) == "table" then
+      text = text..serpent.block(v)
+    else
+      text = text..tostring(v)
+    end
+  end
+  log(text)
+end  
+
+-- Debug command
+function cmd_debug(params)
+  local cmd = params.parameter
+  if cmd == "dump" then
+    for v, data in pairs(global) do
+      print_game(v, ": ", data)
+    end
+  elseif cmd == "dumplog" then
+    for v, data in pairs(global) do
+      print_file(v, ": ", data)
+    end
+    print_game("Dump written to log file")
+  end
+end
+commands.add_command("mutc-debug", "Usage: mutc-debug dump|dumplog", cmd_debug)
 
 ------------------------------------------------------------------------------------
 --                    FIND LOCAL VARIABLES THAT ARE USED GLOBALLY                 --
