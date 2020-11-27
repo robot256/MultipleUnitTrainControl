@@ -306,12 +306,9 @@ local function StartTrainWatcher()
 	if global.moving_trains and next(global.moving_trains) then
 		-- Set up the action to process train after it comes to a stop
 		script.on_event(defines.events.on_train_changed_state, OnTrainChangedState)
-    -- Set up the action to purge the moving_trains list periodically
-    script.on_nth_tick(settings_nth_tick*2, OnNthTickPurgeMovingList)
-	else
+  else
 		script.on_event(defines.events.on_train_changed_state, nil)
-    script.on_nth_tick(settings_nth_tick*2, nil)
-	end
+  end
 end
 
 
@@ -491,8 +488,7 @@ local function OnNthTick(event)
 				end
 				current_nth_tick = newVal
 				global.current_nth_tick = current_nth_tick
-				script.on_nth_tick(nil)
-				script.on_nth_tick(current_nth_tick, OnNthTick)
+				RefreshNthTickHandlers()
 			end
 		end
 	end
@@ -548,16 +544,24 @@ script.on_event( defines.events.on_pre_player_mined_item,
 
 
 
+
+
+local function RefreshNthTickHandlers()
+  script.on_nth_tick(nil)
+  if not (settings_nth_tick == 0 or settings_mode == "disabled") then
+    script.on_nth_tick(current_nth_tick, OnNthTick)
+  end
+  script.on_nth_tick(math.max(current_nth_tick*2, 600), OnNthTickPurgeMovingList)
+end
+
 -------------
 -- Enables the on_nth_tick event according to the mod setting value
 --   Safe to run inside on_load().
+--   Also handle the Moving Train List purge timer when settings_nth_tick changes
 local function StartBalanceUpdates()
-
-	if settings_nth_tick == 0 or settings_mode == "disabled" then
-		-- Value of zero disables fuel balancing
-		--game.print("Disabling Nth Tick due to setting")
-		script.on_nth_tick(nil)
-	else
+  -- Value of zero disables fuel balancing
+  --game.print("Disabling Nth Tick due to setting")
+  if not(settings_nth_tick == 0 or settings_mode == "disabled") then
 		-- See if we stored a longer update rate in global
 		if global.current_nth_tick and global.current_nth_tick > settings_nth_tick then
 			current_nth_tick = global.current_nth_tick
@@ -566,9 +570,8 @@ local function StartBalanceUpdates()
 		end
 		-- Start the event
 		--game.print("Enabling Nth Tick with setting " .. settings_nth_tick)
-		script.on_nth_tick(nil)
-		script.on_nth_tick(current_nth_tick, OnNthTick)
 	end
+	RefreshNthTickHandlers()
 end
 
 
