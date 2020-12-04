@@ -528,9 +528,10 @@ script.on_event(defines.events.on_picked_up_item, OnPickedUpItem)
 -- Before player or robot mines an item on the ground, change -mu to normal loco items.
 function OnPreMined(event)
   if event.entity.name == "item-on-ground" then
+    local stack = event.entity.stack
     -- Change item-on-ground to unloaded wagon before robot picks it up
-    if event.entity.stack.valid_for_read and global.downgrade_pairs[event.entity.stack.name] then
-      event.entity.stack.set_stack({name=global.downgrade_pairs[event.entity.stack.name], count=entity.stack.count})
+    if stack.valid_for_read and global.downgrade_pairs[stack.name] then
+      stack.set_stack({name=global.downgrade_pairs[stack.name], count=stack.count})
     end
   end
 end
