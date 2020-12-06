@@ -2,7 +2,7 @@
 Version: 0.3.8
 Date: 2020-12-06
   Bugfixes:
-    - Fixed compatibility with Electronic Locomotive mods.
+    - Fixed compatibility with Electronic Locomotives mods.
   Changes:
     - Added ship and boat engines to MU blacklist.
     - Added Editor Extensions "super locomotive" to MU blacklist (it's too fast already!).
