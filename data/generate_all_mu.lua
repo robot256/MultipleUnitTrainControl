@@ -131,7 +131,7 @@ if settings.startup["multiple-unit-train-control-allow_yuoki_steam"].value == fa
   end
 end
 -- Add Battery Locomotive if it's present (since the names are generic, don't want to exclude others
-if game.active_mods["BatteryLocomotive"] then
+if mods["BatteryLocomotive"] then
   for _,name in pairs(kazuya_blacklist) do
     mu_blacklist[name] = true
   end
