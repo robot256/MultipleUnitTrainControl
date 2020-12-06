@@ -32,12 +32,25 @@ function createMuLocoEntityPrototype(name, newName, has_description, power_multi
 	loco.max_power = multiply_energy_value(loco.max_power, power_multiplier)
 	
 	-- Concatenate the localized name and description string of the source loco with our template.
-	loco.localised_name = {'template.mu-name',{'entity-name.'..name}}
-	if has_description==true then
+  if loco.localised_name then
+    -- Original mod already set dynamic localised name, use it in our template
+    loco.localised_name = {'template.mu-name',table.deepcopy(loco.localised_name)}
+  else
+    -- Use original mod's name from locale file
+    loco.localised_name = {'template.mu-name',{'entity-name.'..name}}
+  end
+  
+  if loco.localised_description then
+    -- Original mod already set dynamic localised description, use it in our template
+    loco.localised_description = {'template.mu-description',table.deepcopy(loco.localised_description)}
+	elseif has_description==true then
+    -- We know this mod set a description in their locale file (no way to determine dynamically at this phase)
 		loco.localised_description = {'template.mu-description',{'entity-description.'..name}}
 	else
+    -- Assume there is no description in locale file
 		loco.localised_description = {'template.plain-mu-description'}
 	end
+  
 	return loco
 end
 
