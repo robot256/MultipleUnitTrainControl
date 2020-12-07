@@ -486,6 +486,16 @@ local function OnNthTick(event)
   end
 end
 
+
+-- Made this function global to avoid crash on circular reference?
+function RefreshNthTickHandlers()
+  script.on_nth_tick(nil)
+  if not (settings_nth_tick == 0 or settings_mode == "disabled") then
+    script.on_nth_tick(current_nth_tick, OnNthTick)
+  end
+  script.on_nth_tick(math.max(current_nth_tick*2, 600), OnNthTickPurgeMovingList)
+end
+
 --== ON_PLAYER_CONFIGURED_BLUEPRINT EVENT ==--
 -- ID 70, fires when you select a blueprint to place
 --== ON_PLAYER_SETUP_BLUEPRINT EVENT ==--
@@ -505,7 +515,7 @@ end
 
 --== ON_PICKED_UP_ITEM ==--
 -- When player picks up an item, change -mu to normal loco items.
-function OnPickedUpItem(event)
+local function OnPickedUpItem(event)
   if global.downgrade_pairs[event.item_stack.name] then
     game.players[event.player_index].remove_item(event.item_stack)
     game.players[event.player_index].insert({name=global.downgrade_pairs[event.item_stack.name], count=event.item_stack.count})
@@ -517,7 +527,7 @@ script.on_event(defines.events.on_picked_up_item, OnPickedUpItem)
 --== ON_PRE_PLAYER_MINED_ITEM ==--
 --== ON_ROBOT_PRE_MINED ==--
 -- Before player or robot mines an item on the ground, change -mu to normal loco items.
-function OnPreMined(event)
+local function OnPreMined(event)
   if event.entity.name == "item-on-ground" then
     local stack = event.entity.stack
     -- Change item-on-ground to unloaded wagon before robot picks it up
@@ -535,17 +545,6 @@ script.on_event( defines.events.on_pre_player_mined_item,
                  filterLib.generateNameFilter("item-on-ground")
                )
 
-
-
-
-
-local function RefreshNthTickHandlers()
-  script.on_nth_tick(nil)
-  if not (settings_nth_tick == 0 or settings_mode == "disabled") then
-    script.on_nth_tick(current_nth_tick, OnNthTick)
-  end
-  script.on_nth_tick(math.max(current_nth_tick*2, 600), OnNthTickPurgeMovingList)
-end
 
 -------------
 -- Enables the on_nth_tick event according to the mod setting value
