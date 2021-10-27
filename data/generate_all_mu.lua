@@ -68,6 +68,9 @@ local has_description = {
   "nt-train-nuclear",
 -- Electric Vehicles Reborn
   "electric-vehicles-electric-locomotive",
+-- Real Shuttle Trains (no interface to add shuttle locomitives. also uses Kazuya's nonfunctional electric train interface.)
+  "shuttle",
+  "electric_shuttle",
 }
 
 -- Convert entity-description list to dictionary
