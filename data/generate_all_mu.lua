@@ -68,9 +68,6 @@ local has_description = {
   "nt-train-nuclear",
 -- Electric Vehicles Reborn
   "electric-vehicles-electric-locomotive",
--- Real Shuttle Trains (no interface to add shuttle locomitives. also uses Kazuya's nonfunctional electric train interface.)
-  "shuttle",
-  "electric_shuttle",
 }
 
 -- Convert entity-description list to dictionary
@@ -95,6 +92,11 @@ local blacklist = {
   "cargo_ship_engine",
 -- Editor Extensions overpowered super loco does not need power doubling at all!
   "ee-super-locomotive",
+-- Real Shuttle Trains (no interface to add shuttle locomitives. also uses Kazuya's nonfunctional electric train interface.)
+  "shuttle",
+  "electric_shuttle",
+-- Space Exploration "special item"
+  "se-space-elevator-tug",
 }
 
 local yuoki_blacklist = {
