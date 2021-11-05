@@ -101,7 +101,7 @@ local blacklist = {
   "cargo_ship_engine",
 -- Editor Extensions overpowered super loco does not need power doubling at all!
   "ee-super-locomotive",
--- Real Shuttle Trains (no interface to add shuttle locomitives. also uses Kazuya's nonfunctional electric train interface.)
+-- Real Shuttle Trains (no interface to add shuttle locomotives, and the auto-disconnecting logic interferes. also uses Kazuya's nonfunctional electric train interface.)
   "shuttle",
   "electric_shuttle",
 -- Space Exploration "special item"
@@ -144,7 +144,7 @@ if settings.startup["multiple-unit-train-control-allow_yuoki_steam"].value == fa
     mu_blacklist[name] = true
   end
 end
--- Add Battery Locomotive to blacklist if it's present (since the names are generic, don't want to exclude others
+-- Add Battery Locomotive to blacklist if it's present (since the names are generic, don't want to exclude others)
 if mods["BatteryLocomotive"] then
   for _,name in pairs(kazuya_blacklist) do
     mu_blacklist[name] = true
