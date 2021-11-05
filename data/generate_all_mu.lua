@@ -68,6 +68,15 @@ local has_description = {
   "nt-train-nuclear",
 -- Electric Vehicles Reborn
   "electric-vehicles-electric-locomotive",
+-- Space Trains
+  "space-trains-locomotive",
+  "space-trains-locomotive-solar1",
+  "space-trains-locomotive-solar2",
+  "space-trains-locomotive-solar3",
+  "space-trains-short-locomotive",
+  "space-trains-short-locomotive-solar1",
+  "space-trains-short-locomotive-solar2",
+  "space-trains-short-locomotive-solar3",
 }
 
 -- Convert entity-description list to dictionary
@@ -113,7 +122,7 @@ local yuoki_blacklist = {
 }
 
 local kazuya_blacklist = {
--- Battery Locomotive (mod does not have a remote interface yet)
+-- Battery Locomotive (mod does not have functioning remote interface yet)
   "battery-locomotive",
   "battery-locomotive-mk2",
   "battery-locomotive-mk3"
@@ -135,11 +144,16 @@ if settings.startup["multiple-unit-train-control-allow_yuoki_steam"].value == fa
     mu_blacklist[name] = true
   end
 end
--- Add Battery Locomotive if it's present (since the names are generic, don't want to exclude others
+-- Add Battery Locomotive to blacklist if it's present (since the names are generic, don't want to exclude others
 if mods["BatteryLocomotive"] then
   for _,name in pairs(kazuya_blacklist) do
     mu_blacklist[name] = true
   end
+end
+
+-- Add Degraine's Electric Locomotive to blacklist if present
+if mods["ElectricTrains"] then
+  mu_blacklist["electric-locomotive"] = true
 end
 
 
