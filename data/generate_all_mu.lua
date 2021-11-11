@@ -106,6 +106,9 @@ local blacklist = {
   "electric_shuttle",
 -- Space Exploration "special item"
   "se-space-elevator-tug",
+-- Railway Motor Cars "personal vehicles"
+  "railway-motor-car-train",
+  "railway-motor-car-nuclear-train",
 }
 
 local yuoki_blacklist = {
