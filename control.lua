@@ -522,8 +522,7 @@ local function OnNthTick(event)
   end
 end
 
-
--- Made this function global to avoid crash on circular reference?
+-- Make this a global function so it can be called inside OnNthTick up above
 function RefreshNthTickHandlers()
   script.on_nth_tick(nil)
   if not (settings_nth_tick == 0 or settings_mode == "disabled") then
@@ -531,6 +530,7 @@ function RefreshNthTickHandlers()
   end
   script.on_nth_tick(math.max(current_nth_tick*2, 600), OnNthTickPurgeMovingList)
 end
+
 
 --== ON_PLAYER_CONFIGURED_BLUEPRINT EVENT ==--
 -- ID 70, fires when you select a blueprint to place

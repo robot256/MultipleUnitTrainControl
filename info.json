@@ -8,7 +8,7 @@
   "homepage": "https://github.com/robot256/MultipleUnitTrainControl",
   "description": "Replaces bidirectional trains with ones twice as powerful, to simulate real locomotives driving backwards.",
   "dependencies": [
-    "base >= 1.1.0", 
+    "base >= 1.0.0", 
     "flib",
     "Robot256Lib >= 0.1.0",
     "(?)FARL >= 3.1.3", 
