@@ -1,10 +1,40 @@
 ---------------------------------------------------------------------------------------------------
-Version: 0.3.9
+Version: 0.4.14
+Date: 2021-11-11
+  Features:
+    -- Added Railway Motor Cars to blacklist.
+---------------------------------------------------------------------------------------------------
+Version: 0.4.13
+Date: 2021-11-05
+  Features:
+    - Added Degraine's Electric Train to blacklist.
+    - Added Railway Motor Car to blacklist.
+    - Added compatibility with future Space Elevators from Space Exploration.
+    - Added beta compatibility with Train Tunnels mod.
+  Bugfixes:
+    - Actually added Real Shuttle Trains to the blacklist this time.
+---------------------------------------------------------------------------------------------------
+Version: 0.4.12
+Date: 2021-10-27
+  Bugfixes:
+    - Added Real Shuttle Trains mod to the blacklist for compatibility.
+---------------------------------------------------------------------------------------------------
+Version: 0.4.11
+Date: 2021-09-20
+  Bugfixes:
+    - Fixed failure to load when Electronic Locomotives is installed without any additional Electronic Locomotive mods.
+---------------------------------------------------------------------------------------------------
+Version: 0.4.10
+Date: 2021-02-28
+  Features:
+    - Fixed compatibility with Realistic_Electric_Trains_Fork and Realistic_Electric_Trains_fix.
+---------------------------------------------------------------------------------------------------
+Version: 0.4.9
 Date: 2020-12-07
   Bugfixes:
     - Fix crash when balancing fuel in a large number of locomotives.
 ---------------------------------------------------------------------------------------------------
-Version: 0.3.8
+Version: 0.4.8
 Date: 2020-12-06
   Bugfixes:
     - Fixed compatibility with Electronic Locomotives mods.
@@ -13,15 +43,20 @@ Date: 2020-12-06
     - Added Editor Extensions "super locomotive" to MU blacklist (it's too fast already!).
     - Added BatteryLocomotive by KoharaKazuya to the blacklist (until they implement a remote interface to register new types of locomotives).
 ---------------------------------------------------------------------------------------------------
-Version: 0.3.7
+Version: 0.4.7
 Date: 2020-12-03
   Bugfixes:
-    - Fixed crash when picking up MU item from ground.
+    - Fixed crash when picking up MU items from the ground.
 ---------------------------------------------------------------------------------------------------
-Version: 0.3.6
+Version: 0.4.6
 Date: 2020-11-27
   Bugfixes:
     - Fixed crash when fuel balancing is disabled.
+---------------------------------------------------------------------------------------------------
+Version: 0.4.5
+Date: 2020-11-25
+  Features:
+    - Updated for Factorio 1.1.1.
 ---------------------------------------------------------------------------------------------------
 Version: 0.3.5
 Date: 2020-11-14
