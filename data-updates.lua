@@ -20,7 +20,7 @@ end
 
 require ("data.createMuLoco")
 
--- Special code
+-- Special code: Run this first so that auto-gen doesn't attempt to handle them
 require ("prototypes.ret_add_mu")
 
 -- Generate procedurally
