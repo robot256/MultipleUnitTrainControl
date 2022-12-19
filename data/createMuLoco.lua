@@ -5,7 +5,6 @@
  * Arguments:
  *  std= entity name string of the standard version
  *  mu= entity name string of the mu version to be created
- *  hasDescription= boolean indicating whether standard version has entity-description locale entry
  *  power_multiplier= power buff to multiply, defaults to 2
  *  fuel_item= item name string of Realistic Electric Trains dummy fuel item used by the standard version
 --]]
@@ -19,7 +18,6 @@ require ("data.createMuLocoRecipePrototype")
 function createMuLoco(arg)
 	local oldName = arg.std
 	local newName = arg.mu
-	local hasDescription = arg.hasDescription or false
 	local power_multiplier = arg.power_multiplier or 2
 	local fuel_item = arg.fuel_item
   
@@ -42,7 +40,7 @@ function createMuLoco(arg)
   local mu_item = createMuLocoItemPrototype(oldName, newName)
   if mu_item then
     data:extend{ mu_item,
-      createMuLocoEntityPrototype(oldName, newName, hasDescription, power_multiplier),
+      createMuLocoEntityPrototype(oldName, newName, power_multiplier),
       createMuLocoRecipePrototype(oldName, newName, mu_fuel_item_name)
     }
     table.insert(data.raw.technology["multiple-unit-train-control-locomotives"].effects, {type = "unlock-recipe", recipe = newName})

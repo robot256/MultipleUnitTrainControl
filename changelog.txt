@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.4.16
+Date: 2022-12-18
+  Changes:
+    - Updated description text to use new fallback groups. This should automatically fix any missing descriptions on MU locomotives.\]
+  Bugfixes:
+    - Update MU loco fuel categories to match base loco in data-final-fixes.
+---------------------------------------------------------------------------------------------------
 Version: 0.4.15
 Date: 2022-05-08
   Bugfixes:

@@ -7,7 +7,7 @@
 --]]
 
 
-function createMuLocoEntityPrototype(name, newName, has_description, power_multiplier)
+function createMuLocoEntityPrototype(name, newName, power_multiplier)
   -- Copy source locomotive prototype
   local oldLoco = data.raw["locomotive"][name]
   local loco = table.deepcopy(oldLoco)
@@ -43,12 +43,11 @@ function createMuLocoEntityPrototype(name, newName, has_description, power_multi
   if loco.localised_description then
     -- Original mod already set dynamic localised description, use it in our template
     loco.localised_description = {'template.mu-description',table.deepcopy(loco.localised_description)}
-  elseif has_description==true then
-    -- We know this mod set a description in their locale file (no way to determine dynamically at this phase)
-    loco.localised_description = {'template.mu-description',{'entity-description.'..name}}
   else
-    -- Assume there is no description in locale file
-    loco.localised_description = {'template.plain-mu-description'}
+    -- Use fallback group to append our description to an existing one
+    loco.localised_description = {"?", {"",{"entity-description."..name},"\n",{'template.mu-description'}},
+                                       {"",{"item-description."..name},"\n",{'template.mu-description'}},
+                                       {'template.mu-description'}}
   end
   
   return loco
