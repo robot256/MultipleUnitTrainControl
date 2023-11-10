@@ -8,7 +8,7 @@
 --]]
 
 
-function balanceInventories(inventoryOne, inventoryTwo)
+function balanceInventories(inventoryOne, inventoryTwo, settings_debug)
 	if inventoryOne and inventoryTwo and inventoryOne.valid and inventoryTwo.valid then
 		local locoOneInventory = inventoryOne.get_contents()
 		local locoTwoInventory = inventoryTwo.get_contents()
@@ -41,7 +41,7 @@ function balanceInventories(inventoryOne, inventoryTwo)
 				end
 			end
 		end
-	else
+	elseif settings_debug == "debug" then
 		game.print("MUTC Balancer ignoring invalid inventories")
 	end
 end
