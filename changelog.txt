@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.4.17
+Date: 2023-10-04
+  Changes:
+    - Verify equipment grid of MU loco matches base loco in data-final-fixes (to catch some incompatibilities).
+  Bugfixes:
+    - Fixed compatibility with SE Space Trains via dependency.
+---------------------------------------------------------------------------------------------------
 Version: 0.4.16
 Date: 2022-12-18
   Changes:
