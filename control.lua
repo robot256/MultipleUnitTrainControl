@@ -65,6 +65,11 @@ local function CallRemoteInterface()
     end
   end
   
+  -- Register MU version of Degraine's Electric Locomotive
+  if remote.interfaces["electrictrains"] then
+    remote.call("electrictrains", "register", "deg-electric-locomotive-mu", "deg-electric-locomotive-fuel-dummy-mu")
+  end
+  
 end
 
 -- Set up the mapping between normal and MU locomotives

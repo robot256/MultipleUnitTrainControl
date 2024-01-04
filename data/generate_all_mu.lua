@@ -72,9 +72,11 @@ if mods["BatteryLocomotive"] then
   end
 end
 
--- Add Degraine's Electric Locomotive to blacklist if present
+-- Add dummy fuel item for Degraine's Electric Locomotive if present (code provided by Degraine for compatibility)
 if mods["ElectricTrains"] then
-  mu_blacklist["electric-locomotive"] = true
+  local dummy_fuel = flib.copy_prototype(data.raw["item"]["deg-electric-locomotive-fuel-dummy"],"deg-electric-locomotive-fuel-dummy-mu")
+  dummy_fuel.fuel_value = multiply_energy_value(dummy_fuel.fuel_value, 2)
+  data:extend{dummy_fuel}
 end
 
 
