@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.4.21
+Date: 2024-08-29
+  Changes:
+    - Removed obsolete compatibility code for LuziferSenpai's Electronic Locomotives. No special code is needed anymore for compatibility.
+---------------------------------------------------------------------------------------------------
 Version: 0.4.20
 Date: 2024-08-27
   Changes:

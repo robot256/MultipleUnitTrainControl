@@ -824,13 +824,13 @@ commands.add_command("mutc-debug", "Usage: mutc-debug dump|dumplog", cmd_debug)
 --                    FIND LOCAL VARIABLES THAT ARE USED GLOBALLY                 --
 --                              (Thanks to eradicator!)                           --
 ------------------------------------------------------------------------------------
-setmetatable(_ENV,{
-  __newindex=function (self,key,value) --locked_global_write
-    error('\n\n[ER Global Lock] Forbidden global *write*:\n'
-      .. serpent.line{key=key or '<nil>',value=value or '<nil>'}..'\n')
-    end,
-  __index   =function (self,key) --locked_global_read
-    error('\n\n[ER Global Lock] Forbidden global *read*:\n'
-      .. serpent.line{key=key or '<nil>'}..'\n')
-    end ,
-  })
+-- setmetatable(_ENV,{
+  -- __newindex=function (self,key,value) --locked_global_write
+    -- error('\n\n[ER Global Lock] Forbidden global *write*:\n'
+      -- .. serpent.line{key=key or '<nil>',value=value or '<nil>'}..'\n')
+    -- end,
+  -- __index   =function (self,key) --locked_global_read
+    -- error('\n\n[ER Global Lock] Forbidden global *read*:\n'
+      -- .. serpent.line{key=key or '<nil>'}..'\n')
+    -- end ,
+  -- })
