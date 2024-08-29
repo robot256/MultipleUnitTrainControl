@@ -25,9 +25,11 @@ function processTrainWireless(t)
 		if global.downgrade_pairs[loco1.name] then
 			local mu_name = loco1.name
 			local std_name = global.downgrade_pairs[mu_name]
+      local alt_mu_name = global.alt_pairs[mu_name]
+      local alt_std_name = global.alt_pairs[std_name]
 			-- Found an MU, look for its twin as an MU first
 			for _,loco2 in pairs(back_movers) do
-				if loco2.name == mu_name then
+				if loco2.name == mu_name or loco2.name == alt_mu_name then
 					-- Potential twin, make sure it's not in a pair already
 					local loco2_free = true
 					for _,this_pair in pairs(found_pairs) do
@@ -47,7 +49,7 @@ function processTrainWireless(t)
 			if not loco1_done then
 				-- Didn't find an MU twin, look for a normal twin to this MU so we can upgrade it
 				for _,loco2 in pairs(back_movers) do
-					if loco2.name == std_name then
+					if loco2.name == std_name or loco2.name == alt_std_name then
 						-- Potential twin, make sure it's not in a pair already
 						local loco2_free = true
 						for _,this_pair in pairs(found_pairs) do
@@ -59,7 +61,7 @@ function processTrainWireless(t)
 						if loco2_free and checkModuleMatching(loco1,loco2) then
 							-- Found a normal twin, upgrade loco2
 							table.insert(found_pairs,{loco1,loco2})
-							table.insert(upgrade_locos,{loco2,mu_name})
+							table.insert(upgrade_locos,{loco2,global.upgrade_pairs[loco2.name]})
 							loco1_done = true
 							break
 						end
@@ -76,9 +78,11 @@ function processTrainWireless(t)
 		elseif global.upgrade_pairs[loco1.name] then
 			local std_name = loco1.name
 			local mu_name = global.upgrade_pairs[std_name]
+      local alt_mu_name = global.alt_pairs[mu_name]
+      local alt_std_name = global.alt_pairs[std_name]
 			-- Found a normal, look for its twin as an MU first
 			for _,loco2 in pairs(back_movers) do
-				if loco2.name == mu_name then
+				if loco2.name == mu_name or loco2.name == alt_mu_name then
 					-- Potential twin, make sure it's not in a pair already
 					local loco2_free = true
 					for _,this_pair in pairs(found_pairs) do
@@ -99,7 +103,7 @@ function processTrainWireless(t)
 			if not loco1_done then
 				-- Didn't find an MU twin, look for a normal twin to this MU so we can upgrade it
 				for _,loco2 in pairs(back_movers) do
-					if loco2.name == std_name then
+					if loco2.name == std_name or loco2.name == alt_std_name then
 						-- Potential twin, make sure it's not in a pair already
 						local loco2_free = true
 						for _,this_pair in pairs(found_pairs) do
@@ -112,7 +116,7 @@ function processTrainWireless(t)
 							-- Found a normal twin, upgrade loco1 and loco2
 							table.insert(found_pairs,{loco1,loco2})
 							table.insert(upgrade_locos,{loco1,mu_name})
-							table.insert(upgrade_locos,{loco2,mu_name})
+							table.insert(upgrade_locos,{loco2,global.upgrade_pairs[loco2.name]})
 							loco1_done = true
 							break
 						end

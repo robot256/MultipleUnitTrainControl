@@ -76,8 +76,9 @@ end
 -- Extract from the game prototypes list what MU locomotives are enabled
 local function InitEntityMaps()
 
-  global.upgrade_pairs = {}
-  global.downgrade_pairs = {}
+  global.upgrade_pairs = {}    -- Maps STD names to MU names
+  global.downgrade_pairs = {}  -- Maps MU names to STD names
+  global.alt_pairs = {}        -- Maps MU and STD names to ALT_MU and ALT_STD names respectively
   
   -- Retrieve entity names from dummy technology, store in global variable
   for _,effect in pairs(game.technology_prototypes["multiple-unit-train-control-locomotives"].effects) do
@@ -107,6 +108,17 @@ local function InitEntityMaps()
         game.print({"debug-message.mu-mapping-message",mod_name,std,mu})
       end
       
+      
+    end
+  end
+  
+  -- Electric Trains (formerly Space Trains) compatibility for "wagon loco" alternate
+  if game.active_mods["electric-trains"] then
+    if global.upgrade_pairs["electric-locomotive"] and global.upgrade_pairs["electric-locomotive-wagon"] then
+      global.alt_pairs["electric-locomotive"] = "electric-locomotive-wagon"
+      global.alt_pairs["electric-locomotive-wagon"] = "electric-locomotive"
+      global.alt_pairs["electric-locomotive-mu"] = "electric-locomotive-wagon-mu"
+      global.alt_pairs["electric-locomotive-wagon-mu"] = "electric-locomotive-mu"
     end
   end
   

@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.4.20
+Date: 2024-08-27
+  Changes:
+    - Added compatibility with nerfkidjcb's Electric Trains. Electric Locomotive and Electric Locomotive Wagon can be combined in an MU pair now.
+---------------------------------------------------------------------------------------------------
 Version: 0.4.19
 Date: 2024-01-04
   Changes:

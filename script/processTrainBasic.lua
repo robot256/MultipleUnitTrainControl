@@ -68,9 +68,11 @@ function processTrainBasic(t)
 				if global.downgrade_pairs[loco1.name] then
 					local mu_name = loco1.name
 					local std_name = global.downgrade_pairs[mu_name]
-					-- Found an MU, look for its twin as an MU first
+					local alt_mu_name = global.alt_pairs[mu_name]
+          local alt_std_name = global.alt_pairs[std_name]
+			    -- Found an MU, look for its twin as an MU first
 					for _,loco2 in pairs(back_movers) do
-						if loco2.name == mu_name then
+						if loco2.name == mu_name or loco2.name == alt_mu_name then
 							-- Potential twin, make sure it's in this unit
 							local loco2_here = false
 							for _,loco2a in pairs(unit) do
@@ -101,7 +103,7 @@ function processTrainBasic(t)
 					if not loco1_done then
 						-- Didn't find an MU twin, look for a normal twin to this MU so we can upgrade it
 						for _,loco2 in pairs(back_movers) do
-							if loco2.name == std_name then
+							if loco2.name == std_name or loco2.name == alt_std_name then
 								-- Potential twin, make sure it's in this unit
 								local loco2_here = false
 								for _,loco2a in pairs(unit) do
@@ -122,7 +124,7 @@ function processTrainBasic(t)
 										-- Found a normal twin, upgrade loco2
 										--game.print("Adding pair [" .. loco1.backer_name .. ", " .. loco2.backer_name .. "]")
 										table.insert(found_pairs,{loco1,loco2})
-										table.insert(upgrade_locos,{loco2,mu_name})
+										table.insert(upgrade_locos,{loco2,global.upgrade_pairs[loco2.name]})
 										loco1_done = true
 										break
 									end
@@ -141,9 +143,11 @@ function processTrainBasic(t)
 				elseif global.upgrade_pairs[loco1.name] then
 					local std_name = loco1.name
 					local mu_name = global.upgrade_pairs[std_name]
-					-- Found a normal, look for its twin as an MU first
+					local alt_mu_name = global.alt_pairs[mu_name]
+          local alt_std_name = global.alt_pairs[std_name]
+			    -- Found a normal, look for its twin as an MU first
 					for _,loco2 in pairs(back_movers) do
-						if loco2.name == mu_name then
+						if loco2.name == mu_name or loco2.name == alt_mu_name then
 							-- Potential twin, make sure it's in this unit
 							local loco2_here = false
 							for _,loco2a in pairs(unit) do
@@ -198,7 +202,7 @@ function processTrainBasic(t)
 										--game.print("Adding pair [" .. loco1.backer_name .. ", " .. loco2.backer_name .. "]")
 										table.insert(found_pairs,{loco1,loco2})
 										table.insert(upgrade_locos,{loco1,mu_name})
-										table.insert(upgrade_locos,{loco2,mu_name})
+										table.insert(upgrade_locos,{loco2,global.upgrade_pairs[loco2.name]})
 										loco1_done = true
 										break
 									end
