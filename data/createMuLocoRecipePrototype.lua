@@ -21,15 +21,15 @@ function createMuLocoRecipePrototype(name, newName, newFuel)
   {
     type = "recipe",
     name = newName,
-    ingredients = {{newName, 1}},
-    result = name,
+    ingredients = {{type="item",name=newName,amount=1}},
+    results = {{type="item",name=name,amount=1}},
     hidden = true,
     allow_as_intermediate = false
   }
   
   -- Add dummy fuel item if needed
   if newFuel then 
-    table.insert(newRecipe.ingredients, {newFuel,1})
+    table.insert(newRecipe.ingredients, {type="item",name=newFuel,amount=1})
   end
   
   return newRecipe

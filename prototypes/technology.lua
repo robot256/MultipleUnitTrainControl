@@ -13,7 +13,7 @@ data:extend{
 	name = "multiple-unit-train-control",
 	icon = "__MultipleUnitTrainControl__/graphics/icons/mu-control.png",
 	icon_size = 128,
-	prerequisites = {"automated-rail-transportation","electronics"},
+	prerequisites = {"automated-rail-transportation"},
 	effects = {},  -- Handled by mod scripting
 	unit =  -- Intended to be early-game upgrade for simple railroads
 	{
@@ -31,7 +31,7 @@ data:extend{
 	name = "adv-multiple-unit-train-control",
 	icon = "__MultipleUnitTrainControl__/graphics/icons/adv-mu-control.png",
 	icon_size = 128,
-	prerequisites = {"multiple-unit-train-control","advanced-electronics"},
+	prerequisites = {"multiple-unit-train-control"},
 	effects = {},  -- Handled by mod scripting
 	unit =  -- Wireless mode after you get advanced circuits.
 	{

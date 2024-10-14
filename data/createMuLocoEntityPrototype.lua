@@ -14,16 +14,6 @@ function createMuLocoEntityPrototype(name, newName, power_multiplier)
   
   -- Change name of prototype
   loco.name = newName
-  -- Make this entity non-placeable (you're not allowed to have -mu items in your inventory), doesn't really work?
-  if(loco.flags["placeable-neutral"]) then
-    loco.flags["placeable-neutral"] = nil
-  end
-  if(loco.flags["placeable-player"]) then
-    loco.flags["placeable-player"] = nil
-  end
-  if(loco.flags["placeable-enemy"]) then
-    loco.flags["placeable-enemy"] = nil
-  end
   
   -- Make it so a normal locomotive can be pasted on this blueprint, doesn't really work?
   loco.additional_pastable_entities = {name}

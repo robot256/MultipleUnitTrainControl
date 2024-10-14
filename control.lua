@@ -47,7 +47,7 @@ local function CallRemoteInterface()
 
   -- Make sure FuelTrainStop plays nice with magu's ElectricTrain in the MU versions
   if remote.interfaces["FuelTrainStop"] then
-    for std,mu in pairs(global.upgrade_pairs) do
+    for std,mu in pairs(storage.upgrade_pairs) do
       if std:match("^et%-electric%-locomotive%-%d$") or 
          std:match("^fusion%-locomotive%-%d$") then
         remote.call("FuelTrainStop", "exclude_from_fuel_schedule", mu)
@@ -57,11 +57,11 @@ local function CallRemoteInterface()
   
   -- Add MU versions of Fluid Trains locomotives to the mod's update list
   if remote.interfaces["fluidTrains_hook"] then
-    if global.upgrade_pairs["SteamTrains-locomotive"] then
-      remote.call("fluidTrains_hook", "addLocomotive", global.upgrade_pairs["SteamTrains-locomotive"], 20000)
+    if storage.upgrade_pairs["SteamTrains-locomotive"] then
+      remote.call("fluidTrains_hook", "addLocomotive", storage.upgrade_pairs["SteamTrains-locomotive"], 20000)
     end
-    if global.upgrade_pairs["Diesel-Locomotive-fluid-locomotive"] then
-      remote.call("fluidTrains_hook", "addLocomotive", global.upgrade_pairs["Diesel-Locomotive-fluid-locomotive"], 1500)
+    if storage.upgrade_pairs["Diesel-Locomotive-fluid-locomotive"] then
+      remote.call("fluidTrains_hook", "addLocomotive", storage.upgrade_pairs["Diesel-Locomotive-fluid-locomotive"], 1500)
     end
   end
   
@@ -76,18 +76,18 @@ end
 -- Extract from the game prototypes list what MU locomotives are enabled
 local function InitEntityMaps()
 
-  global.upgrade_pairs = {}    -- Maps STD names to MU names
-  global.downgrade_pairs = {}  -- Maps MU names to STD names
-  global.alt_pairs = {}        -- Maps MU and STD names to ALT_MU and ALT_STD names respectively
+  storage.upgrade_pairs = {}    -- Maps STD names to MU names
+  storage.downgrade_pairs = {}  -- Maps MU names to STD names
+  storage.alt_pairs = {}        -- Maps MU and STD names to ALT_MU and ALT_STD names respectively
   
   -- Retrieve entity names from dummy technology, store in global variable
-  for _,effect in pairs(game.technology_prototypes["multiple-unit-train-control-locomotives"].effects) do
+  for _,effect in pairs(prototypes.technology["multiple-unit-train-control-locomotives"].effects) do
     if effect.type == "unlock-recipe" then
-      local recipe = game.recipe_prototypes[effect.recipe]
+      local recipe = prototypes.recipe[effect.recipe]
       local std = recipe.products[1].name
       local mu = recipe.ingredients[1].name
-      global.upgrade_pairs[std] = mu
-      global.downgrade_pairs[mu] = std
+      storage.upgrade_pairs[std] = mu
+      storage.downgrade_pairs[mu] = std
       
       ------------
       -- RET Compatibility for this Loco
@@ -103,7 +103,7 @@ local function InitEntityMaps()
         end
       end
       if settings_debug == "info" then
-        game.print({"debug-message.mu-mapping-message",mod_name,game.entity_prototypes[std].localised_name,game.entity_prototypes[mu].localised_name})
+        game.print({"debug-message.mu-mapping-message",mod_name,prototypes.entity[std].localised_name,prototypes.entity[mu].localised_name})
       elseif settings_debug == "debug" then
         game.print({"debug-message.mu-mapping-message",mod_name,std,mu})
       end
@@ -113,12 +113,12 @@ local function InitEntityMaps()
   end
   
   -- Electric Trains (formerly Space Trains) compatibility for "wagon loco" alternate
-  if game.active_mods["electric-trains"] then
-    if global.upgrade_pairs["electric-locomotive"] and global.upgrade_pairs["electric-locomotive-wagon"] then
-      global.alt_pairs["electric-locomotive"] = "electric-locomotive-wagon"
-      global.alt_pairs["electric-locomotive-wagon"] = "electric-locomotive"
-      global.alt_pairs["electric-locomotive-mu"] = "electric-locomotive-wagon-mu"
-      global.alt_pairs["electric-locomotive-wagon-mu"] = "electric-locomotive-mu"
+  if script.active_mods["electric-trains"] then
+    if storage.upgrade_pairs["electric-locomotive"] and storage.upgrade_pairs["electric-locomotive-wagon"] then
+      storage.alt_pairs["electric-locomotive"] = "electric-locomotive-wagon"
+      storage.alt_pairs["electric-locomotive-wagon"] = "electric-locomotive"
+      storage.alt_pairs["electric-locomotive-mu"] = "electric-locomotive-wagon-mu"
+      storage.alt_pairs["electric-locomotive-wagon-mu"] = "electric-locomotive-mu"
     end
   end
   
@@ -133,9 +133,9 @@ end
 local function ProcessInventoryQueue()
   local idle = true
   
-  if global.inventories_to_balance and next(global.inventories_to_balance) then
-    --game.print("Taking from inventory queue, " .. #global.inventories_to_balance .. " remaining")
-    local inventories = table.remove(global.inventories_to_balance, 1)
+  if storage.inventories_to_balance and next(storage.inventories_to_balance) then
+    --game.print("Taking from inventory queue, " .. #storage.inventories_to_balance .. " remaining")
+    local inventories = table.remove(storage.inventories_to_balance, 1)
     balanceInventories(inventories[1], inventories[2], settings_debug)
     
     idle = false  -- Tell OnTick that we did something useful
@@ -154,7 +154,7 @@ local function ProcessReplacement(r)
     -- Replace the locomotive
     local errorString = ""
     if settings_debug == "info" then
-      game.print({"debug-message.mu-replacement-message",r[1].localised_name,r[1].backer_name,game.entity_prototypes[r[2]].localised_name})
+      game.print({"debug-message.mu-replacement-message",r[1].localised_name,r[1].backer_name,prototypes.entity[r[2]].localised_name})
       errorString = {"debug-message.mu-replacement-failed",r[1].localised_name,r[1].backer_name,r[1].position.x,r[1].position.y}
     elseif settings_debug == "debug" then
       game.print({"debug-message.mu-replacement-message",r[1].name,r[1].backer_name,r[2]})
@@ -163,7 +163,7 @@ local function ProcessReplacement(r)
     
     local newLoco = replaceCarriage(r[1], r[2])
     -- Find which mu_pair the old one was in and put the new one instead
-    for _,p in pairs(global.mu_pairs) do
+    for _,p in pairs(storage.mu_pairs) do
       if p[1] == r[1] then
         p[1] = newLoco
         break
@@ -194,7 +194,7 @@ local function isTrainStopped(train)
     -- Do an additional checks to make sure the train isn't currently being manipulated by another mod
     ----------------------
     -- ** Compatibility with Space Exploration Space Elevators **
-    if game.entity_prototypes["se-space-elevator-energy-interface"] then
+    if prototypes.entity["se-space-elevator-energy-interface"] then
       local space_elevator_hypertrain_radius = 12
       local front_pos = train.front_stock.position
       local front_structs = train.front_stock.surface.find_entities_filtered{position=front_pos, radius=space_elevator_hypertrain_radius, name="se-space-elevator-energy-interface"}
@@ -209,8 +209,8 @@ local function isTrainStopped(train)
       end
     end
     -- ** Compatibility with Train Tunnels **
-    if game.entity_prototypes["traintunnel"] then
-      local tunnel_radius = game.entity_prototypes["traintunnel"].radius
+    if prototypes.entity["traintunnel"] then
+      local tunnel_radius = prototypes.entity["traintunnel"].radius
       local front_structs = train.front_stock.surface.find_entities_filtered{position=train.front_stock.position, radius=tunnel_radius+train.front_stock.get_radius()+3, name={"traintunnel","traintunnelup"}}
       if front_structs and #front_structs>0 then
         game.print("skipping tunnel "..tostring(game.tick))
@@ -289,7 +289,7 @@ local function OnTrainChangedState(event)
   --game.print("Train ".. id .. " In OnTrainChangedState!")
   -- Event contains train, old_train_state
   -- If this train is queued for replacement, check state and maybe process now
-  if global.moving_trains[id] then
+  if storage.moving_trains[id] then
     local t = event.train
     -- We are waitng to process it, check everything!
     if t and t.valid then
@@ -300,7 +300,7 @@ local function OnTrainChangedState(event)
         if train_queue_semaphore == false then
           train_queue_semaphore = true
           ProcessTrain(t)
-          global.moving_trains[id] = nil
+          storage.moving_trains[id] = nil
           train_queue_semaphore = false
         elseif (settings_debug ~= "none") then
           game.print("OnChange Train " .. id .. " event ignored because semaphore is occupied (this is weird!)")
@@ -308,7 +308,7 @@ local function OnTrainChangedState(event)
       end
     end
   end
-  if not next(global.moving_trains) then
+  if not next(storage.moving_trains) then
     script.on_event(defines.events.on_train_changed_state, nil)
   end
   
@@ -316,16 +316,16 @@ local function OnTrainChangedState(event)
 end
 
 --== ON_NTH_TICK (longer duration) EVENT ==--
--- Periodically purges global.moving_trains because some mods make train ids
+-- Periodically purges storage.moving_trains because some mods make train ids
 -- go invalid while still in motion, that would otherwise never be deleted.
 -- This could probably happen if trains get attacked and partially destroyed as well.
 local function OnNthTickPurgeMovingList(event)
 
   local purged = 0
   local saved = 0
-  for id,train in pairs(global.moving_trains) do
+  for id,train in pairs(storage.moving_trains) do
     if not train or not train.valid then
-      global.moving_trains[id] = nil
+      storage.moving_trains[id] = nil
       purged = purged + 1
     else
       saved = saved + 1
@@ -335,9 +335,9 @@ local function OnNthTickPurgeMovingList(event)
   if settings_debug == "debug" then
     if purged > 1 then
       if saved > 0 then
-        game.print("MUTC Purged "..tostring(purged).." dead trains from global.moving_trains. "..tostring(saved).." moving trains are still valid.")
+        game.print("MUTC Purged "..tostring(purged).." dead trains from storage.moving_trains. "..tostring(saved).." moving trains are still valid.")
       else
-        game.print("MUTC Purged "..tostring(purged).." dead trains from global.moving_trains.")
+        game.print("MUTC Purged "..tostring(purged).." dead trains from storage.moving_trains.")
       end
     end
   end
@@ -347,7 +347,7 @@ end
 -------------
 -- Enables the on_train_changed_state event according to current variables
 local function StartTrainWatcher()
-  if global.moving_trains and next(global.moving_trains) then
+  if storage.moving_trains and next(storage.moving_trains) then
     -- Set up the action to process train after it comes to a stop
     script.on_event(defines.events.on_train_changed_state, OnTrainChangedState)
   else
@@ -364,11 +364,11 @@ local function ProcessTrainQueue()
   if train_queue_semaphore==false then
     train_queue_semaphore = true
     
-    if global.created_trains then
+    if storage.created_trains then
       --game.print("ProcessTrainQueue has a train in the queue")
       -- Keep looping until we discard all the invalid intermediate trains
-      while next(global.created_trains) do
-        local t = table.remove(global.created_trains,1)
+      while next(storage.created_trains) do
+        local t = table.remove(storage.created_trains,1)
         if t and t.valid then
           -- Check if this train is in a safe state
           if isTrainStopped(t) then
@@ -379,7 +379,7 @@ local function ProcessTrainQueue()
             break
           else
             -- Flag this train to be processed on a ChangedState event
-            global.moving_trains[t.id] = t
+            storage.moving_trains[t.id] = t
             --game.print("Train " .. id .. " still moving.")
           end
         end
@@ -409,8 +409,8 @@ local function OnTick(event)
   -- Balancing inventories has third priority
   ProcessInventoryQueue()
   
-  if (not next(global.inventories_to_balance)) and 
-     (not next(global.created_trains)) then
+  if (not next(storage.inventories_to_balance)) and 
+     (not next(storage.created_trains)) then
     -- All on_tick queues are empty, unsubscribe from OnTick to save UPS
     --game.print("Turning off OnTick")
     script.on_event(defines.events.on_tick, nil)
@@ -430,22 +430,22 @@ local function OnTrainCreated(event)
   --game.print("Train "..id.." In OnTrainCreated!")
 
   -- Add this train to the train processing list, wait for it to stop
-  table.insert(global.created_trains, event.train)
+  table.insert(storage.created_trains, event.train)
   
   -- Remove old trains from moving_trains list
   -- When using Renai transportation Train Jumps, this will take care of 99% of the spurious entries 
   --   from long trains that get disconnected and reconnected while in motion.
-    if global.moving_trains then
+    if storage.moving_trains then
         if event.old_train_id_1 then
-            if global.moving_trains[event.old_train_id_1] then
+            if storage.moving_trains[event.old_train_id_1] then
               --game.print("Removed old train "..tostring(event.old_train_id_1).." from moving_trains list")
-              global.moving_trains[event.old_train_id_1] = nil
+              storage.moving_trains[event.old_train_id_1] = nil
             end
         end
         if event.old_train_id_2 then
-            if global.moving_trains[event.old_train_id_2] then
+            if storage.moving_trains[event.old_train_id_2] then
               --game.print("Removed old train "..tostring(event.old_train_id_2).." from moving_trains list")
-              global.moving_trains[event.old_train_id_2] = nil
+              storage.moving_trains[event.old_train_id_2] = nil
             end
         end
     end
@@ -463,7 +463,7 @@ end
 local function OnModuleChanged(event)
   local e = event.entity
   if e and e.valid and e.type=="locomotive" then
-    table.insert(global.created_trains, e.train)
+    table.insert(storage.created_trains, e.train)
     script.on_event(defines.events.on_tick, OnTick)
   end
 end
@@ -472,49 +472,49 @@ end
 --== ON_NTH_TICK EVENT ==--
 -- Initiates balancing of fuel inventories in every MU consist
 local function OnNthTick(event)
-  if global.mu_pairs and next(global.mu_pairs) then
+  if storage.mu_pairs and next(storage.mu_pairs) then
     local numInventories = 0
   
-    local n = #global.mu_pairs
+    local n = #storage.mu_pairs
     local done = false
     for i=1,n do
-      local entry = global.mu_pairs[i]
+      local entry = storage.mu_pairs[i]
       if (entry[1] and entry[2] and entry[1].valid and entry[2].valid) then
         -- This pair is good, balance if there are burner fuel inventories (only check one, since they are identical prototypes)
         if entry[1].burner then
           local inventoryOne = entry[1].burner.inventory
           local inventoryTwo = entry[2].burner.inventory
           if inventoryOne.valid and inventoryOne.valid and #inventoryOne > 0 then
-            table.insert(global.inventories_to_balance, {inventoryOne, inventoryTwo})
+            table.insert(storage.inventories_to_balance, {inventoryOne, inventoryTwo})
             numInventories = numInventories + 1
             -- if it burns stuff, it might have a result
             inventoryOne = entry[1].burner.burnt_result_inventory
             inventoryTwo = entry[2].burner.burnt_result_inventory
             if inventoryOne.valid and inventoryOne.valid and #inventoryOne > 0 then
-              table.insert(global.inventories_to_balance, {inventoryOne, inventoryTwo})
+              table.insert(storage.inventories_to_balance, {inventoryOne, inventoryTwo})
               numInventories = numInventories + 1
             end
           end
         end
       else
         -- This pair has one or more invalid locomotives, or they don't have burners at all, remove it from the list
-        global.mu_pairs[i] = nil
+        storage.mu_pairs[i] = nil
       end
     end
     local j=0
     for i=1,n do  -- Condense the list
-      if global.mu_pairs[i] ~= nil then
+      if storage.mu_pairs[i] ~= nil then
         j = j+1
-        global.mu_pairs[j] = global.mu_pairs[i]
+        storage.mu_pairs[j] = storage.mu_pairs[i]
       end
     end
     for i=j+1,n do
-      global.mu_pairs[i] = nil
+      storage.mu_pairs[i] = nil
     end
       
     -- Set up the on_tick action to process trains
     --game.print("Nth tick starting OnTick")
-    if next(global.inventories_to_balance) then
+    if next(storage.inventories_to_balance) then
       script.on_event(defines.events.on_tick, OnTick)
       
       -- Update the Nth tick interval to make sure we have enough time to update all the trains
@@ -532,7 +532,7 @@ local function OnNthTick(event)
           game.print({"debug-message.mu-changing-tick-message",newVal})
         end
         current_nth_tick = newVal
-        global.current_nth_tick = current_nth_tick
+        storage.current_nth_tick = current_nth_tick
         RefreshNthTickHandlers()
       end
     end
@@ -554,7 +554,7 @@ end
 --== ON_PLAYER_SETUP_BLUEPRINT EVENT ==--
 -- ID 68, fires when you select an area to make a blueprint or copy
 local function OnPlayerSetupBlueprint(event)
-  blueprintLib.mapBlueprint(event,global.downgrade_pairs)
+  blueprintLib.mapBlueprint(event,storage.downgrade_pairs)
 end
 
 
@@ -562,16 +562,17 @@ end
 -- Fires when player presses 'Q'.  We need to sneakily grab the correct item from inventory if it exists,
 --  or sneakily give the correct item in cheat mode.
 local function OnPlayerPipette(event)
-  blueprintLib.mapPipette(event,global.downgrade_pairs)
+  blueprintLib.mapPipette(event,storage.downgrade_pairs)
 end
 
 
 --== ON_PICKED_UP_ITEM ==--
 -- When player picks up an item, change -mu to normal loco items.
 local function OnPickedUpItem(event)
-  if global.downgrade_pairs[event.item_stack.name] then
+  if storage.downgrade_pairs[event.item_stack.name] then
     game.players[event.player_index].remove_item(event.item_stack)
-    game.players[event.player_index].insert({name=global.downgrade_pairs[event.item_stack.name], count=event.item_stack.count})
+    game.players[event.player_index].insert{name=storage.downgrade_pairs[event.item_stack.name], 
+        count=event.item_stack.count, quality=event.item_stack.quality}
   end
 end
 script.on_event(defines.events.on_picked_up_item, OnPickedUpItem)
@@ -584,8 +585,8 @@ local function OnPreMined(event)
   if event.entity.name == "item-on-ground" then
     local stack = event.entity.stack
     -- Change item-on-ground to unloaded wagon before robot picks it up
-    if stack.valid_for_read and global.downgrade_pairs[stack.name] then
-      stack.set_stack({name=global.downgrade_pairs[stack.name], count=stack.count})
+    if stack.valid_for_read and storage.downgrade_pairs[stack.name] then
+      stack.set_stack({name=storage.downgrade_pairs[stack.name], count=stack.count, quality=stack.quality})
     end
   end
 end
@@ -608,8 +609,8 @@ local function StartBalanceUpdates()
   --game.print("Disabling Nth Tick due to setting")
   if not(settings_nth_tick == 0 or settings_mode == "disabled") then
     -- See if we stored a longer update rate in global
-    if global.current_nth_tick and global.current_nth_tick > settings_nth_tick then
-      current_nth_tick = global.current_nth_tick
+    if storage.current_nth_tick and storage.current_nth_tick > settings_nth_tick then
+      current_nth_tick = storage.current_nth_tick
     else
       current_nth_tick = settings_nth_tick
     end
@@ -623,15 +624,13 @@ end
 -----------
 -- Queues all existing trains for updating with new settings
 local function QueueAllTrains()
-  for _, surface in pairs(game.surfaces) do
-    local trains = surface.get_trains()
-    for _,train in pairs(trains) do
-      -- Pretend this train was just created. Don't worry how long it takes.
-      table.insert(global.created_trains, train)
-      --game.print("Train " .. train.id .. " queued for scrub.")
-    end
+  local trains = game.train_manager.get_trains{}
+  for _,train in pairs(trains) do
+    -- Pretend this train was just created. Don't worry how long it takes.
+    table.insert(storage.created_trains, train)
+    --game.print("Train " .. train.id .. " queued for scrub.")
   end
-  if next(global.created_trains) then
+  if next(storage.created_trains) then
     script.on_event(defines.events.on_tick, OnTick)
   end
 end
@@ -698,8 +697,8 @@ local function init_events()
   end
   
   -- Set conditional OnTick event handler correctly on load based on global queues, so we can sync with a multiplayer game.
-  if (global.inventories_to_balance and next(global.inventories_to_balance)) or
-    (global.created_trains and next(global.created_trains)) then
+  if (storage.inventories_to_balance and next(storage.inventories_to_balance)) or
+    (storage.created_trains and next(storage.created_trains)) then
     script.on_event(defines.events.on_tick, OnTick)
   end
   
@@ -714,8 +713,8 @@ script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
     QueueAllTrains()  -- This will execute some replacements immediately
     if settings_mode == "disabled" then
       -- Clean globals when disabled
-      global.mu_pairs = {}
-      global.inventories_to_balance = {}
+      storage.mu_pairs = {}
+      storage.inventories_to_balance = {}
     end
     
     -- Update technology visible state
@@ -727,7 +726,7 @@ script.on_event(defines.events.on_runtime_mod_setting_changed, function(event)
   elseif event.setting == "multiple-unit-train-control-on_nth_tick" then
     -- When interval changes, clear the saved update rate and start over
     settings_nth_tick = settings.global["multiple-unit-train-control-on_nth_tick"].value
-    global.current_nth_tick = nil
+    storage.current_nth_tick = nil
     StartBalanceUpdates()
     StartTrainWatcher()
   
@@ -747,10 +746,10 @@ end)
 -- When game is created, initialize globals and events
 script.on_init(function()
   --game.print("In on_init!")
-  global.created_trains = {}
-  global.moving_trains = {}
-  global.mu_pairs = {}
-  global.inventories_to_balance = {}
+  storage.created_trains = {}
+  storage.moving_trains = {}
+  storage.mu_pairs = {}
+  storage.inventories_to_balance = {}
   InitEntityMaps()
   UpdateTechnologyState()
   init_events()
@@ -760,18 +759,18 @@ end)
 -- When mod list/versions change, reinitialize globals and scrub existing trains
 script.on_configuration_changed(function(data)
   --game.print("In on_configuration_changed!")
-  global.created_trains = global.created_trains or {}
-  global.moving_trains = global.moving_trains or {}
-  global.mu_pairs = global.mu_pairs or {}
-  global.inventories_to_balance = global.inventories_to_balance or {}
+  storage.created_trains = storage.created_trains or {}
+  storage.moving_trains = storage.moving_trains or {}
+  storage.mu_pairs = storage.mu_pairs or {}
+  storage.inventories_to_balance = storage.inventories_to_balance or {}
   InitEntityMaps()
   -- On config change, scrub the list of trains
   QueueAllTrains()
   init_events()
   
   -- Migrate by clearing old globals
-  global.trains_in_queue = nil
-  global.replacement_queue = nil
+  storage.trains_in_queue = nil
+  storage.replacement_queue = nil
 end)
 
 end
@@ -824,13 +823,13 @@ commands.add_command("mutc-debug", "Usage: mutc-debug dump|dumplog", cmd_debug)
 --                    FIND LOCAL VARIABLES THAT ARE USED GLOBALLY                 --
 --                              (Thanks to eradicator!)                           --
 ------------------------------------------------------------------------------------
--- setmetatable(_ENV,{
-  -- __newindex=function (self,key,value) --locked_global_write
-    -- error('\n\n[ER Global Lock] Forbidden global *write*:\n'
-      -- .. serpent.line{key=key or '<nil>',value=value or '<nil>'}..'\n')
-    -- end,
-  -- __index   =function (self,key) --locked_global_read
-    -- error('\n\n[ER Global Lock] Forbidden global *read*:\n'
-      -- .. serpent.line{key=key or '<nil>'}..'\n')
-    -- end ,
-  -- })
+setmetatable(_ENV,{
+  __newindex=function (self,key,value) --locked_global_write
+    error('\n\n[ER Global Lock] Forbidden global *write*:\n'
+      .. serpent.line{key=key or '<nil>',value=value or '<nil>'}..'\n')
+    end,
+  __index   =function (self,key) --locked_global_read
+    error('\n\n[ER Global Lock] Forbidden global *read*:\n'
+      .. serpent.line{key=key or '<nil>'}..'\n')
+    end ,
+  })

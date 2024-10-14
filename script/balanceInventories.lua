@@ -7,13 +7,30 @@
  *    Last item will be repeatedly swapped between inventories until it is consumed.
 --]]
 
+local function itemKey(entry)
+  return entry.name.." "..entry.quality
+end
+
+local function itemFromKey(key, count)
+  for name,quality in string.gmatch(key, "([^%s]+) ([^%s]+)") do
+    return {name=name, quality=quality, count=count}
+  end
+end
 
 function balanceInventories(inventoryOne, inventoryTwo, settings_debug)
 	if inventoryOne and inventoryTwo and inventoryOne.valid and inventoryTwo.valid then
-		local locoOneInventory = inventoryOne.get_contents()
-		local locoTwoInventory = inventoryTwo.get_contents()
-	  
+		-- Convert inventory structures to flat dictionaries for processing
+    local locoOneInventory = {}
+    for _,e in pairs(inventoryOne.get_contents()) do
+      locoOneInventory[itemKey(e)] = (locoOneInventory[itemKey(e)] or 0) + e.count
+    end
+		local locoTwoInventory = {}
+    for _,e in pairs(inventoryTwo.get_contents()) do
+      locoTwoInventory[itemKey(e)] = (locoTwoInventory[itemKey(e)] or 0) + e.count
+    end
+		
 	  -- loop for each item in locoTwo, add it to locoOne if it's not already there
+    
 		for k,v in pairs(locoTwoInventory) do
 			if not locoOneInventory[k] then
 				locoOneInventory[k] = 0
@@ -29,15 +46,19 @@ function balanceInventories(inventoryOne, inventoryTwo, settings_debug)
       local itemsToMove = math.floor((locoOneInventory[k] - locoTwoInventory[k])/2)
 			if itemsToMove > 0 then
 				-- locoOne has more items. insert up to this number in locoTwo
-				itemsToMove = inventoryTwo.insert({name=k,count=itemsToMove})
+				local item = itemFromKey(k, itemsToMove)
+        itemsToMove = inventoryTwo.insert(item)
 				if itemsToMove > 0 then  -- Can't remove zero items :D
-					inventoryOne.remove({name=k,count=itemsToMove})
+          item.count = itemsToMove
+					inventoryOne.remove(item)
 				end
 			elseif itemsToMove < 0 then
 				-- locoTwo has more items
-				itemsToMove = inventoryOne.insert({name=k,count=-1*itemsToMove})
+				local item = itemFromKey(k, -1*itemsToMove)
+        itemsToMove = inventoryOne.insert(item)
 				if itemsToMove > 0 then
-					inventoryTwo.remove({name=k,count=itemsToMove})
+          item.count = itemsToMove
+					inventoryTwo.remove(item)
 				end
 			end
 		end

@@ -13,9 +13,9 @@ local function isRelevantModule(name)
 		moduleTypes = {}
 		game.print("MUTC is Caching RET module types")
 		-- Cache table of allowable modules
-		if game.technology_prototypes["ret-modular-locomotives"] then
-			for _,effect in pairs(game.technology_prototypes["ret-modular-locomotives"].effects) do
-				if effect.type == "unlock-recipe" and game.equipment_prototypes[effect.recipe] then
+		if prototypes.technology["ret-modular-locomotives"] then
+			for _,effect in pairs(prototypes.technology["ret-modular-locomotives"].effects) do
+				if effect.type == "unlock-recipe" and prototypes.equipment[effect.recipe] then
 					moduleTypes[effect.recipe] = true
 					--game.print("Cached module type " .. effect.recipe)
 				end

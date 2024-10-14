@@ -65,14 +65,14 @@ function processTrainBasic(t)
 			if loco1_here then
 				-- Loco1 is a front_mover in this unit
 				local loco1_done = false
-				if global.downgrade_pairs[loco1.name] then
+				if storage.downgrade_pairs[loco1.name] then
 					local mu_name = loco1.name
-					local std_name = global.downgrade_pairs[mu_name]
-					local alt_mu_name = global.alt_pairs[mu_name]
-          local alt_std_name = global.alt_pairs[std_name]
+					local std_name = storage.downgrade_pairs[mu_name]
+					local alt_mu_name = storage.alt_pairs[mu_name]
+          local alt_std_name = storage.alt_pairs[std_name]
 			    -- Found an MU, look for its twin as an MU first
 					for _,loco2 in pairs(back_movers) do
-						if loco2.name == mu_name or loco2.name == alt_mu_name then
+						if (loco2.name == mu_name or loco2.name == alt_mu_name) and (loco2.quality == loco1.quality) then
 							-- Potential twin, make sure it's in this unit
 							local loco2_here = false
 							for _,loco2a in pairs(unit) do
@@ -103,7 +103,7 @@ function processTrainBasic(t)
 					if not loco1_done then
 						-- Didn't find an MU twin, look for a normal twin to this MU so we can upgrade it
 						for _,loco2 in pairs(back_movers) do
-							if loco2.name == std_name or loco2.name == alt_std_name then
+							if (loco2.name == std_name or loco2.name == alt_std_name) and (loco2.quality == loco1.quality) then
 								-- Potential twin, make sure it's in this unit
 								local loco2_here = false
 								for _,loco2a in pairs(unit) do
@@ -124,7 +124,7 @@ function processTrainBasic(t)
 										-- Found a normal twin, upgrade loco2
 										--game.print("Adding pair [" .. loco1.backer_name .. ", " .. loco2.backer_name .. "]")
 										table.insert(found_pairs,{loco1,loco2})
-										table.insert(upgrade_locos,{loco2,global.upgrade_pairs[loco2.name]})
+										table.insert(upgrade_locos,{loco2,storage.upgrade_pairs[loco2.name]})
 										loco1_done = true
 										break
 									end
@@ -140,14 +140,14 @@ function processTrainBasic(t)
 						end
 					end
 					
-				elseif global.upgrade_pairs[loco1.name] then
+				elseif storage.upgrade_pairs[loco1.name] then
 					local std_name = loco1.name
-					local mu_name = global.upgrade_pairs[std_name]
-					local alt_mu_name = global.alt_pairs[mu_name]
-          local alt_std_name = global.alt_pairs[std_name]
+					local mu_name = storage.upgrade_pairs[std_name]
+					local alt_mu_name = storage.alt_pairs[mu_name]
+          local alt_std_name = storage.alt_pairs[std_name]
 			    -- Found a normal, look for its twin as an MU first
 					for _,loco2 in pairs(back_movers) do
-						if loco2.name == mu_name or loco2.name == alt_mu_name then
+						if (loco2.name == mu_name or loco2.name == alt_mu_name) and (loco2.quality == loco1.quality) then
 							-- Potential twin, make sure it's in this unit
 							local loco2_here = false
 							for _,loco2a in pairs(unit) do
@@ -179,7 +179,7 @@ function processTrainBasic(t)
 					if not loco1_done then
 						-- Didn't find an MU twin, look for a normal twin to this MU so we can upgrade it
 						for _,loco2 in pairs(back_movers) do
-							if loco2.name == std_name then
+							if (loco2.name == std_name or loco2.name == alt_std_name) and (loco2.quality == loco1.quality) then
 								-- Potential twin, make sure it's in this unit
 								local loco2_here = false
 								for _,loco2a in pairs(unit) do
@@ -202,7 +202,7 @@ function processTrainBasic(t)
 										--game.print("Adding pair [" .. loco1.backer_name .. ", " .. loco2.backer_name .. "]")
 										table.insert(found_pairs,{loco1,loco2})
 										table.insert(upgrade_locos,{loco1,mu_name})
-										table.insert(upgrade_locos,{loco2,global.upgrade_pairs[loco2.name]})
+										table.insert(upgrade_locos,{loco2,storage.upgrade_pairs[loco2.name]})
 										loco1_done = true
 										break
 									end
@@ -234,10 +234,10 @@ function processTrainBasic(t)
 			end
 		end
 		if loco2_free then
-			if global.downgrade_pairs[loco2.name] then
+			if storage.downgrade_pairs[loco2.name] then
 				-- Found an unpaired MU, downgrade it
 				--game.print("Found back straggler " .. loco2.backer_name)
-				table.insert(upgrade_locos,{loco2, global.downgrade_pairs[loco2.name]})
+				table.insert(upgrade_locos,{loco2, storage.downgrade_pairs[loco2.name]})
 				break
 			end
 			-- record straggler

@@ -20,6 +20,7 @@ function createMuLocoItemPrototype(name,newName)
 	local newItem = flib.copy_prototype(item, newName)
 	
 	-- Make the new icon
+  newItem.icon = nil
 	newItem.icons = flib.create_icons(newItem,icon_overlay) or icon_overlay
 	
 	-- Fix the localization
@@ -27,8 +28,7 @@ function createMuLocoItemPrototype(name,newName)
 	newItem.localised_description = {'template.mu-item-description',{'entity-name.'..name}}
   
   -- Make the item hidden
-  newItem.flags = newItem.flags or {}
-  table.insert(newItem.flags, "hidden")
+  newItem.hidden = true
 	
 	return newItem
 end
