@@ -285,21 +285,21 @@ end
 -- Use this to replace locomotives at a safe (stopped) time.
 local function OnTrainChangedState(event) 
   local id = event.train.id
-      
-  --game.print("Train ".. id .. " In OnTrainChangedState!")
+  
+  --game.print("Train ".. id .. " In OnTrainChangedState ("..tostring(event.train.state)..")")
   -- Event contains train, old_train_state
   -- If this train is queued for replacement, check state and maybe process now
   if storage.moving_trains[id] then
-    local t = event.train
+    local train = event.train
     -- We are waitng to process it, check everything!
-    if t and t.valid then
+    if train and train.valid then
       -- Check if this train is in a safe state
-      if isTrainStopped(t) then
+      if isTrainStopped(train) then
         -- Immediately replace these locomotives
         --game.print("Train " .. id .. " being processed.")
         if train_queue_semaphore == false then
           train_queue_semaphore = true
-          ProcessTrain(t)
+          ProcessTrain(train)
           storage.moving_trains[id] = nil
           train_queue_semaphore = false
         elseif (settings_debug ~= "none") then
@@ -367,19 +367,19 @@ local function ProcessTrainQueue()
     if storage.created_trains then
       --game.print("ProcessTrainQueue has a train in the queue")
       -- Keep looping until we discard all the invalid intermediate trains
-      while next(storage.created_trains) do
-        local t = table.remove(storage.created_trains,1)
-        if t and t.valid then
+      for k,train in pairs(storage.created_trains) do
+        storage.created_trains[k] = nil
+        if train.valid then
           -- Check if this train is in a safe state
-          if isTrainStopped(t) then
+          if isTrainStopped(train) then
             -- Immediately replace these locomotives
-            --game.print("Train " .. id .. " being processed.")
-            ProcessTrain(t)
+            --game.print("["..tostring(game.tick).."] ".."Train " .. train.id .. " being processed: "..serpent.line(train.carriages))
+            ProcessTrain(train)
             -- Don't process any more trains this tick
             break
           else
             -- Flag this train to be processed on a ChangedState event
-            storage.moving_trains[t.id] = t
+            storage.moving_trains[train.id] = train
             --game.print("Train " .. id .. " still moving.")
           end
         end
@@ -427,7 +427,7 @@ end
 local function OnTrainCreated(event)
   -- Event contains train, old_train_id_1, old_train_id_2
   local id = event.train.id
-  --game.print("Train "..id.." In OnTrainCreated!")
+  --game.print("["..tostring(game.tick).."] ".."Train "..id.." In OnTrainCreated: "..serpent.line(event.train.carriages))
 
   -- Add this train to the train processing list, wait for it to stop
   table.insert(storage.created_trains, event.train)
@@ -461,9 +461,9 @@ end
 --== ON_GUI_CLOSED and ON_PLAYER_FAST_TRANSFERRED ==--
 -- Events trigger when player changes module contents of a modular locomotive
 local function OnModuleChanged(event)
-  local e = event.entity
-  if e and e.valid and e.type=="locomotive" then
-    table.insert(storage.created_trains, e.train)
+  local entity = event.entity
+  if entity and entity.valid and entity.type=="locomotive" then
+    table.insert(storage.created_trains, entity.train)
     script.on_event(defines.events.on_tick, OnTick)
   end
 end
@@ -561,9 +561,9 @@ end
 --== ON_PLAYER_PIPETTE ==--
 -- Fires when player presses 'Q'.  We need to sneakily grab the correct item from inventory if it exists,
 --  or sneakily give the correct item in cheat mode.
-local function OnPlayerPipette(event)
-  blueprintLib.mapPipette(event,storage.downgrade_pairs)
-end
+-- local function OnPlayerPipette(event)
+  -- blueprintLib.mapPipette(event,storage.downgrade_pairs)
+-- end
 
 
 --== ON_PICKED_UP_ITEM ==--
@@ -679,7 +679,7 @@ local function init_events()
 
   -- Subscribe to Blueprint activity
   script.on_event({defines.events.on_player_setup_blueprint,defines.events.on_player_configured_blueprint}, OnPlayerSetupBlueprint)
-  script.on_event(defines.events.on_player_pipette, OnPlayerPipette)
+  --script.on_event(defines.events.on_player_pipette, OnPlayerPipette)
   
   -- Subscribe to Technology activity
   script.on_event(defines.events.on_research_finished, OnResearchFinished)

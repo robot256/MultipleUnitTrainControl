@@ -15,6 +15,11 @@ function createMuLocoEntityPrototype(name, newName, power_multiplier)
   -- Change name of prototype
   loco.name = newName
   
+  loco.hidden = true
+  
+  -- Make it so bots can revive ghosts with the normal item and pipette works like magic
+  loco.placeable_by = loco.placeable_by or {item=name, count=1}
+  
   -- Make it so a normal locomotive can be pasted on this blueprint, doesn't really work?
   loco.additional_pastable_entities = {name}
   
