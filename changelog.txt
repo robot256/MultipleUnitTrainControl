@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.0.1
+Date: 2024-10-31
+  Bugfixes:
+    - Fixed crash when pipetting by using built-in pipette function.
+  Changes:
+    - Updated translations from Crowdin.
+---------------------------------------------------------------------------------------------------
 Version: 1.0.0
 Date: 2024-10-11
   Features:

@@ -20,9 +20,6 @@ function createMuLocoEntityPrototype(name, newName, power_multiplier)
   -- Make it so bots can revive ghosts with the normal item and pipette works like magic
   loco.placeable_by = loco.placeable_by or {item=name, count=1}
   
-  -- Make it so a normal locomotive can be pasted on this blueprint, doesn't really work?
-  loco.additional_pastable_entities = {name}
-  
   -- Change the power level (string contains suffix "kW"). This also increases fuel consumption.
   loco.max_power = multiply_energy_value(loco.max_power, power_multiplier)
   

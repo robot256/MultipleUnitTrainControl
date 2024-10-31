@@ -558,14 +558,6 @@ local function OnPlayerSetupBlueprint(event)
 end
 
 
---== ON_PLAYER_PIPETTE ==--
--- Fires when player presses 'Q'.  We need to sneakily grab the correct item from inventory if it exists,
---  or sneakily give the correct item in cheat mode.
--- local function OnPlayerPipette(event)
-  -- blueprintLib.mapPipette(event,storage.downgrade_pairs)
--- end
-
-
 --== ON_PICKED_UP_ITEM ==--
 -- When player picks up an item, change -mu to normal loco items.
 local function OnPickedUpItem(event)
