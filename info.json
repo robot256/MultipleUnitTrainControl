@@ -1,6 +1,6 @@
 {
   "name": "MultipleUnitTrainControl",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "factorio_version": "2.0",
   "title": "Multiple Unit Train Control",
   "author": "robot256",
@@ -25,7 +25,9 @@
     "(?)fluidTrains",
     "(?)electric-vehicles-reborn >= 0.1.2",
     "(?)se-space-trains",
-	"(?)ElectricTrains",
+    "(?)ElectricTrains",
+    "(?)kry-vehicle-grids",
+    "(?)electric-trains",
     "!Noxys_Multidirectional_Trains"
   ]
 }

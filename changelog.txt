@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.0.2
+Date: 2024-11-22
+  Bugfixes:
+    - Potentially fixed compatability issue with kry-vehicle-grids and electric-trains by adding dependencies.
+    - Fixed a crash when running the "/mutc-debug dump" console command.
+  Changes:
+    - Updated translations from Crowdin.
+---------------------------------------------------------------------------------------------------
 Version: 1.0.1
 Date: 2024-10-31
   Bugfixes:
