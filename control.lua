@@ -799,11 +799,11 @@ end
 function cmd_debug(params)
   local cmd = params.parameter
   if cmd == "dump" then
-    for v, data in pairs(global) do
+    for v, data in pairs(storage) do
       print_game(v, ": ", data)
     end
   elseif cmd == "dumplog" then
-    for v, data in pairs(global) do
+    for v, data in pairs(storage) do
       print_file(v, ": ", data)
     end
     print_game("Dump written to log file")
