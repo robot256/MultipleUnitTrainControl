@@ -1,6 +1,8 @@
 # MultipleUnitTrainControl
 Factorio mod written in Lua.  Lets locomotives provide backwards force in automatic if they are in a bidirectional pair.
 
+[Please use Crowdin to contribute translations!](https://crowdin.com/project/factorio-mods-localization)
+
 
 - Type: Mod
 - Name: Multiple Unit Train Control
