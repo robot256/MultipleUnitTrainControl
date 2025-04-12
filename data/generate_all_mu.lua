@@ -27,6 +27,8 @@ local blacklist = {
 -- Railway Motor Cars "personal vehicles"
   "railway-motor-car-train",
   "railway-motor-car-nuclear-train",
+-- Steam Locomotive Redux (and Redux Redux) dummy entity
+  "rtc-steam-locomotive-placement-entity",
 }
 
 local yuoki_blacklist = {
