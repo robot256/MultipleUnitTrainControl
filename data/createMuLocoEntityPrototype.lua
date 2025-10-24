@@ -17,6 +17,8 @@ function createMuLocoEntityPrototype(name, newName, power_multiplier)
   
   loco.hidden = true
   
+  loco.factoriopedia_alternative = name
+  
   -- Make it so bots can revive ghosts with the normal item and pipette works like magic
   loco.placeable_by = loco.placeable_by or {item=name, count=1}
   
