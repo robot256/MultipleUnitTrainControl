@@ -7,17 +7,22 @@
 --]]
 
 
-function createMuLocoEntityPrototype(name, newName, power_multiplier)
+function createMuLocoEntityPrototype(name, newName, newIcons, power_multiplier)
   -- Copy source locomotive prototype
   local oldLoco = data.raw["locomotive"][name]
   local loco = table.deepcopy(oldLoco)
   
   -- Change name of prototype
   loco.name = newName
-  
-  loco.hidden = true
+  loco.icon = nil
+  loco.icons = newIcons
+  --loco.hidden = true
   
   loco.factoriopedia_alternative = name
+  loco.deconstruction_alternative = name
+  loco.fast_replaceable_group = oldLoco.fast_replaceable_group or name
+  loco.custom_tooltip_fields = loco.custom_tooltip_fields or {}
+  table.insert(loco.custom_tooltip_fields, {name="Base power", value=oldLoco.max_power})
   
   -- Make it so bots can revive ghosts with the normal item and pipette works like magic
   loco.placeable_by = loco.placeable_by or {item=name, count=1}

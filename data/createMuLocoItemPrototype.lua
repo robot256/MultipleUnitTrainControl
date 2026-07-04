@@ -16,20 +16,20 @@ function createMuLocoItemPrototype(name,newName)
     log("Can't find item prototype for \""..name.."\"")
     return nil
   end
-	-- Copy source locomotive prototype
-	local newItem = flib.copy_prototype(item, newName)
-	
-	-- Make the new icon
+  -- Copy source locomotive prototype
+  local newItem = flib.copy_prototype(item, newName)
+  
+  -- Make the new icon
+  newItem.icons = flib.create_icons(newItem,icon_overlay) or icon_overlay
   newItem.icon = nil
-	newItem.icons = flib.create_icons(newItem,icon_overlay) or icon_overlay
-	
-	-- Fix the localization
-	newItem.localised_name = {'template.mu-name',{'entity-name.'..name}}
-	newItem.localised_description = {'template.mu-item-description',{'entity-name.'..name}}
+  
+  -- Fix the localization
+  newItem.localised_name = {'template.mu-name',{'entity-name.'..name}}
+  newItem.localised_description = {'template.mu-item-description',{'entity-name.'..name}}
   
   -- Make the item hidden
   newItem.hidden = true
-	
-	return newItem
+  
+  return newItem
 end
 return createMuLocoItemPrototype

@@ -40,7 +40,7 @@ function createMuLoco(arg)
   local mu_item = createMuLocoItemPrototype(oldName, newName)
   if mu_item then
     data:extend{ mu_item,
-      createMuLocoEntityPrototype(oldName, newName, power_multiplier),
+      createMuLocoEntityPrototype(oldName, newName, mu_item.icons, power_multiplier),
       createMuLocoRecipePrototype(oldName, newName, mu_fuel_item_name)
     }
     table.insert(data.raw.technology["multiple-unit-train-control-locomotives"].effects, {type = "unlock-recipe", recipe = newName})

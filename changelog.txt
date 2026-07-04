@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.0
+Date: 2026-07-04
+  Changes:
+    - Updated for Factorio 2.1 with minimal changes (major refactor is planned).
+    - MU Locomotives can be selected by the deconstruction planner when configured for the base locomotive.
+    - MU Locomotives can be upgraded manually and by upgrade-planner (when 'Show all items in selection lists' is enabled). Still some issues with this.
+---------------------------------------------------------------------------------------------------
 Version: 1.0.5
 Date: 2026-04-04
   Changes:
