@@ -72,6 +72,11 @@ local function CallRemoteInterface()
   
 end
 
+local has_PlanetsLib = script.active_mods["PlanetsLib"]
+local entity_variants_list
+if has_PlanetsLib then
+  entity_variants_list = prototypes.mod_data.Planetslib.data.entity_variants_list
+end
 -- Set up the mapping between normal and MU locomotives
 -- Extract from the game prototypes list what MU locomotives are enabled
 local function InitEntityMaps()
@@ -84,11 +89,20 @@ local function InitEntityMaps()
   for _,effect in pairs(prototypes.technology["multiple-unit-train-control-locomotives"].effects) do
     if effect.type == "unlock-recipe" then
       local recipe = prototypes.recipe[effect.recipe]
-      local std = recipe.products[1].name
-      local mu = recipe.ingredients[1].name
+      local std = recipe.products[1].name --standard locomotive
+      local mu = recipe.ingredients[1].name --MU locomotive
       storage.upgrade_pairs[std] = mu
       storage.downgrade_pairs[mu] = std
-      
+      if entity_variants_list then --Add PlanetsLib entity variants to list of valid pairs
+        if entity_variants_list[std] then
+          for i,variant in ipairs(entity_variants_list[std]) do
+            storage.upgrade_pairs[variant] = entity_variants_list[mu][i]
+            storage.downgrade_pairs[entity_variants_list[mu][i]] = variant
+          
+          end
+        end
+        
+      end
       ------------
       -- RET Compatibility for this Loco
       local mod_name = ""
