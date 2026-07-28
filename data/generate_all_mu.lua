@@ -4,6 +4,7 @@
  * Description: Procedurally generate MU Locomotives for any remaining locos that we have not addressed
 --]]
 
+local createMuLoco = require("data.createMuLoco")
 
 local blacklist = {
 -- Laser Tank (MU is broken when Electric Vehicles Lib: Reborn is *not* installed)
@@ -51,7 +52,7 @@ local kazuya_blacklist = {
   "battery-locomotive-mk3"
 }
 
--- Convert blacklist to dictionary
+-- Convert blacklist to dictionary map
 local mu_blacklist = {}
 for _,name in pairs(blacklist) do
   mu_blacklist[name] = true
@@ -74,13 +75,37 @@ if mods["BatteryLocomotive"] then
   end
 end
 
--- Add dummy fuel item for Degraine's Electric Locomotive if present (code provided by Degraine for compatibility)
+-----------------------------------------------------
+-- Create special case compatibility locomotives
+
+-- Degraine's Electric Train uses a dummy fuel item
 if mods["ElectricTrains"] then
-  local dummy_fuel = flib.copy_prototype(data.raw["item"]["deg-electric-locomotive-fuel-dummy"],"deg-electric-locomotive-fuel-dummy-mu")
-  dummy_fuel.fuel_value = multiply_energy_value(dummy_fuel.fuel_value, 2)
-  data:extend{dummy_fuel}
+  if not mu_blacklist["deg-electric-locomotive"] then
+    log("Creating MU version of ret-electric-locomotive")
+    createMuLoco{std="deg-electric-locomotive",mu="deg-electric-locomotive-mu",fuel_item="deg-electric-locomotive-fuel-dummy",hasDescription=true}
+  end
 end
 
+-- Realistic Electric Trains use a dummy fuel item
+if mods["Realistic_Electric_Trains"] then
+	-- Generate an MU version of the Electric, Electric Mk2, and Electric Modular Locomotives
+  if not mu_blacklist["ret-electric-locomotive"] then
+    log("Creating MU version of ret-electric-locomotive")
+    createMuLoco{std="ret-electric-locomotive",mu="ret-electric-locomotive-mu",fuel_item="ret-dummy-fuel-1",hasDescription=true}
+  end
+  if not mu_blacklist["ret-electric-locomotive-mk2"] then
+    log("Creating MU version of ret-electric-locomotive-mk2")
+    createMuLoco{std="ret-electric-locomotive-mk2",mu="ret-electric-locomotive-mk2-mu",fuel_item="ret-dummy-fuel-2",hasDescription=true}
+	end
+  if not mu_blacklist["ret-modular-locomotive"] then
+    log("Creating MU version of ret-modular-locomotive")
+    createMuLoco{std="ret-modular-locomotive",mu="ret-modular-locomotive-mu",hasDescription=true}
+  end
+end
+-----------------------------------------------------
+
+-----------------------------------------------------
+-- Procedural Creation for everything else
 
 -- Make a list of locomotives to add (can't modify data.raw while iterating over it)
 local mu_make_new = {}
