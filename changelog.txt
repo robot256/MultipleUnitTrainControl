@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.1
+Date: 2026-07-28
+  Changes:
+    - Updated dependency list for 2.0/2.1 versions of FARL, Realistic Electric Trains, and Fluid Trains.
+    - Complete rewrite of the data stage to use mod-data prototypes instead of dummy recipes and technology.
+---------------------------------------------------------------------------------------------------
 Version: 1.1.0
 Date: 2026-07-04
   Changes:

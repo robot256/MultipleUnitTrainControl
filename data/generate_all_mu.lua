@@ -81,27 +81,32 @@ end
 -- Degraine's Electric Train uses a dummy fuel item
 if mods["ElectricTrains"] then
   if not mu_blacklist["deg-electric-locomotive"] then
-    log("Creating MU version of ret-electric-locomotive")
-    createMuLoco{std="deg-electric-locomotive",mu="deg-electric-locomotive-mu",fuel_item="deg-electric-locomotive-fuel-dummy",hasDescription=true}
+    createMuLoco{std="deg-electric-locomotive",mu="deg-electric-locomotive-mu",fuel_item="deg-electric-locomotive-fuel-dummy"}
   end
 end
 
 -- Realistic Electric Trains use a dummy fuel item
-if mods["Realistic_Electric_Trains"] then
-	-- Generate an MU version of the Electric, Electric Mk2, and Electric Modular Locomotives
-  if not mu_blacklist["ret-electric-locomotive"] then
-    log("Creating MU version of ret-electric-locomotive")
-    createMuLoco{std="ret-electric-locomotive",mu="ret-electric-locomotive-mu",fuel_item="ret-dummy-fuel-1",hasDescription=true}
-  end
-  if not mu_blacklist["ret-electric-locomotive-mk2"] then
-    log("Creating MU version of ret-electric-locomotive-mk2")
-    createMuLoco{std="ret-electric-locomotive-mk2",mu="ret-electric-locomotive-mk2-mu",fuel_item="ret-dummy-fuel-2",hasDescription=true}
-	end
-  if not mu_blacklist["ret-modular-locomotive"] then
-    log("Creating MU version of ret-modular-locomotive")
-    createMuLoco{std="ret-modular-locomotive",mu="ret-modular-locomotive-mu",hasDescription=true}
+-- Generate an MU version of the Electric, Electric Mk2, and Electric Modular Locomotives
+if data.raw["locomotive"]["ret-electric-locomotive"] and not mu_blacklist["ret-electric-locomotive"] then
+  createMuLoco{std="ret-electric-locomotive",mu="ret-electric-locomotive-mu",fuel_item="ret-dummy-fuel-1"}
+end
+if data.raw["locomotive"]["ret-electric-locomotive-mk2"] and not mu_blacklist["ret-electric-locomotive-mk2"] then
+  createMuLoco{std="ret-electric-locomotive-mk2",mu="ret-electric-locomotive-mk2-mu",fuel_item="ret-dummy-fuel-2"}
+end
+if data.raw["locomotive"]["ret-modular-locomotive"] and not mu_blacklist["ret-modular-locomotive"] then
+  createMuLoco{std="ret-modular-locomotive",mu="ret-modular-locomotive-mu"}
+end
+
+-- Electric Trains (space trains) has locomotive-wagon for alt-pairs
+if mods["electric-trains"] then
+  -- If either is blacklisted, don't make them here with alt_names. The non-blacklisted one will be made in the procedural loop.
+  if not mu_blacklist["electric-locomotive"] and not mu_blacklist["electric-locomotive-wagon"] then
+    createMuLoco{std="electric-locomotive", mu="electric-locomotive-mu", alt_name="electric-locomotive-wagon"}
+    createMuLoco{std="electric-locomotive-wagon", mu="electric-locomotive-wagon-mu", alt_name="electric-locomotive"}
   end
 end
+
+
 -----------------------------------------------------
 
 -----------------------------------------------------
@@ -110,24 +115,11 @@ end
 -- Make a list of locomotives to add (can't modify data.raw while iterating over it)
 local mu_make_new = {}
 for name,loco in pairs(data.raw["locomotive"]) do
-  local make_mu = true
-  -- Check if this is a MU or if it already has a MU
-  if mu_blacklist[name] then
-    make_mu = false
-    log("Ignoring locomotive \""..name.."\"")
-  elseif string.find(name, "%-mu$") ~= nil then
-    -- ends in MU, make sure regular loco exists. If not, then the vanilla loco ended with -mu, and the new one will be -mu-mu
-    if data.raw["locomotive"][string.sub(name, 1, -4)] then
-      -- This MU has a regular loco, do nothing
-      make_mu = false
-    end
-  elseif data.raw["locomotive"][name.."-mu"] then
-    -- Already made an MU of this loco
-    make_mu = false
-  end
-  
-  if make_mu then
-    -- no MU of this loco, make a new one assuming it is basic
+  -- Make sure loco is not on the blacklist and hasn't been added already as either an STD or MU loco
+  if not (mu_blacklist[name] or 
+          data.raw["mod-data"]["mutc-locomotive-data"].data.mu_map[name] or 
+          data.raw["mod-data"]["mutc-locomotive-data"].data.std_map[name]) then
+    -- no MU of this loco yet, make a new one assuming it is basic
     table.insert(mu_make_new, name)
   end
 end
@@ -136,3 +128,6 @@ end
 for _,name in pairs(mu_make_new) do
   createMuLoco{std=name, mu=name.."-mu"}
 end
+
+
+log(serpent.block(data.raw.item["deg-electric-locomotive-fuel-dummy-mu"]))

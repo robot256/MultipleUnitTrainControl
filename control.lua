@@ -44,16 +44,6 @@ local train_queue_semaphore = false
 
 -- Interacts with other mods based on what MU locomotives were created
 local function CallRemoteInterface()
-
-  -- Make sure FuelTrainStop plays nice with magu's ElectricTrain in the MU versions
-  if remote.interfaces["FuelTrainStop"] then
-    for std,mu in pairs(storage.upgrade_pairs) do
-      if std:match("^et%-electric%-locomotive%-%d$") or 
-         std:match("^fusion%-locomotive%-%d$") then
-        remote.call("FuelTrainStop", "exclude_from_fuel_schedule", mu)
-      end
-    end
-  end
   
   -- Add MU versions of Fluid Trains locomotives to the mod's update list
   if remote.interfaces["fluidTrains_hook"] then
@@ -70,6 +60,17 @@ local function CallRemoteInterface()
     remote.call("electrictrains", "register", "deg-electric-locomotive-mu", "deg-electric-locomotive-fuel-dummy-mu")
   end
   
+  if remote.interfaces["realistic_electric_trains"] then
+    for std,mu in pairs(storage.upgrade_pairs) do
+      -- Check if this is an RET loco, and what fuel the std version uses
+      local fuel_item = remote.call("realistic_electric_trains", "get_locomotive_fuel", std)
+      local fuel_item_mu = prototypes.mod_data["mutc-locomotive-data"].data.std_map[std].fuel_item
+      if fuel_item and fuel_item_mu then
+        remote.call("realistic_electric_trains", "register_locomotive_type", mu, fuel_item_mu or fuel_item)
+      end
+    end
+  end
+  
 end
 
 -- Set up the mapping between normal and MU locomotives
@@ -81,44 +82,23 @@ local function InitEntityMaps()
   storage.alt_pairs = {}        -- Maps MU and STD names to ALT_MU and ALT_STD names respectively
   
   -- Retrieve entity names from dummy technology, store in global variable
-  for _,effect in pairs(prototypes.technology["multiple-unit-train-control-locomotives"].effects) do
-    if effect.type == "unlock-recipe" then
-      local recipe = prototypes.recipe[effect.recipe]
-      local std = recipe.products[1].name
-      local mu = recipe.ingredients[1].name
-      storage.upgrade_pairs[std] = mu
-      storage.downgrade_pairs[mu] = std
-      
-      ------------
-      -- RET Compatibility for this Loco
-      local mod_name = ""
-      if remote.interfaces["realistic_electric_trains"] then
-        -- Check if this is an RET loco, and what fuel the std version uses
-        local fuel_item = remote.call("realistic_electric_trains", "get_locomotive_fuel", std)
-        if fuel_item then
-          -- Add the MU version to RET's global map. Use custom fuel item if specified.
-          if recipe.ingredients[2] then fuel_item = recipe.ingredients[2].name end
-          remote.call("realistic_electric_trains", "register_locomotive_type", mu, fuel_item)
-          mod_name = "Realistic Electric Trains "
-        end
-      end
-      if settings_debug == "info" then
-        game.print({"debug-message.mu-mapping-message",mod_name,prototypes.entity[std].localised_name,prototypes.entity[mu].localised_name})
-      elseif settings_debug == "debug" then
-        game.print({"debug-message.mu-mapping-message",mod_name,std,mu})
-      end
-      
-      
+  for std,entry in pairs(prototypes.mod_data["mutc-locomotive-data"].data.std_map) do
+    local mu = entry.mu_name
+    
+    -- Add basic map
+    storage.upgrade_pairs[std] = mu
+    storage.downgrade_pairs[mu] = std
+    
+    -- Add alt maps
+    if entry.alt_name then
+      storage.alt_pairs[std] = entry.alt_name
+      storage.alt_pairs[mu] = prototypes.mod_data["mutc-locomotive-data"].data.std_map[entry.alt_name].mu_name
     end
-  end
-  
-  -- Electric Trains (formerly Space Trains) compatibility for "wagon loco" alternate
-  if script.active_mods["electric-trains"] then
-    if storage.upgrade_pairs["electric-locomotive"] and storage.upgrade_pairs["electric-locomotive-wagon"] then
-      storage.alt_pairs["electric-locomotive"] = "electric-locomotive-wagon"
-      storage.alt_pairs["electric-locomotive-wagon"] = "electric-locomotive"
-      storage.alt_pairs["electric-locomotive-mu"] = "electric-locomotive-wagon-mu"
-      storage.alt_pairs["electric-locomotive-wagon-mu"] = "electric-locomotive-mu"
+    
+    if settings_debug == "info" then
+      game.print({"debug-message.mu-mapping-message","",prototypes.entity[std].localised_name,prototypes.entity[mu].localised_name})
+    elseif settings_debug == "debug" then
+      game.print({"debug-message.mu-mapping-message","",std,mu})
     end
   end
   

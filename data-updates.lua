@@ -4,5 +4,5 @@
  * Description: Add the MU locomotives
 --]]
 
--- Generate procedurally
+-- Generate procedurally, including compatibility exceptions
 require ("data.generate_all_mu")

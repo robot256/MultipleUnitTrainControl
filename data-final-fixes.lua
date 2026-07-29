@@ -4,24 +4,16 @@
  * Description: Update fuel categories and grids for MU locomotives to match the originals
 --]]
 
-for name,loco in pairs(data.raw["locomotive"]) do
-  -- Check if this is a MU or if it already has a MU
-  if string.find(name, "%-mu$") ~= nil then
-    -- ends in MU, make sure regular loco exists (without the last -mu).
-    local basename = string.sub(name, 1, -4)
-    if data.raw["locomotive"][basename] then
-    
-      -- Update fuel category
-      if data.raw.locomotive[basename].burner then
-        -- This MU has a regular loco with burner, copy fuel categories to MU version
-        data.raw.locomotive[name].burner.fuel_category = data.raw.locomotive[basename].burner.fuel_category
-        -- Link the fuel_categories table so it gets updated here even if the base changes later, no dependencies required!
-        data.raw.locomotive[name].burner.fuel_categories = data.raw.locomotive[basename].burner.fuel_categories
-      end
-    
-      -- Update grid assignment (or set to nil)
-      data.raw.locomotive[name].equipment_grid = data.raw.locomotive[basename].equipment_grid
-    end
-    
+for mu_name,std_name in pairs(data.raw["mod-data"]["mutc-locomotive-data"].data.mu_map) do
+  -- Update fuel category
+  if data.raw.locomotive[std_name].burner then
+    -- This MU has a regular loco with burner, copy fuel categories to MU version
+    -- Link the fuel_categories table so it gets updated here even if the base changes later, no dependencies required!
+    data.raw.locomotive[mu_name].burner.fuel_categories = data.raw.locomotive[std_name].burner.fuel_categories
   end
+
+  -- Update grid assignment (or set to nil) to match base loco
+  data.raw.locomotive[mu_name].equipment_grid = data.raw.locomotive[std_name].equipment_grid
 end
+
+log(serpent.block(data.raw.item["deg-electric-locomotive-fuel-dummy"]))

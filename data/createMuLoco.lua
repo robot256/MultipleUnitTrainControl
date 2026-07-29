@@ -54,14 +54,16 @@ end
 
 local function createMuDummyFuelItem(oldFuel, newFuel, power_multiplier)
 	power_multiplier = power_multiplier or 2
-	
-	-- Generate dummy fuel items for base locos, because they are sized based on power consumption and we don't balance burner heat between pairs
-	local dummy_fuel_mu = flib.copy_prototype(data.raw["item"][oldFuel],newFuel)
-	
-	-- Change the power level (string contains suffix "kW"). This also increases fuel consumption.
+  
+  local old_fuel = data.raw["item"][oldFuel]
+  
+  -- Generate dummy fuel items for base locos, because they are sized based on power consumption and we don't balance burner heat between pairs
+	local dummy_fuel_mu = flib.copy_prototype(old_fuel,newFuel)
+  
+  -- Change the fuel energy content (string contains suffix "xJ").
 	dummy_fuel_mu.fuel_value = multiply_energy_value(dummy_fuel_mu.fuel_value, power_multiplier)
 	
-	return dummy_fuel_mu
+  return dummy_fuel_mu
 end
 
 local function createMuLocoEntityPrototype(name, newName, newIcons, power_multiplier)
@@ -135,7 +137,7 @@ local function createMuLoco(arg)
 	local mu_fuel_item_name
   local mu_fuel_item
 	if fuel_item then
-		local mu_fuel_item = createMuDummyFuelItem(fuel_item, fuel_item.."-mu", power_multiplier)
+    mu_fuel_item = createMuDummyFuelItem(fuel_item, fuel_item.."-mu", power_multiplier)
 		mu_fuel_item_name = mu_fuel_item.name
 	end
 	
@@ -144,7 +146,12 @@ local function createMuLoco(arg)
   local mu_entity = mu_item and createMuLocoEntityPrototype(oldName, newName, mu_item.icons, power_multiplier)
   if mu_item and mu_entity then
     data:extend{ mu_item, mu_entity, mu_fuel_item }
-    data.raw["mod-data"]["mutc-locomotive-data"].data.mu_map[oldName] = {mu_name = newName, alt_names = arg.alt_names, fuel_item = mu_fuel_item_name}
+    data.raw["mod-data"]["mutc-locomotive-data"].data.std_map[oldName] = {mu_name = newName, alt_names = arg.alt_names, fuel_item = mu_fuel_item_name}
+    data.raw["mod-data"]["mutc-locomotive-data"].data.mu_map[newName] = oldName
+    
+    if mu_fuel_item then
+      log("Created fuel item\n"..serpent.block(mu_fuel_item))
+    end
   end
 end
 
