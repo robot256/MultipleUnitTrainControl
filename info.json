@@ -30,6 +30,8 @@
     "(?)kry-vehicle-grids",
     "(?)electric-trains",
     "(?)pypostprocessing",
+    "(?)auto-train-refuel",
+    "(?)LogisticTrainNetwork",
     "!Noxys_Multidirectional_Trains"
   ]
 }
