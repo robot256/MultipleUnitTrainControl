@@ -65,7 +65,7 @@ local function CallRemoteInterface()
       -- Check if this is an RET loco, and what fuel the std version uses
       local fuel_item = remote.call("realistic_electric_trains", "get_locomotive_fuel", std)
       local fuel_item_mu = prototypes.mod_data["mutc-locomotive-data"].data.std_map[std].fuel_item
-      if fuel_item and fuel_item_mu then
+      if fuel_item then
         remote.call("realistic_electric_trains", "register_locomotive_type", mu, fuel_item_mu or fuel_item)
       end
     end

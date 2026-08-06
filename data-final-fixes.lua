@@ -15,5 +15,3 @@ for mu_name,std_name in pairs(data.raw["mod-data"]["mutc-locomotive-data"].data.
   -- Update grid assignment (or set to nil) to match base loco
   data.raw.locomotive[mu_name].equipment_grid = data.raw.locomotive[std_name].equipment_grid
 end
-
-log(serpent.block(data.raw.item["deg-electric-locomotive-fuel-dummy"]))

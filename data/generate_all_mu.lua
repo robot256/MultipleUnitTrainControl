@@ -128,6 +128,3 @@ end
 for _,name in pairs(mu_make_new) do
   createMuLoco{std=name, mu=name.."-mu"}
 end
-
-
-log(serpent.block(data.raw.item["deg-electric-locomotive-fuel-dummy-mu"]))
