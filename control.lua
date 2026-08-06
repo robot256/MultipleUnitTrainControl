@@ -85,27 +85,86 @@ local function CallRemoteInterface()
   
 end
 
+
 -- Set up the mapping between normal and MU locomotives
 -- Extract from the game prototypes list what MU locomotives are enabled
 local function InitEntityMaps()
+
+  local data_std_map = prototypes.mod_data["mutc-locomotive-data"].data.std_map
 
   storage.upgrade_pairs = {}    -- Maps STD names to MU names
   storage.downgrade_pairs = {}  -- Maps MU names to STD names
   storage.alt_pairs = {}        -- Maps MU and STD names to ALT_MU and ALT_STD names respectively
   
-  -- Retrieve entity names from dummy technology, store in global variable
-  for std,entry in pairs(prototypes.mod_data["mutc-locomotive-data"].data.std_map) do
+  ----- PlanetsLib Compatibility -----
+  local entity_variants_list = prototypes.mod_data.Planetslib and prototypes.mod_data.Planetslib.data.entity_variants_list
+  ----------
+  
+  -- Retrieve entity names from mod-data entry, store in global variable
+  for std,entry in pairs(data_std_map) do
     local mu = entry.mu_name
+    
+    if not (prototypes.entity[std] and prototypes.entity[std].type == "locomotive") then
+      error("Multiple Unit Train Control tried to register unknown prototype '"..std)
+    end
+    if not (prototypes.entity[mu] and prototypes.entity[mu].type == "locomotive") then
+      error("Multiple Unit Train Control tried to register unknown prototype '"..mu)
+    end
     
     -- Add basic map
     storage.upgrade_pairs[std] = mu
     storage.downgrade_pairs[mu] = std
     
-    -- Add alt maps
-    if entry.alt_name then
-      storage.alt_pairs[std] = entry.alt_name
-      storage.alt_pairs[mu] = prototypes.mod_data["mutc-locomotive-data"].data.std_map[entry.alt_name].mu_name
+    -- Add alt maps (different locomotive that also pairs with this one)
+    local alt_std = entry.alt_name
+    local alt_mu = alt_std and data_std_map[alt_std] and data_std_map[alt_std].mu_name
+    if alt_std and alt_mu then
+      if not (prototypes.entity[alt_std] and prototypes.entity[alt_std].type == "locomotive") then
+        error("Multiple Unit Train Control tried to register unknown prototype '"..alt_std)
+      end
+      if not (prototypes.entity[alt_mu] and prototypes.entity[alt_mu].type == "locomotive") then
+        error("Multiple Unit Train Control tried to register unknown prototype '"..alt_mu)
+      end
+      
+      storage.alt_pairs[std] = alt_std
+      storage.alt_pairs[mu] = alt_mu
     end
+    
+    ----- PlanetsLib Compatibility: Add PlanetsLib entity variants to list of valid pairs -----
+    if entity_variants_list then
+      if entity_variants_list[std] and entity_variants_list[mu] and table_size(entity_variants_list[std]) == table_size(entity_variants_list[mu]) then  -- Verify the mu loco also has the same variants
+        for i,std_variant in ipairs(entity_variants_list[std]) do
+          local mu_variant = entity_variants_list[mu][i]
+          if mu_variant then
+            if not (prototypes.entity[std_variant] and prototypes.entity[std_variant].type == "locomotive") then
+              error("Multiple Unit Train Control tried to register unknown prototype '"..std_variant)
+            end
+            if not (prototypes.entity[mu_variant] and prototypes.entity[mu_variant].type == "locomotive") then
+              error("Multiple Unit Train Control tried to register unknown prototype '"..mu_variant)
+            end
+            storage.upgrade_pairs[std_variant] = mu_variant
+            storage.downgrade_pairs[mu_variant] = std_variant
+            
+            -- Add alts for the variants
+            if alt_std and alt_mu and entity_variants_list[alt_std] and entity_variants_list[alt_mu] and 
+               table_size(entity_variants_list[alt_std]) == table_size(entity_variants_list[alt_mu]) then  -- Verify the alt loco also has the same variants
+              alt_std_variant = entity_variants_list[alt_std][i]
+              alt_mu_variant = entity_variants_list[alt_mu][i]
+              if not (alt_std_variant and prototypes.entity[alt_std_variant] and prototypes.entity[alt_std_variant].type == "locomotive") then
+                error("Multiple Unit Train Control tried to register unknown prototype '"..alt_std_variant)
+              end
+              if not (alt_mu_variant and prototypes.entity[alt_mu_variant] and prototypes.entity[alt_mu_variant].type == "locomotive") then
+                error("Multiple Unit Train Control tried to register unknown prototype '"..alt_mu_variant)
+              end
+            
+              storage.alt_pairs[std_variant] = alt_std_variant
+              storage.alt_pairs[mu_variant] = alt_mu_variant
+            end
+          end
+        end
+      end
+    end
+    ----------
     
     if settings_debug == "info" then
       game.print({"debug-message.mu-mapping-message","",prototypes.entity[std].localised_name,prototypes.entity[mu].localised_name})
