@@ -44,7 +44,19 @@ local train_queue_semaphore = false
 
 -- Interacts with other mods based on what MU locomotives were created
 local function CallRemoteInterface()
-  
+  -- Make sure FuelTrainStop and LTN plays nice with magu's ElectricTrain in the MU versions
+  for std,mu in pairs(storage.upgrade_pairs) do
+    if std:match("^et%-electric%-locomotive%-%d$") or 
+        std:match("^fusion%-locomotive%-%d$") then
+       if remote.interfaces["FuelTrainStop"] then
+         remote.call("FuelTrainStop", "exclude_from_fuel_schedule", mu)
+       end
+      if remote.interfaces["logistic-train-network"] and remote.interfaces["logistic-train-network"]["exclude_from_fuel_schedule"] then
+        remote.call("logistic-train-network", "exclude_from_fuel_schedule", mu)
+      end
+    end
+  end
+
   -- Add MU versions of Fluid Trains locomotives to the mod's update list
   if remote.interfaces["fluidTrains_hook"] then
     if storage.upgrade_pairs["SteamTrains-locomotive"] then
