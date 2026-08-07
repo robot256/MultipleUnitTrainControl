@@ -800,6 +800,9 @@ end)
 -- When game is loaded (from save or server), only set up events to match previous state
 script.on_load(function()
   init_events()
+
+  -- reinit other mod status
+  CallRemoteInterface()
 end)
 
 -- When game is created, initialize globals and events
