@@ -101,8 +101,8 @@ end
 if mods["electric-trains"] then
   -- If either is blacklisted, don't make them here with alt_names. The non-blacklisted one will be made in the procedural loop.
   if not mu_blacklist["electric-locomotive"] and not mu_blacklist["electric-locomotive-wagon"] then
-    createMuLoco{std="electric-locomotive", mu="electric-locomotive-mu", alt_name="electric-locomotive-wagon"}
-    createMuLoco{std="electric-locomotive-wagon", mu="electric-locomotive-wagon-mu", alt_name="electric-locomotive"}
+    createMuLoco{std="electric-locomotive", mu="electric-locomotive-mu", alt_names={"electric-locomotive-wagon"}}
+    createMuLoco{std="electric-locomotive-wagon", mu="electric-locomotive-wagon-mu", alt_names={"electric-locomotive"}}
   end
 end
 

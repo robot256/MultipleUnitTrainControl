@@ -1,10 +1,14 @@
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.1
-Date: 2026-07-28
+Date: 2026-08-06
+  Features:
+    - Added compatibility with LTN fuel stop exclude list API. (Thanks to hgschmie)
+    - Added compatibility with PlanetsLib entity variants API.
   Changes:
     - Updated dependency list for 2.0/2.1 versions of FARL, Realistic Electric Trains, and Fluid Trains.
-    - Complete rewrite of the data stage to use mod-data prototypes instead of dummy recipes and technology.
----------------------------------------------------------------------------------------------------
+    - Complete rewrite of the data stage and init code to use mod-data prototypes instead of dummy recipes and technology.
+    - Added safety checks to make sure the registered locomotive prototypes actually exist.
+ ---------------------------------------------------------------------------------------------------
 Version: 1.1.0
 Date: 2026-07-04
   Changes:

@@ -48,9 +48,9 @@ local function CallRemoteInterface()
   for std,mu in pairs(storage.upgrade_pairs) do
     if std:match("^et%-electric%-locomotive%-%d$") or 
         std:match("^fusion%-locomotive%-%d$") then
-       if remote.interfaces["FuelTrainStop"] then
-         remote.call("FuelTrainStop", "exclude_from_fuel_schedule", mu)
-       end
+      if remote.interfaces["FuelTrainStop"] then
+        remote.call("FuelTrainStop", "exclude_from_fuel_schedule", mu)
+      end
       if remote.interfaces["logistic-train-network"] and remote.interfaces["logistic-train-network"]["exclude_from_fuel_schedule"] then
         remote.call("logistic-train-network", "exclude_from_fuel_schedule", mu)
       end
@@ -79,6 +79,12 @@ local function CallRemoteInterface()
       local fuel_item_mu = prototypes.mod_data["mutc-locomotive-data"].data.std_map[std].fuel_item
       if fuel_item then
         remote.call("realistic_electric_trains", "register_locomotive_type", mu, fuel_item_mu or fuel_item)
+        if remote.interfaces["FuelTrainStop"] then
+          remote.call("FuelTrainStop", "exclude_from_fuel_schedule", mu)
+        end
+        if remote.interfaces["logistic-train-network"] and remote.interfaces["logistic-train-network"]["exclude_from_fuel_schedule"] then
+          remote.call("logistic-train-network", "exclude_from_fuel_schedule", mu)
+        end
       end
     end
   end
@@ -116,18 +122,23 @@ local function InitEntityMaps()
     storage.downgrade_pairs[mu] = std
     
     -- Add alt maps (different locomotive that also pairs with this one)
-    local alt_std = entry.alt_name
-    local alt_mu = alt_std and data_std_map[alt_std] and data_std_map[alt_std].mu_name
-    if alt_std and alt_mu then
-      if not (prototypes.entity[alt_std] and prototypes.entity[alt_std].type == "locomotive") then
-        error("Multiple Unit Train Control tried to register unknown prototype '"..alt_std)
+    if entry.alt_names then
+      for _,alt_std in pairs(entry.alt_names) do
+        local alt_mu = alt_std and data_std_map[alt_std] and data_std_map[alt_std].mu_name
+        if alt_std then log(std.." requests alt name "..alt_std..", found alt_mu="..tostring(alt_mu)) end
+        
+        if alt_std and alt_mu then
+          if not (prototypes.entity[alt_std] and prototypes.entity[alt_std].type == "locomotive") then
+            error("Multiple Unit Train Control tried to register unknown prototype '"..alt_std)
+          end
+          if not (prototypes.entity[alt_mu] and prototypes.entity[alt_mu].type == "locomotive") then
+            error("Multiple Unit Train Control tried to register unknown prototype '"..alt_mu)
+          end
+          
+          storage.alt_pairs[std] = alt_std
+          storage.alt_pairs[mu] = alt_mu
+        end
       end
-      if not (prototypes.entity[alt_mu] and prototypes.entity[alt_mu].type == "locomotive") then
-        error("Multiple Unit Train Control tried to register unknown prototype '"..alt_mu)
-      end
-      
-      storage.alt_pairs[std] = alt_std
-      storage.alt_pairs[mu] = alt_mu
     end
     
     ----- PlanetsLib Compatibility: Add PlanetsLib entity variants to list of valid pairs -----
@@ -146,19 +157,24 @@ local function InitEntityMaps()
             storage.downgrade_pairs[mu_variant] = std_variant
             
             -- Add alts for the variants
-            if alt_std and alt_mu and entity_variants_list[alt_std] and entity_variants_list[alt_mu] and 
-               table_size(entity_variants_list[alt_std]) == table_size(entity_variants_list[alt_mu]) then  -- Verify the alt loco also has the same variants
-              alt_std_variant = entity_variants_list[alt_std][i]
-              alt_mu_variant = entity_variants_list[alt_mu][i]
-              if not (alt_std_variant and prototypes.entity[alt_std_variant] and prototypes.entity[alt_std_variant].type == "locomotive") then
-                error("Multiple Unit Train Control tried to register unknown prototype '"..alt_std_variant)
+            if entry.alt_names then
+              for _,alt_std in pairs(entry.alt_names) do
+                local alt_mu = alt_std and data_std_map[alt_std] and data_std_map[alt_std].mu_name
+                if alt_std and alt_mu and entity_variants_list[alt_std] and entity_variants_list[alt_mu] and 
+                       table_size(entity_variants_list[alt_std]) == table_size(entity_variants_list[alt_mu]) then  -- Verify the alt loco also has the same variants
+                  alt_std_variant = entity_variants_list[alt_std][i]
+                  alt_mu_variant = entity_variants_list[alt_mu][i]
+                  if not (alt_std_variant and prototypes.entity[alt_std_variant] and prototypes.entity[alt_std_variant].type == "locomotive") then
+                    error("Multiple Unit Train Control tried to register unknown prototype '"..alt_std_variant)
+                  end
+                  if not (alt_mu_variant and prototypes.entity[alt_mu_variant] and prototypes.entity[alt_mu_variant].type == "locomotive") then
+                    error("Multiple Unit Train Control tried to register unknown prototype '"..alt_mu_variant)
+                  end
+                
+                  storage.alt_pairs[std_variant] = alt_std_variant
+                  storage.alt_pairs[mu_variant] = alt_mu_variant
+                end
               end
-              if not (alt_mu_variant and prototypes.entity[alt_mu_variant] and prototypes.entity[alt_mu_variant].type == "locomotive") then
-                error("Multiple Unit Train Control tried to register unknown prototype '"..alt_mu_variant)
-              end
-            
-              storage.alt_pairs[std_variant] = alt_std_variant
-              storage.alt_pairs[mu_variant] = alt_mu_variant
             end
           end
         end
